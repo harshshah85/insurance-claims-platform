@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life &amp; DI Claims Platform — Event-Driven Architecture Reference</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); padding: 64px 40px 56px; text-align: center; border-bottom: 1px solid #21262d; }
+  .hero-tag { display: inline-block; background: #e63946; color: white; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 4px; padding: 4px 12px; margin-bottom: 20px; }
+  .hero h1 { font-size: 36px; font-weight: 700; color: #ffffff; line-height: 1.2; margin-bottom: 12px; }
+  .hero h1 span { color: #a8dadc; }
+  .hero p { font-size: 16px; color: #8b949e; max-width: 640px; margin: 0 auto 28px; line-height: 1.6; }
+  .hero-meta { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; font-size: 12px; color: #8b949e; }
+  .hero-meta span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #2a9d8f; display: inline-block; }
+
+  /* CARDS GRID */
+  .grid-section { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #8b949e; margin-bottom: 24px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+
+  .card { background: #161b22; border: 1px solid #21262d; border-radius: 12px; padding: 28px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px; transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s; }
+  .card:hover { border-color: #457b9d; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .card-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .card-header { display: flex; align-items: flex-start; gap: 14px; }
+  .card-title { font-size: 16px; font-weight: 700; color: #e6edf3; line-height: 1.3; }
+  .card-subtitle { font-size: 12px; color: #8b949e; margin-top: 2px; }
+  .card-body { font-size: 13px; color: #8b949e; line-height: 1.6; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .tag { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 20px; }
+
+  /* Card accent colors */
+  .card-arch { border-top: 3px solid #e63946; }
+  .card-arch .card-icon { background: rgba(230,57,70,0.15); }
+  .card-arch:hover { border-color: #e63946; }
+
+  .card-stream { border-top: 3px solid #2a9d8f; }
+  .card-stream .card-icon { background: rgba(42,157,143,0.15); }
+  .card-stream:hover { border-color: #2a9d8f; }
+
+  .card-domain { border-top: 3px solid #457b9d; }
+  .card-domain .card-icon { background: rgba(69,123,157,0.15); }
+  .card-domain:hover { border-color: #457b9d; }
+
+  .card-decision { border-top: 3px solid #d4a017; }
+  .card-decision .card-icon { background: rgba(212,160,23,0.15); }
+  .card-decision:hover { border-color: #d4a017; }
+
+  .card-adr { border-top: 3px solid #6d3fa0; }
+  .card-adr .card-icon { background: rgba(109,63,160,0.15); }
+  .card-adr:hover { border-color: #6d3fa0; }
+
+  /* Tag colors */
+  .tag-arch { background: rgba(230,57,70,0.15); color: #e63946; }
+  .tag-stream { background: rgba(42,157,143,0.15); color: #2a9d8f; }
+  .tag-data { background: rgba(212,160,23,0.15); color: #d4a017; }
+  .tag-ml { background: rgba(109,63,160,0.15); color: #b88ee8; }
+  .tag-api { background: rgba(69,123,157,0.15); color: #7ab8d8; }
+
+  /* ARCHITECTURE OVERVIEW */
+  .overview { background: #161b22; border: 1px solid #21262d; border-radius: 12px; padding: 32px; margin: 0 24px 40px; max-width: 1052px; margin-left: auto; margin-right: auto; }
+  .overview h2 { font-size: 16px; font-weight: 700; color: #e6edf3; margin-bottom: 20px; }
+  .flow { font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace; font-size: 12px; color: #8b949e; background: #0d1117; border: 1px solid #21262d; border-radius: 8px; padding: 20px 24px; overflow-x: auto; line-height: 1.9; }
+  .flow .hl { color: #2a9d8f; }
+  .flow .hl2 { color: #e63946; }
+  .flow .hl3 { color: #d4a017; }
+  .flow .hl4 { color: #a8dadc; }
+  .flow .comment { color: #484f58; }
+
+  /* KEY DECISIONS */
+  .decisions { max-width: 1100px; margin: 0 auto; padding: 0 24px 48px; }
+  .decisions h2 { font-size: 16px; font-weight: 700; color: #e6edf3; margin-bottom: 20px; }
+  .decision-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .decision-item { background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 18px 20px; }
+  .decision-item h3 { font-size: 13px; font-weight: 700; color: #e6edf3; margin-bottom: 6px; }
+  .decision-item p { font-size: 12px; color: #8b949e; line-height: 1.6; }
+  .decision-num { font-size: 10px; font-weight: 700; color: #457b9d; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+
+  /* FOOTER */
+  footer { border-top: 1px solid #21262d; text-align: center; padding: 28px 24px; font-size: 12px; color: #484f58; }
+  footer a { color: #457b9d; text-decoration: none; }
+  footer a:hover { color: #a8dadc; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Architecture Reference</div>
+  <h1>Life &amp; Disability Income<br><span>Claims Platform</span></h1>
+  <p>End-to-end reference architecture for an event-driven Life &amp; DI claims platform — Kafka event backbone, event sourcing + CQRS, straight-through low-touch adjudication, fraud scoring, omnichannel correspondence, and controlled money movement.</p>
+  <div class="hero-meta">
+    <span><span class="dot"></span> Apache Kafka</span>
+    <span><span class="dot" style="background:#457b9d"></span> Event Sourcing + CQRS</span>
+    <span><span class="dot" style="background:#d4a017"></span> STP Decisioning</span>
+    <span><span class="dot" style="background:#e63946"></span> Fraud / SIU</span>
+    <span><span class="dot" style="background:#6d3fa0"></span> Money Movement</span>
+  </div>
+</div>
+
+<!-- DOCUMENT CARDS -->
+<div class="grid-section">
+  <div class="section-label">Reference Documents</div>
+  <div class="grid">
+
+    <!-- L1 & L2 Diagrams -->
+    <a href="Architecture-Diagrams-L1-L2.html" class="card card-arch">
+      <div class="card-header">
+        <div class="card-icon">📐</div>
+        <div>
+          <div class="card-title">L1 &amp; L2 Architecture Diagrams</div>
+          <div class="card-subtitle">System Context + Container Diagrams</div>
+        </div>
+      </div>
+      <div class="card-body">
+        C4 model diagrams showing all external actors (client, advisor, service rep, SIU, treasury), the 9 bounded contexts as containers, policy-admin CDC integration, the event-sourced backbone, and the 3-year platform roadmap.
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-arch">C4 Model</span>
+        <span class="tag tag-stream">9 Bounded Contexts</span>
+        <span class="tag tag-ml">3-Year Roadmap</span>
+        <span class="tag tag-api">Event-Sourced</span>
+      </div>
+    </a>
+
+    <!-- Event Streaming Architecture -->
+    <a href="Event-Streaming-Architecture.html" class="card card-stream">
+      <div class="card-header">
+        <div class="card-icon">🔀</div>
+        <div>
+          <div class="card-title">Event Streaming Architecture</div>
+          <div class="card-subtitle">Topic Design, Contracts &amp; Stream Topology</div>
+        </div>
+      </div>
+      <div class="card-body">
+        The Kafka backbone — 14 core topics, the 36-event domain catalog, Schema Registry + Avro evolution rules, event sourcing &amp; CQRS read models, exactly-once processing, the transactional outbox, DLQ/retry, and Kafka Streams / Flink topology.
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-stream">14 Topics</span>
+        <span class="tag tag-data">Avro Schema Registry</span>
+        <span class="tag tag-stream">EOS + Outbox</span>
+        <span class="tag tag-api">CQRS</span>
+      </div>
+    </a>
+
+    <!-- Claims Domain Model -->
+    <a href="Claims-Domain-Model.html" class="card card-domain">
+      <div class="card-header">
+        <div class="card-icon">🧩</div>
+        <div>
+          <div class="card-title">Claims Domain Model</div>
+          <div class="card-subtitle">Aggregates, Events &amp; Lifecycle State Machine</div>
+        </div>
+      </div>
+      <div class="card-body">
+        9 bounded contexts, 11 aggregates, the 36-event domain catalog, the Life (death) and DI (income) claim lifecycle state machines, party/beneficiary modeling, and the read-model projections that serve the Claims Domain APIs.
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-api">11 Aggregates</span>
+        <span class="tag tag-stream">36 Events</span>
+        <span class="tag tag-domain">State Machine</span>
+        <span class="tag tag-arch">DDD</span>
+      </div>
+    </a>
+
+    <!-- Decisioning & Fraud -->
+    <a href="Claims-Decisioning-and-Fraud.html" class="card card-decision">
+      <div class="card-header">
+        <div class="card-icon">🎯</div>
+        <div>
+          <div class="card-title">Claims Decisioning &amp; Fraud</div>
+          <div class="card-subtitle">STP Eligibility, Low-Touch Path &amp; SIU Routing</div>
+        </div>
+      </div>
+      <div class="card-body">
+        The STP eligibility score and fraud risk score formulas, the low-touch / auto-ticketing path, decision tiers, the rules-then-ML strategy, SIU referral triggers, suppression rules, and sample decision event payloads.
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-data">STP Scoring</span>
+        <span class="tag tag-ml">Fraud Risk</span>
+        <span class="tag tag-data">Low-Touch Path</span>
+        <span class="tag tag-stream">SIU Referral</span>
+      </div>
+    </a>
+
+    <!-- Security & Regulatory -->
+    <a href="Security-and-Regulatory-Compliance.html" class="card" style="border-top:3px solid #e63946;">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(230,57,70,0.15);">🔐</div>
+        <div>
+          <div class="card-title">Security &amp; Regulatory Compliance</div>
+          <div class="card-subtitle">7-Layer Security + Life/DI Regulatory Map</div>
+        </div>
+      </div>
+      <div class="card-body">
+        mTLS + Kafka SASL/SSL, field-level encryption of PII/PHI, OAuth 2.0 by consumer, STRIDE threat model, and the regulatory map — UCSPA prompt-pay, contestability, DMF/escheatment, ERISA, HIPAA/GLBA, OFAC/AML, SOX over money movement, and immutable audit.
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-arch">mTLS · OAuth 2.0</span>
+        <span class="tag tag-arch">STRIDE</span>
+        <span class="tag tag-data">UCSPA · ERISA</span>
+        <span class="tag tag-ml">HIPAA · OFAC</span>
+      </div>
+    </a>
+
+    <!-- Correspondence & Money Movement -->
+    <a href="Correspondence-and-Money-Movement.html" class="card" style="border-top:3px solid #e76f51;">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(231,111,81,0.15);">💸</div>
+        <div>
+          <div class="card-title">Correspondence &amp; Money Movement</div>
+          <div class="card-subtitle">Omnichannel Comms + Disbursement Saga</div>
+        </div>
+      </div>
+      <div class="card-body">
+        Event-driven inbound/outbound correspondence with client, advisor &amp; service reps; the omnichannel preference center; and the money-movement saga — dual control, OFAC, payment holds, tax withholding (1099-R), idempotent disbursement, and treasury reconciliation.
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-data">Omnichannel</span>
+        <span class="tag tag-stream">Disbursement Saga</span>
+        <span class="tag tag-arch">Dual Control</span>
+        <span class="tag tag-ml">Reconciliation</span>
+      </div>
+    </a>
+
+    <!-- Observability -->
+    <a href="Observability-Monitoring.html" class="card" style="border-top:3px solid #2a9d8f;">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(42,157,143,0.15);">📊</div>
+        <div>
+          <div class="card-title">Observability &amp; Monitoring</div>
+          <div class="card-subtitle">SLOs, Consumer Lag &amp; Alert Routing</div>
+        </div>
+      </div>
+      <div class="card-body">
+        Event-freshness and decisioning SLOs, consumer-lag and DLQ alerting, money-movement watch metrics, STP-rate and cycle-time business SLOs, P1–P4 alert routing, dashboards per team role, and the blameless incident process.
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-api">SLOs · SLAs</span>
+        <span class="tag tag-stream">Consumer Lag</span>
+        <span class="tag tag-data">STP Quality</span>
+        <span class="tag tag-arch">Incident Mgmt</span>
+      </div>
+    </a>
+
+    <!-- FinOps -->
+    <a href="FinOps-Cost-Model.html" class="card" style="border-top:3px solid #d4a017;">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(212,160,23,0.15);">💰</div>
+        <div>
+          <div class="card-title">FinOps &amp; Cost Architecture</div>
+          <div class="card-subtitle">Cost Model by Phase &amp; ROI Framework</div>
+        </div>
+      </div>
+      <div class="card-body">
+        Confluent / MSK and AWS cost components, phase-by-phase cost estimates (Year 1–3), the ROI framework driven by STP automation and cycle-time reduction, 7 cost optimization levers, and the cost governance model.
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-data">TCO by Phase</span>
+        <span class="tag tag-ml">ROI Framework</span>
+        <span class="tag tag-data">Optimization Levers</span>
+      </div>
+    </a>
+
+    <!-- Onboarding -->
+    <a href="Claims-Onboarding-Workflow.html" class="card" style="border-top:3px solid #6d3fa0;">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(109,63,160,0.15);">🚀</div>
+        <div>
+          <div class="card-title">Claims Onboarding Workflow</div>
+          <div class="card-subtitle">New Product &amp; New Claim Intake Onboarding</div>
+        </div>
+      </div>
+      <div class="card-body">
+        Two onboarding scenarios (new product/plan vs. new claim intake), step-by-step workflows, automated vs. manual step breakdown, quarantine recovery for unresolved policy numbers, and the Year 3 self-service FNOL vision.
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-stream">Policy CDC</span>
+        <span class="tag tag-api">Schema Registry</span>
+        <span class="tag tag-arch">IDV Intake</span>
+        <span class="tag tag-ml">Self-Service FNOL</span>
+      </div>
+    </a>
+
+    <!-- Decision Records -->
+    <a href="Event-Driven-Decision-Records.html" class="card card-adr">
+      <div class="card-header">
+        <div class="card-icon">⚖️</div>
+        <div>
+          <div class="card-title">Event-Driven Decision Records</div>
+          <div class="card-subtitle">Architecture Decision Reference</div>
+        </div>
+      </div>
+      <div class="card-body">
+        The architecture decisions behind the platform — event sourcing vs. CRUD, choreography vs. orchestration, Kafka vs. Kinesis vs. EventBridge, Avro vs. Protobuf vs. JSON Schema, and the saga-vs-2PC call for money movement. Decision matrix per ADR.
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-ml">Platform Comparison</span>
+        <span class="tag tag-arch">Decision Matrix</span>
+        <span class="tag tag-api">ADR Format</span>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- ARCHITECTURE OVERVIEW -->
+<div class="overview">
+  <h2>Platform Architecture Overview</h2>
+  <div class="flow">
+<span class="comment">// Event Flow — Life &amp; DI Claims Platform</span>
+
+<span class="hl">Client / Advisor / Service Rep</span>  ──(FNOL, omnichannel)──►  <span class="hl4">Intake API</span>  ──►  <span class="hl2">claims.fnol.v1</span>  ──►  <span class="hl">Claim Aggregate (event-sourced)</span>
+<span class="hl">Policy Admin System</span>  ──(Kafka Connect CDC)──►  <span class="hl3">policy.snapshot.v1</span>  ──────────────────────────────────────►↑
+
+<span class="comment">// Stream processing — Kafka Streams / Flink</span>
+<span class="hl2">claims.*</span>  ──►  <span class="hl">STP Decisioning</span>  ──►  <span class="hl3">claims.decision.v1</span>   <span class="comment">// low-touch auto-ticket ≥ 85</span>
+<span class="hl2">claims.*</span>  ──►  <span class="hl">Fraud Scoring</span>  ──►  <span class="hl3">claims.fraud.scored.v1</span>  ──►  <span class="hl2">SIU Case</span>  <span class="comment">// risk ≥ 60</span>
+
+<span class="comment">// Read models (CQRS) &amp; serving</span>
+<span class="hl2">claims.*</span>  ──►  <span class="hl4">Projections</span>  ──►  <span class="hl4">Claims Domain APIs</span>  ──►  <span class="hl">Client Portal / Advisor Desktop</span>
+
+<span class="comment">// Outbound — correspondence &amp; money movement (saga)</span>
+<span class="hl3">claims.decision.v1</span>  ──►  <span class="hl2">Correspondence Engine</span>  ──►  <span class="hl">Email / SMS / Secure Msg / Print</span>
+<span class="hl3">claims.decision.approved</span>  ──►  <span class="hl2">Payment Saga</span>  (dual control · OFAC · 1099-R)  ──►  <span class="hl">Treasury / EFT / Check</span>  ──►  <span class="hl3">payment.settled.v1</span>
+  </div>
+</div>
+
+<!-- KEY DESIGN DECISIONS -->
+<div class="decisions">
+  <h2>Key Design Decisions</h2>
+  <div class="decision-grid">
+    <div class="decision-item">
+      <div class="decision-num">Decision 01</div>
+      <h3>Event Sourcing as System of Record</h3>
+      <p>Each claim is an event-sourced aggregate; the ordered event log is the source of truth, not a mutable row. Read models are CQRS projections rebuilt from the log. This gives a natural regulatory audit trail and time-travel for disputes.</p>
+    </div>
+    <div class="decision-item">
+      <div class="decision-num">Decision 02</div>
+      <h3>Policy Admin Stays the Golden Record</h3>
+      <p>The Policy Admin System remains the system of record for in-force status, coverage and contestability dates. The platform consumes it via Kafka Connect CDC into <code>policy.snapshot.v1</code>. FNOL events with unresolved policy numbers are quarantined, not dropped.</p>
+    </div>
+    <div class="decision-item">
+      <div class="decision-num">Decision 03</div>
+      <h3>Low-Touch Path via STP Score</h3>
+      <p>Clean, low-risk claims are auto-adjudicated and auto-ticketed. STP eligibility ≥ 85 routes to straight-through approval; 65–84 assisted; 40–64 standard; &lt; 40 complex / SIU. Rules first, ML propensity in Year 3.</p>
+    </div>
+    <div class="decision-item">
+      <div class="decision-num">Decision 04</div>
+      <h3>Claims Domain APIs as Abstraction Layer</h3>
+      <p>Consuming apps (client portal, advisor desktop, service-rep tools) never read the event log directly. They query CQRS read models through versioned Claims Domain APIs, decoupling channels from the internal event model.</p>
+    </div>
+    <div class="decision-item">
+      <div class="decision-num">Decision 05</div>
+      <h3>STP &amp; Fraud Scoring Formulas</h3>
+      <p>STP = (policy_in_force × 0.25) + (coverage_clear × 0.20) + (doc_completeness × 0.20) + (identity_verified × 0.15) + (fraud_inverse × 0.10) + (amount_in_band × 0.10). Fraud risk is a separate weighted score; ≥ 60 forces SIU referral and blocks the low-touch path.</p>
+    </div>
+    <div class="decision-item">
+      <div class="decision-num">Decision 06</div>
+      <h3>Money Movement as a Saga, Never 2PC</h3>
+      <p>Disbursement is a choreographed saga with compensation, not a distributed transaction. Dual-control approval, OFAC screening, payment holds, and tax withholding are explicit states. Payment commands are idempotent and reconciled against treasury.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>Life &amp; DI Claims Platform — Event-Driven Architecture Reference &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+  <p style="margin-top:6px;"><a href="https://github.com/harshshah85/insurance-claims-platform">github.com/harshshah85/insurance-claims-platform</a></p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Correspondence &amp; Money Movement — Life &amp; DI Claims Platform</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
+  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #e76f51; padding-bottom: 8px; margin-top: 40px; }
+  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
+  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
+  .page-break { page-break-before: always; }
+  .cover { text-align: center; padding: 60px 0 40px 0; }
+  .cover h1 { border: none; font-size: 28px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
+  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
+  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7f9fc; }
+  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
+  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
+  pre { background: #1a1a2e; color: #e6edf3; border-radius: 8px; padding: 16px 18px; overflow-x: auto; font-size: 11.5px; line-height: 1.55; margin: 14px 0; }
+  pre .c { color: #6a9955; } pre .k { color: #4fc1ff; } pre .s { color: #ce9178; }
+  .saga { font-family: 'SF Mono','Courier New',monospace; font-size: 11.5px; background: #0d1117; color: #c9d1d9; border-radius: 8px; padding: 18px 20px; overflow-x: auto; line-height: 1.9; margin: 14px 0; }
+  .saga .g { color: #2a9d8f; } .saga .r { color: #e63946; } .saga .y { color: #d4a017; } .saga .b { color: #7ab8d8; } .saga .m { color: #484f58; }
+  .chan { background: #fdf2ee; border-left: 4px solid #e76f51; padding: 10px 14px; margin: 8px 0; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Correspondence &amp; Money Movement</h1>
+  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — Omnichannel Comms + the Disbursement Saga</p>
+  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</div>
+
+<div class="note">
+  <strong>Two integration surfaces, one principle.</strong> Both correspondence and money movement are <em>event-driven and idempotent</em>. Correspondence reacts to claim events and fans out across channels; money movement is a compensating saga that never uses a distributed transaction. Both are decoupled from the claim aggregate — they consume facts and report facts back, closing the loop.
+</div>
+
+<h1>1. Correspondence — Event-Driven &amp; Omnichannel</h1>
+<h2>Every inbound and outbound communication is an event on <code>correspondence.v1</code>. Three audiences: client, advisor, service rep.</h2>
+
+<h3>Inbound (channel → event)</h3>
+<table>
+  <tr><th>Channel</th><th>Captured As</th><th>Becomes</th></tr>
+  <tr><td>Client portal / mobile upload</td><td>Document + form submission</td><td><code>CorrespondenceDelivered</code> (inbound) → <code>RequirementSatisfied</code></td></tr>
+  <tr><td>Secure message / email reply</td><td>Threaded message</td><td>Inbound correspondence linked to <code>claim_id</code></td></tr>
+  <tr><td>Mail / fax / scan</td><td>ECM ingest + OCR</td><td>Document reference event (hash + ECM pointer, never the binary)</td></tr>
+  <tr><td>IVR / phone (service rep)</td><td>Call disposition + notes</td><td>Inbound interaction event on the claim timeline</td></tr>
+  <tr><td>Advisor desktop</td><td>Advisor-submitted form on behalf of client</td><td>Inbound correspondence attributed to the advisor party</td></tr>
+</table>
+
+<h3>Outbound (event → channel)</h3>
+<p>The Correspondence Trigger processor maps claim events to templated outbound messages, then the Correspondence Engine renders and delivers them according to the recipient's preference and consent.</p>
+<table>
+  <tr><th>Triggering Event</th><th>Outbound Message</th><th>Default Audience</th></tr>
+  <tr><td><code>FnolCaptured</code></td><td>Claim acknowledgement (starts the regulatory clock)</td><td>Client + advisor</td></tr>
+  <tr><td><code>RequirementRaised</code></td><td>Requirements / "we need" letter</td><td>Client (advisor cc)</td></tr>
+  <tr><td><code>ClaimApproved</code> / <code>ClaimAutoApproved</code></td><td>Approval &amp; payment-timing notice</td><td>Client + advisor</td></tr>
+  <tr><td><code>ClaimDenied</code></td><td>Denial letter (reason code + appeal rights)</td><td>Client (advisor cc)</td></tr>
+  <tr><td><code>RecertificationDue</code> (DI)</td><td>Recertification reminder</td><td>Client</td></tr>
+  <tr><td><code>PaymentSettled</code></td><td>Payment confirmation + 1099-R note</td><td>Client</td></tr>
+</table>
+
+<div class="chan"><strong>Preference center &amp; consent:</strong> the Correspondence Engine consults a per-party preference &amp; consent model before sending — channel choice (email / SMS / secure message / print), language, accessibility, and legal opt-ins. A regulated notice (e.g. a denial) always has a compliant fallback channel (print/mail) even if the client opted out of digital.</div>
+
+<div class="chan"><strong>Advisor &amp; service-rep loop:</strong> advisors see their clients' claim correspondence in their desktop and can act (nudge a requirement, request a status). Service reps work from the same <code>advisor_worklist</code> read model. Both are first-class correspondence audiences, not afterthoughts — important for an advice-led distribution model.</div>
+
+<!-- MONEY MOVEMENT -->
+<div class="page-break"></div>
+<h1>2. Money Movement — the Disbursement Saga</h1>
+<h2>A choreographed saga with compensation. Never a two-phase commit across the claims platform and treasury.</h2>
+
+<div class="saga">
+<span class="m"># Happy path</span>
+<span class="y">ClaimApproved</span>
+   └─► <span class="b">PaymentScheduled</span>            <span class="m"># Payment aggregate created, idempotent payment_id</span>
+          └─► OFAC / sanctions screen
+                 ├─ hit ──► <span class="r">PaymentHeld</span> (compliance)  ──► manual clear / cancel
+                 └─ clear ─► tax determination (1099-R / withholding)
+                              └─► dual-control approval  <span class="m"># two distinct approvers for &gt; threshold</span>
+                                     └─► <span class="b">cmd.disburse.v1</span>  ──►  Treasury / Disbursement platform
+                                            ├─ success ─► <span class="g">PaymentSettled</span>  ──► correspondence + ledger
+                                            └─ fail ────► <span class="r">PaymentFailed</span>  ──► retry / compensate
+
+<span class="m"># Compensation (e.g. settled then reversed — wrong payee)</span>
+<span class="g">PaymentSettled</span> ──► reversal command ──► <span class="r">PaymentReversed</span> (new event, never a delete) ──► treasury recoup
+</div>
+
+<table>
+  <tr><th>Control</th><th>How it works</th><th>Why</th></tr>
+  <tr><td><strong>Idempotent payment_id</strong></td><td>A payment_id settles at most once; a duplicate <code>cmd.disburse</code> is a no-op</td><td>A retried command must never double-pay a beneficiary</td></tr>
+  <tr><td><strong>OFAC / sanctions screen</strong></td><td>Every payee screened before funds move; hit → <code>PaymentHeld</code></td><td>Legal requirement; blocks prohibited payments</td></tr>
+  <tr><td><strong>Dual control</strong></td><td>Payments above a threshold require two distinct human approvers</td><td>Segregation of duties; SOX-style control over disbursement</td></tr>
+  <tr><td><strong>Tax determination</strong></td><td>Withholding &amp; 1099-R basis computed before settlement (DI benefits taxability depends on premium funding)</td><td>IRS reporting accuracy; avoids downstream corrections</td></tr>
+  <tr><td><strong>Payment hold</strong></td><td>Fraud ≥ 60, beneficiary dispute, or recert overdue holds the disbursement</td><td>Couples decisioning/fraud guardrails to the cash gate</td></tr>
+  <tr><td><strong>Reconciliation</strong></td><td><code>payment_ledger</code> reconciled daily against treasury settlement file</td><td>Kafka carries the command + settled fact; treasury is the cash ledger of record</td></tr>
+</table>
+
+<div class="note"><strong>Why a saga, not 2PC:</strong> the claims platform and the treasury/disbursement system are independent services with independent failure modes. A distributed transaction would couple their availability and still not span the external bank rail. A saga makes every step an explicit, observable state with a compensating action — which is also exactly what an auditor wants to see. (Rationale recorded as an ADR in <em>Event-Driven Decision Records</em>.)</div>
+
+<h1>3. DI Recurring Disbursement</h1>
+<p>Life pays once; DI pays a recurring benefit. The same saga runs each period, gated by recertification.</p>
+<div class="saga">
+<span class="g">BenefitPeriodOpened</span> ──► schedule recurring <span class="b">PaymentScheduled</span> (per period)
+       │
+       ├─ <span class="y">RecertificationReceived</span>  ──► release period payment ──► saga ──► <span class="g">PaymentSettled</span>
+       ├─ <span class="r">RecertificationDue</span> &amp; overdue ──► <span class="r">PaymentHeld</span> (suppress until received)
+       └─ <span class="y">BenefitOffsetApplied</span> (e.g. SSDI) ──► reduce period amount before disbursement
+</div>
+
+<!-- SAMPLE PAYLOAD + METRICS -->
+<div class="page-break"></div>
+<h1>4. Sample Disbursement Command</h1>
+<pre>{
+  <span class="k">"type"</span>: <span class="s">"cmd.disburse.v1"</span>,
+  <span class="k">"subject"</span>: <span class="s">"PAY-2026-077431"</span>,            <span class="c">// payment_id — idempotency key</span>
+  <span class="k">"data"</span>: {
+    <span class="k">"claim_id"</span>: <span class="s">"CLM-2026-018342"</span>,
+    <span class="k">"payee_party_id"</span>: <span class="s">"PTY-90021"</span>,
+    <span class="k">"method"</span>: <span class="s">"ACH"</span>,                       <span class="c">// ACH | CHECK | WIRE</span>
+    <span class="k">"gross"</span>: { <span class="k">"minor_units"</span>: 25000000, <span class="k">"currency"</span>: <span class="s">"USD"</span> },
+    <span class="k">"withholding"</span>: { <span class="k">"minor_units"</span>: 0, <span class="k">"reason"</span>: <span class="s">"LIFE_DEATH_BENEFIT_NONTAXABLE"</span> },
+    <span class="k">"net"</span>: { <span class="k">"minor_units"</span>: 25000000, <span class="k">"currency"</span>: <span class="s">"USD"</span> },
+    <span class="k">"ofac_status"</span>: <span class="s">"CLEAR"</span>,
+    <span class="k">"approvals"</span>: [ <span class="s">"adj-1182"</span>, <span class="s">"adj-2207"</span> ]   <span class="c">// dual control</span>
+  }
+}</pre>
+
+<h1>5. Integration Performance &amp; Closed Loop</h1>
+<table>
+  <tr><th>Metric</th><th>Target</th></tr>
+  <tr><td>Outbound acknowledgement after FNOL</td><td>Sent within minutes — starts the regulatory clock visibly</td></tr>
+  <tr><td>Approval → disbursement initiated</td><td>Within the prompt-payment SLA (well inside state statute)</td></tr>
+  <tr><td>Disbursement idempotency</td><td>0 double-pays — enforced by payment_id</td></tr>
+  <tr><td>Treasury reconciliation breaks</td><td>0 unresolved at end of day</td></tr>
+  <tr><td>Correspondence delivery confirmation</td><td>Delivery/failure event back on <code>correspondence.v1</code> within SLA; failures retried / escalated to print</td></tr>
+</table>
+
+<div class="note"><strong>Closed loop:</strong> delivery confirmations and settlement facts flow back as events (<code>CorrespondenceDelivered</code>, <code>PaymentSettled</code>), updating the client-facing read model and the regulatory timers. The client portal shows "payment sent" because a real settlement event arrived — not because a button was clicked.</div>
+
+<br><br><hr>
+<p style="text-align:center;color:#999;font-size:11px;">Correspondence &amp; Money Movement — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</body>
+</html>

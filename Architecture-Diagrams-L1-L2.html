@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Architecture Diagrams L1 &amp; L2 — Life &amp; DI Claims Platform</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
+  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #e63946; padding-bottom: 8px; margin-top: 40px; }
+  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
+  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
+  .page-break { page-break-before: always; }
+  .cover { text-align: center; padding: 60px 0 40px 0; }
+  .cover h1 { border: none; font-size: 28px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
+  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
+  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7f9fc; }
+  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
+  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
+  .diagram { font-family: 'SF Mono','Courier New',monospace; font-size: 11px; background: #0d1117; color: #c9d1d9; border-radius: 8px; padding: 20px 22px; overflow-x: auto; line-height: 1.7; margin: 14px 0; white-space: pre; }
+  .diagram .g { color: #2a9d8f; } .diagram .r { color: #e63946; } .diagram .y { color: #d4a017; } .diagram .b { color: #7ab8d8; } .diagram .p { color: #b88ee8; } .diagram .m { color: #6e7681; }
+  .roadmap-phase { background: #f0f4f8; border-left: 5px solid #457b9d; padding: 12px 16px; margin: 10px 0; border-radius: 0 8px 8px 0; }
+  .roadmap-phase h3 { margin: 0 0 6px 0; color: #1a1a2e; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Architecture Diagrams — L1 &amp; L2</h1>
+  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — System Context, Containers &amp; Phased Strategy</p>
+  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</div>
+
+<div class="note">
+  <strong>C4 model, two levels.</strong> L1 (System Context) shows the platform as one box surrounded by the people and external systems it talks to. L2 (Container) opens the box into its runtime pieces — the Kafka backbone, the 9 bounded-context services, the read models, and the serving APIs. Lower levels (component / code) are intentionally out of scope for a reference architecture.
+</div>
+
+<h1>1. L1 — System Context</h1>
+<h2>Who and what the platform interacts with. People on the left, systems of record and external services on the right.</h2>
+
+<div class="diagram"><span class="m">                          ┌───────────────────────────────────────────────┐</span>
+<span class="b">  Client</span>          ──FNOL──►   │                                               │   ◄──CDC──  <span class="y">Policy Admin System</span>
+<span class="b">  Advisor</span>         ──────►   │        <span class="g">LIFE &amp; DI CLAIMS PLATFORM</span>            │   ◄──────►  <span class="y">Document / ECM Store</span>
+<span class="b">  Service Rep</span>     ──────►   │     event-driven · event-sourced · CQRS       │   ──cmd──►  <span class="y">Treasury / Disbursement</span>
+<span class="b">  Adjudicator</span>     ──────►   │                                               │   ◄──────►  <span class="r">Fraud / External Data (MIB, DMF)</span>
+<span class="b">  SIU Investigator</span> ──────►   │                                               │   ◄──────►  <span class="y">Identity / KYC Provider</span>
+<span class="b">  Treasury Ops</span>    ──────►   │                                               │   ──notify─►  <span class="r">Regulators / Auditors</span>
+<span class="m">                          └───────────────────────────────────────────────┘</span>
+                                          │
+                                  emits <span class="g">domain events</span> ──►  <span class="y">Enterprise Data Lake / BI</span>
+</div>
+
+<table>
+  <tr><th>External Actor / System</th><th>Relationship</th></tr>
+  <tr><td><strong>Client</strong></td><td>Files FNOL across channels; tracks status; receives correspondence &amp; payment</td></tr>
+  <tr><td><strong>Advisor</strong></td><td>Files/assists on behalf of clients; sees their book's claims; nudges requirements</td></tr>
+  <tr><td><strong>Service Rep</strong></td><td>Works the human-touch queue; handles inbound calls; resolves NIGO items</td></tr>
+  <tr><td><strong>Adjudicator / SIU</strong></td><td>Decisions standard/complex claims; investigates referred fraud cases</td></tr>
+  <tr><td><strong>Policy Admin System</strong></td><td>Golden record for policy in-force, coverage, contestability, beneficiaries — consumed via Kafka Connect CDC</td></tr>
+  <tr><td><strong>Treasury / Disbursement</strong></td><td>Executes the actual debit/credit on the bank rail; the cash ledger of record</td></tr>
+  <tr><td><strong>Document / ECM Store</strong></td><td>Stores death certificates, APS, medical records; events carry references + hashes</td></tr>
+  <tr><td><strong>Fraud / External Data</strong></td><td>MIB, Death Master File (DMF), watchlists, known-fraud networks</td></tr>
+  <tr><td><strong>Identity / KYC Provider</strong></td><td>Verifies claimant &amp; payee identity (IDV/KYC)</td></tr>
+  <tr><td><strong>Enterprise Data Lake / BI</strong></td><td>Subscribes to the same domain events for analytics &amp; ML training — no separate ETL</td></tr>
+</table>
+
+<!-- L2 -->
+<div class="page-break"></div>
+<h1>2. L2 — Container Diagram</h1>
+<h2>Inside the box: the Kafka backbone, context services as producers/consumers, the CQRS read models, and the serving layer.</h2>
+
+<div class="diagram"><span class="m">  CHANNELS                 INGRESS              EVENT BACKBONE (Apache Kafka)            STREAM PROCESSORS</span>
+  <span class="b">Client Portal</span>   ─┐
+  <span class="b">Advisor Desktop</span> ─┼─► <span class="g">Intake API</span> ──► <span class="r">claims.fnol.v1 / claims.lifecycle.v1</span> ──┬─► <span class="p">STP Decisioning</span> (Streams)
+  <span class="b">Service Desktop</span> ─┤        (outbox)        <span class="r">policy.snapshot.v1</span> (CDC)              ├─► <span class="p">Fraud Scoring</span> (Flink)
+  <span class="b">IVR / Mail/Fax</span>  ─┘                          <span class="r">claims.decision / fraud / di.benefit</span>   ├─► <span class="p">DI Recert Timer</span> (Streams)
+                                                <span class="r">correspondence / payment.disbursement</span> ├─► <span class="p">Projectors ×5</span>
+  <span class="y">Policy Admin</span> ──CDC──► Kafka Connect ──────────────┘                                  └─► <span class="p">Correspondence Trigger</span>
+
+  <span class="m">READ MODELS (CQRS)                 SERVING                     OUTBOUND</span>
+  <span class="g">claim_summary</span> (Postgres)  ─┐
+  <span class="g">advisor_worklist</span> (ES)     ─┼─► <span class="b">Claims Domain APIs</span> ─► <span class="b">API Gateway</span> ─► channels
+  <span class="g">di_benefit_ledger</span> (PG)    ─┤
+  <span class="g">fraud_case_view</span> (Dynamo)  ─┤      <span class="y">Correspondence Engine</span> ─► Email/SMS/Secure/Print
+  <span class="g">payment_ledger</span> (PG)       ─┘      <span class="y">Payment Saga</span> ─► Treasury / EFT / Check
+</div>
+
+<table>
+  <tr><th>Container</th><th>Tech</th><th>Responsibility</th></tr>
+  <tr><td>Intake API</td><td>Stateless service + transactional outbox</td><td>Accept FNOL from any channel; emit <code>claims.fnol.v1</code> reliably</td></tr>
+  <tr><td>Kafka backbone</td><td>Apache Kafka (Confluent/MSK) + Schema Registry</td><td>14 topics; the event-sourced system of record</td></tr>
+  <tr><td>Kafka Connect</td><td>CDC + outbox connectors</td><td>Stream Policy Admin changes into <code>policy.snapshot.v1</code>; drain outboxes</td></tr>
+  <tr><td>Stream processors</td><td>Kafka Streams + Flink</td><td>Decisioning, fraud, DI timers, projections, correspondence triggers</td></tr>
+  <tr><td>Read models</td><td>Postgres / Elasticsearch / DynamoDB</td><td>CQRS projections rebuilt from the log</td></tr>
+  <tr><td>Claims Domain APIs</td><td>REST/GraphQL behind API Gateway</td><td>Versioned read access for all channels — never the raw log</td></tr>
+  <tr><td>Correspondence Engine</td><td>Templating + delivery service</td><td>Omnichannel outbound honoring preference &amp; consent</td></tr>
+  <tr><td>Payment Saga</td><td>Saga orchestrator + idempotent commands</td><td>Controlled money movement to treasury</td></tr>
+</table>
+
+<!-- ROADMAP -->
+<div class="page-break"></div>
+<h1>3. Phased Strategy — 3-Year Roadmap</h1>
+<h2>Deliver a measurable signal early; defer ML until there is clean labeled history.</h2>
+
+<div class="roadmap-phase">
+  <h3>Year 1 — Backbone &amp; First Signal</h3>
+  <p>Stand up the Kafka backbone, Schema Registry, and the event-sourced Claim aggregate. Ship FNOL intake across the primary channels and the <strong>Life death-claim happy path</strong> with rule-based STP. Policy Admin CDC live. Read models for client/advisor status. <em>Value:</em> faster acknowledgement and visible status — measurable cycle-time improvement before any ML spend.</p>
+</div>
+<div class="roadmap-phase" style="border-color:#2a9d8f;">
+  <h3>Year 2 — Full Domain &amp; Money Movement</h3>
+  <p>Add <strong>DI claims</strong> (recurring benefit, recertification, offsets), the full <strong>money-movement saga</strong>, <strong>omnichannel correspondence</strong> with preference/consent, and <strong>rule-based fraud scoring + SIU routing</strong>. All 9 bounded contexts in production. <em>Value:</em> rising STP rate, controlled disbursement, fraud leakage reduction.</p>
+</div>
+<div class="roadmap-phase" style="border-color:#6d3fa0;">
+  <h3>Year 3 — Intelligence &amp; Decommission</h3>
+  <p>Introduce <strong>ML propensity</strong> for STP soft-factors and a supervised <strong>fraud model</strong> trained on 18+ months of labeled SIU outcomes (hard guardrails stay as rules). Predictive DI recertification. <strong>Self-service FNOL</strong>. Begin <strong>legacy claims-system decommission</strong>. <em>Value:</em> higher automation, lower run cost.</p>
+</div>
+
+<h3>Why this sequencing</h3>
+<table>
+  <tr><th>Principle</th><th>Rationale</th></tr>
+  <tr><td>Event backbone before features</td><td>Every later capability is just another consumer of the log — the backbone is the leverage point</td></tr>
+  <tr><td>Life before DI</td><td>Life is terminal and simpler; it proves the platform before the durative DI complexity (recertification, offsets) is added</td></tr>
+  <tr><td>Rules before ML</td><td>Explainable from day one for regulators; ML needs labeled history that doesn't exist at launch</td></tr>
+  <tr><td>Measurable Year-1 ROI</td><td>Cycle-time and acknowledgement improvements sustain executive sponsorship through the larger Year-3 investment</td></tr>
+</table>
+
+<br><br><hr>
+<p style="text-align:center;color:#999;font-size:11px;">Architecture Diagrams L1 &amp; L2 + Phased Strategy — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</body>
+</html>

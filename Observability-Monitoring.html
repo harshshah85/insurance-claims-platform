@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Observability &amp; Monitoring — Life &amp; DI Claims Platform</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
+  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #2a9d8f; padding-bottom: 8px; margin-top: 40px; }
+  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
+  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
+  .page-break { page-break-before: always; }
+  .cover { text-align: center; padding: 60px 0 40px 0; }
+  .cover h1 { border: none; font-size: 28px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
+  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
+  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7f9fc; }
+  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
+  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
+  .slo-box { background: #eef8f5; border: 1px solid #2a9d8f; border-radius: 8px; padding: 14px 18px; margin: 10px 0; }
+  .slo-box h3 { color: #2a9d8f; margin: 0 0 8px 0; }
+  .badge { display: inline-block; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: bold; color: white; }
+  .b-p1 { background: #e63946; } .b-p2 { background: #f4a261; } .b-p3 { background: #457b9d; } .b-p4 { background: #888; }
+  .pillar { background: #f0f4f8; border-left: 5px solid #457b9d; border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 12px 0; }
+  .pillar h3 { margin: 0 0 6px 0; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Observability &amp; Monitoring</h1>
+  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — SLOs, Consumer Lag &amp; Alert Routing</p>
+  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</div>
+
+<h1>1. The Three Pillars + the Fourth</h1>
+
+<div class="pillar"><h3>Metrics — what is happening right now?</h3><p>Throughput per topic, consumer lag, processor latency, API latency/error rate, STP rate, payment success rate. Collected every 60s. Used for SLO burn-rate alerting and capacity planning.</p></div>
+<div class="pillar" style="border-color:#2a9d8f;"><h3>Logs — why did it happen?</h3><p>Structured JSON logs from intake, processors, APIs, correspondence, payment saga. Centralized; 90-day retention; <strong>no raw PII/PHI</strong> in logs (tokens only). Searched for root cause.</p></div>
+<div class="pillar" style="border-color:#6d3fa0;"><h3>Traces — where did the request go?</h3><p>Distributed tracing with <code>correlationid</code> propagated FNOL → API → processor → read model. Identifies latency hotspots across service and topic boundaries.</p></div>
+<div class="pillar" style="border-color:#d4a017;"><h3>Event lineage — the fourth pillar</h3><p>Unique to event sourcing: the <code>correlationid</code>/<code>causationid</code> chain lets you replay exactly how any decision or payment came to be. This is both an ops tool and the regulatory audit answer.</p></div>
+
+<h1>2. SLOs — Service Level Objectives</h1>
+<h2>Agreed with business stakeholders. Customer-facing SLAs are the contractual subset.</h2>
+
+<div class="slo-box">
+  <h3>Streaming SLOs — Event Freshness &amp; Health</h3>
+  <table>
+    <tr><th>Path</th><th>SLO Target</th><th>Alert Threshold</th></tr>
+    <tr><td>FNOL → committed to Kafka</td><td>99.9% within 2 seconds</td><td>Intake outbox lag &gt; 30s or publish error rate &gt; 0.1%</td></tr>
+    <tr><td>Consumer lag (decisioning, fraud, projectors)</td><td>Steady-state lag &lt; 1,000 events per partition</td><td>Lag &gt; 5,000 OR rising for 10 min on any critical consumer</td></tr>
+    <tr><td>Policy CDC freshness</td><td>99% of Policy Admin changes in <code>policy.snapshot.v1</code> within 5 min</td><td>CDC connector last_event &gt; 15 min old</td></tr>
+    <tr><td>Read-model lag (claim_summary)</td><td>p95 projection lag &lt; 10 seconds</td><td>Read model &gt; 60s behind the log</td></tr>
+    <tr><td>DLQ rate</td><td>&lt; 0.05% of events reach <code>claims.dlq.v1</code></td><td>Any sustained DLQ inflow, or single PHI/payment event in DLQ</td></tr>
+  </table>
+</div>
+
+<div class="slo-box">
+  <h3>API &amp; Decisioning SLOs</h3>
+  <table>
+    <tr><th>Endpoint / Flow</th><th>Availability</th><th>Latency</th></tr>
+    <tr><td>Claims Domain API — GET /claims/{id}</td><td>99.9%</td><td>p50 &lt; 120ms, p95 &lt; 400ms</td></tr>
+    <tr><td>Intake API — POST /fnol</td><td>99.95%</td><td>p95 &lt; 600ms (ack), async thereafter</td></tr>
+    <tr><td>STP auto-decision (FNOL → decision)</td><td>99.5%</td><td>p95 &lt; 5 seconds end-to-end</td></tr>
+    <tr><td>Payment saga (approval → disbursement initiated)</td><td>99.5%</td><td>Well inside prompt-payment statute</td></tr>
+  </table>
+</div>
+
+<div class="slo-box">
+  <h3>Business SLOs — Outcomes</h3>
+  <table>
+    <tr><th>Metric</th><th>Target</th><th>Cadence</th></tr>
+    <tr><td>STP rate (auto + assisted)</td><td>40–55% of eligible claims (Year 2)</td><td>Weekly dashboard</td></tr>
+    <tr><td>Average claim cycle time (FNOL → decision)</td><td>Trending down quarter over quarter</td><td>Monthly cohort</td></tr>
+    <tr><td>False-auto rate</td><td>&lt; 0.5%</td><td>Weekly — auto-approved later flagged for review</td></tr>
+    <tr><td>Prompt-payment compliance</td><td>100% within statute</td><td>Daily automated check on regulatory timers</td></tr>
+    <tr><td>Treasury reconciliation breaks</td><td>0 unresolved end-of-day</td><td>Daily</td></tr>
+  </table>
+</div>
+
+<!-- ALERT ROUTING -->
+<div class="page-break"></div>
+<h1>3. Alert Routing &amp; On-Call</h1>
+<table>
+  <tr><th>Alert</th><th>Severity</th><th>Route To</th><th>Response</th></tr>
+  <tr><td>Payment saga failure / stuck disbursement</td><td><span class="badge b-p1">P1</span></td><td>Platform + Treasury on-call — immediate page</td><td>15 min</td></tr>
+  <tr><td>PII/PHI or payment event in DLQ</td><td><span class="badge b-p1">P1</span></td><td>Platform Eng + Security — immediate</td><td>15 min</td></tr>
+  <tr><td>STP decisioning consumer down / lag &gt; 5,000</td><td><span class="badge b-p1">P1</span></td><td>Platform Engineering on-call</td><td>15 min</td></tr>
+  <tr><td>Claims Domain API error rate &gt; 1% for 5 min</td><td><span class="badge b-p1">P1</span></td><td>Platform Engineering on-call</td><td>15 min</td></tr>
+  <tr><td>Prompt-payment SLA timer at risk for any claim</td><td><span class="badge b-p2">P2</span></td><td>Claims Ops + Platform</td><td>30 min</td></tr>
+  <tr><td>Policy CDC stalled</td><td><span class="badge b-p2">P2</span></td><td>Data Engineering on-call</td><td>30 min</td></tr>
+  <tr><td>Fraud scoring (Flink) job restart loop</td><td><span class="badge b-p2">P2</span></td><td>Data Engineering on-call</td><td>30 min</td></tr>
+  <tr><td>Read-model projector lag &gt; 60s</td><td><span class="badge b-p3">P3</span></td><td>Data Engineering Slack</td><td>2 hours</td></tr>
+  <tr><td>STP rate drops &gt; 20% week-over-week</td><td><span class="badge b-p3">P3</span></td><td>Decisioning / Data Science Slack</td><td>Next business day</td></tr>
+  <tr><td>Kafka / compute cost spike &gt; 30% vs 7-day avg</td><td><span class="badge b-p4">P4</span></td><td>FinOps team email</td><td>Next business day</td></tr>
+  <tr><td>Anomalous bulk PHI read from one principal</td><td><span class="badge b-p1">P1</span></td><td>Security + Platform — immediate</td><td>15 min</td></tr>
+</table>
+
+<h1>4. Dashboards by Team</h1>
+
+<h3>Platform Engineering (operational health)</h3>
+<table>
+  <tr><th>Panel</th><th>Metric</th></tr>
+  <tr><td>Consumer Lag Heatmap</td><td>Lag per consumer group × partition; red on threshold breach</td></tr>
+  <tr><td>EOS / Transaction Health</td><td>Transaction commit rate, aborted-transaction rate on stream processors</td></tr>
+  <tr><td>API Health</td><td>Claims Domain API p50/p95/p99, error rate, request volume</td></tr>
+  <tr><td>DLQ &amp; Retry</td><td>Inflow to retry tiers and <code>claims.dlq.v1</code>; oldest un-drained message</td></tr>
+</table>
+
+<h3>Claims Ops (flow &amp; SLA)</h3>
+<table>
+  <tr><th>Panel</th><th>Metric</th></tr>
+  <tr><td>Regulatory Timer Board</td><td>Claims approaching acknowledge/decide/pay statutory deadlines</td></tr>
+  <tr><td>Worklist Depth</td><td>Standard/complex queue depth and aging by tier</td></tr>
+  <tr><td>STP Funnel</td><td>FNOL → scored → auto / assisted / standard / SIU</td></tr>
+</table>
+
+<h3>Treasury / Finance (money movement)</h3>
+<table>
+  <tr><th>Panel</th><th>Metric</th></tr>
+  <tr><td>Disbursement Pipeline</td><td>Scheduled → held → settled → failed; held-payment aging</td></tr>
+  <tr><td>Reconciliation</td><td><code>payment_ledger</code> vs treasury settlement file; open breaks</td></tr>
+  <tr><td>DI Benefit Run</td><td>Recurring DI disbursements due/sent; recert-blocked count</td></tr>
+</table>
+
+<h1>5. Incident Management</h1>
+<table>
+  <tr><th>Phase</th><th>Action</th></tr>
+  <tr><td><strong>Detect</strong></td><td>Automated alert via PagerDuty; ack within 15 min (P1) / 30 min (P2)</td></tr>
+  <tr><td><strong>Triage</strong></td><td>Incident channel; incident commander; blast radius (which claims/payees affected)</td></tr>
+  <tr><td><strong>Diagnose</strong></td><td>Metrics for anomaly start; logs by <code>correlationid</code>; trace the causal event chain</td></tr>
+  <tr><td><strong>Mitigate</strong></td><td>Scale consumers, pause/resume processors, replay from offset, hold payments if money-movement is implicated</td></tr>
+  <tr><td><strong>Resolve</strong></td><td>SLOs back to green; for any held payments, confirm no double-pay before release</td></tr>
+  <tr><td><strong>Post-mortem</strong></td><td>Blameless, within 48h for P1s; 5-whys; action items tracked with owners</td></tr>
+</table>
+
+<div class="note"><strong>Replay is the superpower and the footgun:</strong> a projection bug is fixed by rebuilding the read model from the log — safe, because projections are derived. But replaying anything that triggers <em>side effects</em> (correspondence, payments) must run against idempotent consumers or with side effects disabled, or you re-send letters and re-pay beneficiaries. The platform marks side-effecting consumers explicitly so replays are scoped.</div>
+
+<br><br><hr>
+<p style="text-align:center;color:#999;font-size:11px;">Observability &amp; Monitoring — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</body>
+</html>

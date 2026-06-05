@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Security &amp; Regulatory Compliance — Life &amp; DI Claims Platform</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
+  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #e63946; padding-bottom: 8px; margin-top: 40px; }
+  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
+  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
+  .page-break { page-break-before: always; }
+  .cover { text-align: center; padding: 60px 0 40px 0; }
+  .cover h1 { border: none; font-size: 28px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
+  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
+  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7f9fc; }
+  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
+  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
+  .layer { background: #fdeeee; border-left: 5px solid #e63946; padding: 12px 16px; margin: 8px 0; border-radius: 0 8px 8px 0; }
+  .layer h3 { margin: 0 0 4px 0; color: #e63946; }
+  .layer p { margin: 0; font-size: 12px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Security &amp; Regulatory Compliance</h1>
+  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — 7-Layer Security + Regulatory Map</p>
+  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</div>
+
+<div class="note">
+  <strong>Two halves, one obligation.</strong> A Life &amp; DI claims platform moves money to grieving beneficiaries and disabled claimants using their most sensitive data. Part 1 is the technical security stack (edge to data). Part 2 is the regulatory map specific to life &amp; disability claims. The event-sourced log is a security asset here — it is the immutable audit trail regulators ask for.
+</div>
+
+<h1>1. Seven-Layer Security Design</h1>
+
+<div class="layer"><h3>Layer 1 — Edge &amp; Network</h3><p>WAF on all public ingress (intake, portals, APIs); rate limiting and bot defense on FNOL endpoints; private networking between services; no broker exposed publicly. DDoS protection on channel endpoints.</p></div>
+<div class="layer" style="border-color:#e76f51;"><h3>Layer 2 — Transport</h3><p>TLS 1.2+ everywhere. <strong>Kafka SASL/SSL</strong> with mTLS between services and brokers; client certificates per service identity. No plaintext on the wire, internal or external.</p></div>
+<div class="layer" style="border-color:#d4a017;"><h3>Layer 3 — Identity &amp; Access</h3><p><strong>OAuth 2.0 / OIDC</strong> per consumer type: clients (portal, step-up auth for payment changes), advisors/reps (workforce SSO + MFA), service-to-service (client-credentials, short-lived tokens). RBAC + attribute-based rules; least privilege per topic and per read model.</p></div>
+<div class="layer" style="border-color:#2a9d8f;"><h3>Layer 4 — Application</h3><p>Input validation and schema enforcement at every boundary; signed commands; idempotency keys on money-movement commands; dual control on disbursement; segregation of duties between adjudication and payment approval.</p></div>
+<div class="layer" style="border-color:#457b9d;"><h3>Layer 5 — Data</h3><p><strong>Field-level encryption</strong> of PII/PHI; SSN and medical detail <strong>tokenized at the edge</strong> — events carry tokens, the access-controlled vault resolves them. Encryption at rest for topics, read models, and ECM. Key rotation via a managed KMS.</p></div>
+<div class="layer" style="border-color:#6d3fa0;"><h3>Layer 6 — Topic &amp; Stream Authorization</h3><p>Kafka ACLs per principal: producers write only their context's topics, consumers subscribe only to what they need. Data-classification tags on topics (e.g. PHI on <code>party.identity</code>, <code>di.benefit</code>) drive masking in non-prod and in analytics.</p></div>
+<div class="layer" style="border-color:#888;"><h3>Layer 7 — Audit &amp; Detection</h3><p>The event log is the immutable audit record. Plus: access logging on the token vault, anomaly detection (bulk reads, off-hours access), SIEM correlation, and alerting on money-movement and PHI access patterns.</p></div>
+
+<!-- STRIDE -->
+<div class="page-break"></div>
+<h1>2. STRIDE Threat Model (selected)</h1>
+<table>
+  <tr><th>Threat</th><th>Example</th><th>Mitigation</th></tr>
+  <tr><td><strong>S</strong>poofing</td><td>Fraudster files FNOL as a beneficiary</td><td>IDV/KYC before disbursement; step-up auth; identity-verified invariant on payee</td></tr>
+  <tr><td><strong>T</strong>ampering</td><td>Altering a claim decision or payee bank detail</td><td>Immutable event log; signed commands; dual control + OFAC on payments</td></tr>
+  <tr><td><strong>R</strong>epudiation</td><td>"I never approved that payment"</td><td>Causation/correlation chain in events; approver identities recorded on the decision</td></tr>
+  <tr><td><strong>I</strong>nfo disclosure</td><td>SSN/medical leak via analytics or logs</td><td>Tokenization + field encryption; PHI masking in non-prod; no raw PII in logs</td></tr>
+  <tr><td><strong>D</strong>enial of service</td><td>FNOL endpoint flooded</td><td>WAF rate limiting; backpressure; Kafka buffering absorbs bursts</td></tr>
+  <tr><td><strong>E</strong>levation</td><td>Adjudicator self-approves a large payment</td><td>Segregation of duties; dual-control threshold; SIU/compliance can't be bypassed</td></tr>
+</table>
+
+<h1>3. Regulatory Map — Life &amp; DI Claims</h1>
+<h2>Each obligation mapped to where the platform enforces it. Vendor-neutral; not legal advice.</h2>
+
+<table>
+  <tr><th>Regulation / Standard</th><th>What it requires (claims context)</th><th>Where enforced</th></tr>
+  <tr><td><strong>UCSPA</strong> (Unfair Claims Settlement Practices Acts)</td><td>Prompt acknowledgement, timely investigation &amp; decision, fair settlement; many states require <strong>interest</strong> on delayed death proceeds</td><td>Regulatory SLA timers on <code>FnolCaptured</code>/decision/payment; interest computed on overdue disbursement</td></tr>
+  <tr><td><strong>Contestability</strong> (state policy law)</td><td>Within ~2 years of issue, insurer may investigate material misrepresentation before paying</td><td>Hard guardrail: contestable Life claims never auto-approve; forced <code>CONTESTABILITY_REVIEW</code></td></tr>
+  <tr><td><strong>DMF + NAIC Unclaimed Benefits / Escheatment</strong></td><td>Cross-check Death Master File; locate beneficiaries; escheat unclaimed proceeds to the state</td><td>DMF as a fraud/external signal; dormancy timers; escheatment workflow in Compliance context</td></tr>
+  <tr><td><strong>ERISA</strong> (employer group Life/DI)</td><td>Claims &amp; appeals procedures, decision timeframes, full-and-fair review for group plans</td><td>Group-claim variant of the lifecycle with ERISA timeframes &amp; appeal-rights correspondence</td></tr>
+  <tr><td><strong>HIPAA</strong></td><td>Protect PHI in DI medical records / APS; minimum necessary access</td><td>Tokenized PHI; layer-5/6 controls; access logging on medical fields</td></tr>
+  <tr><td><strong>GLBA</strong> + state privacy (CCPA et al.)</td><td>Safeguard nonpublic personal info; privacy notices; consumer rights</td><td>Field encryption; consent model in correspondence; data-subject request tooling</td></tr>
+  <tr><td><strong>OFAC / AML</strong></td><td>Screen payees against sanctions lists; block prohibited payments; report suspicious activity</td><td>OFAC screen in the payment saga; <code>PaymentHeld</code> on hit; SIU/compliance referral</td></tr>
+  <tr><td><strong>IRS reporting</strong></td><td>1099-R for taxable DI benefits; correct withholding</td><td>Tax determination step before settlement; <code>payment_ledger</code> as 1099-R basis</td></tr>
+  <tr><td><strong>SOX</strong> (financial controls)</td><td>Controls over disbursement; segregation of duties; auditability</td><td>Dual control, idempotent payments, immutable log, reconciliation</td></tr>
+  <tr><td><strong>SOC 2</strong></td><td>Security/availability/confidentiality controls for the platform</td><td>The seven layers above + change management &amp; access reviews</td></tr>
+</table>
+
+<div class="note"><strong>Why event sourcing helps compliance:</strong> a market-conduct examiner asking "show me every action on this claim and who took it, in order" gets a direct answer — the ordered event log <em>is</em> that record, with approver identities and causation links. There is no reconstructing history from mutable rows and scattered logs.</div>
+
+<h1>4. Data Classification &amp; Handling</h1>
+<table>
+  <tr><th>Class</th><th>Examples</th><th>Handling</th></tr>
+  <tr><td>Restricted (PHI/PII)</td><td>SSN, medical records, APS, bank details</td><td>Tokenized + field-encrypted; vault-resolved; masked in non-prod &amp; analytics</td></tr>
+  <tr><td>Confidential</td><td>Claim amounts, decisions, fraud scores</td><td>Encrypted at rest; RBAC; not exposed to clients raw (scores are internal)</td></tr>
+  <tr><td>Internal</td><td>Aggregate metrics, SLAs</td><td>Standard access controls</td></tr>
+  <tr><td>Public</td><td>This reference architecture</td><td>No real data; illustrative values only</td></tr>
+</table>
+
+<br><br><hr>
+<p style="text-align:center;color:#999;font-size:11px;">Security &amp; Regulatory Compliance — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</body>
+</html>

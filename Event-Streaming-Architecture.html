@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Event Streaming Architecture — Life &amp; DI Claims Platform</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
+  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #2a9d8f; padding-bottom: 8px; margin-top: 40px; }
+  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
+  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
+  .page-break { page-break-before: always; }
+  .cover { text-align: center; padding: 60px 0 40px 0; }
+  .cover h1 { border: none; font-size: 28px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
+  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
+  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7f9fc; }
+  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
+  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
+  pre { background: #1a1a2e; color: #e6edf3; border-radius: 8px; padding: 16px 18px; overflow-x: auto; font-size: 11.5px; line-height: 1.55; margin: 14px 0; }
+  pre .c { color: #6a9955; }
+  pre .k { color: #4fc1ff; }
+  pre .s { color: #ce9178; }
+  .topic-box { background: #eef8f5; border: 1px solid #2a9d8f; border-radius: 8px; padding: 14px 18px; margin: 12px 0; }
+  .topic-box h3 { color: #2a9d8f; margin: 0 0 8px 0; }
+  .flow { font-family: 'SF Mono','Courier New',monospace; font-size: 11.5px; background: #0d1117; color: #c9d1d9; border-radius: 8px; padding: 18px 20px; overflow-x: auto; line-height: 1.85; margin: 14px 0; }
+  .flow .g { color: #2a9d8f; } .flow .r { color: #e63946; } .flow .y { color: #d4a017; } .flow .b { color: #7ab8d8; } .flow .m { color: #484f58; }
+  .pill { display:inline-block; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: bold; color: white; }
+  .p-eos { background:#2a9d8f; } .p-key { background:#457b9d; } .p-cmp { background:#6d3fa0; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Event Streaming Architecture</h1>
+  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — Topic Design, Event Contracts &amp; Stream Topology</p>
+  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</div>
+
+<div class="note">
+  <strong>Design stance:</strong> Kafka is the <em>backbone</em>, not a side-channel. Each claim is an event-sourced aggregate whose ordered event log is the system of record. Everything downstream — decisioning, fraud, correspondence, money movement, analytics — is a consumer of that log. This document defines the topics, the event contracts, and the processing topology that make that safe at insurer scale.
+</div>
+
+<h1>1. Topic Taxonomy — 14 Core Topics</h1>
+<h2>Three classes of topic: event (fact) topics, command topics, and infrastructure topics. Naming is <code>&lt;context&gt;.&lt;noun&gt;.&lt;version&gt;</code>.</h2>
+
+<table>
+  <tr><th>Topic</th><th>Class</th><th>Key</th><th>Partitions</th><th>Retention / Cleanup</th><th>Purpose</th></tr>
+  <tr><td><code>claims.fnol.v1</code></td><td>Event</td><td>claim_id</td><td>24</td><td>7d delete</td><td>First Notice of Loss intake events from every channel</td></tr>
+  <tr><td><code>claims.lifecycle.v1</code></td><td>Event</td><td>claim_id</td><td>24</td><td>compact + 30d</td><td>Claim aggregate state transitions (the event-sourced log)</td></tr>
+  <tr><td><code>claims.requirements.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>30d delete</td><td>Outstanding requirement raised / satisfied (docs, forms, proof)</td></tr>
+  <tr><td><code>claims.decision.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>compact</td><td>Adjudication outcomes: approved / denied / pended / STP auto-decision</td></tr>
+  <tr><td><code>claims.fraud.scored.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>90d delete</td><td>Fraud risk scores and SIU referral signals</td></tr>
+  <tr><td><code>policy.snapshot.v1</code></td><td>Event (CDC)</td><td>policy_id</td><td>24</td><td>compact</td><td>Policy Admin CDC: in-force, coverage, contestability, beneficiaries</td></tr>
+  <tr><td><code>party.identity.v1</code></td><td>Event</td><td>party_id</td><td>12</td><td>compact</td><td>Claimant / beneficiary identity &amp; verification (IDV/KYC) results</td></tr>
+  <tr><td><code>di.benefit.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>compact + 90d</td><td>DI recurring benefit periods, recertification, RTW, offsets</td></tr>
+  <tr><td><code>correspondence.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>90d delete</td><td>Inbound &amp; outbound correspondence facts across all channels</td></tr>
+  <tr><td><code>payment.disbursement.v1</code></td><td>Event</td><td>payment_id</td><td>12</td><td>compact</td><td>Money-movement saga events: scheduled → held → settled / failed</td></tr>
+  <tr><td><code>cmd.adjudicate.v1</code></td><td>Command</td><td>claim_id</td><td>12</td><td>3d delete</td><td>Requests to (re)run adjudication for a claim</td></tr>
+  <tr><td><code>cmd.disburse.v1</code></td><td>Command</td><td>payment_id</td><td>6</td><td>3d delete</td><td>Idempotent disbursement commands into the payment saga</td></tr>
+  <tr><td><code>claims.dlq.v1</code></td><td>Infra (DLQ)</td><td>original_key</td><td>6</td><td>14d delete</td><td>Poison / unprocessable events, with failure metadata headers</td></tr>
+  <tr><td><code>claims.retry.5m.v1</code></td><td>Infra (retry)</td><td>original_key</td><td>6</td><td>1d delete</td><td>Tiered retry topic (5m); siblings at 1m / 30m by convention</td></tr>
+</table>
+
+<div class="note"><strong>Why <code>claim_id</code> keying matters:</strong> partitioning on <code>claim_id</code> guarantees per-claim ordering — every event for one claim lands on one partition and is processed in sequence. This is what makes the event-sourced aggregate deterministic. Cross-claim ordering is never assumed.</div>
+
+<h1>2. The Domain Event Catalog — 36 Events</h1>
+<h2>Events are immutable facts named in the past tense. Grouped by the bounded context that owns (produces) them.</h2>
+
+<table>
+  <tr><th>Bounded Context</th><th>Domain Events (past-tense facts)</th></tr>
+  <tr><td><strong>Intake &amp; FNOL</strong></td><td><code>ClaimNotified</code>, <code>FnolCaptured</code>, <code>ChannelAttached</code>, <code>IntakeValidated</code></td></tr>
+  <tr><td><strong>Policy &amp; Coverage</strong></td><td><code>PolicyResolved</code>, <code>PolicyUnresolved</code> (quarantine), <code>CoverageConfirmed</code>, <code>ContestabilityFlagged</code></td></tr>
+  <tr><td><strong>Party &amp; Identity</strong></td><td><code>ClaimantRegistered</code>, <code>BeneficiaryIdentified</code>, <code>IdentityVerified</code>, <code>IdentityChallenged</code></td></tr>
+  <tr><td><strong>Requirements</strong></td><td><code>RequirementRaised</code>, <code>RequirementSatisfied</code>, <code>RequirementWaived</code>, <code>RequirementOverdue</code></td></tr>
+  <tr><td><strong>Adjudication &amp; Decisioning</strong></td><td><code>StpEligibilityScored</code>, <code>ClaimAutoApproved</code>, <code>ClaimApproved</code>, <code>ClaimDenied</code>, <code>ClaimPended</code>, <code>DecisionReversed</code></td></tr>
+  <tr><td><strong>Fraud &amp; SIU</strong></td><td><code>FraudScored</code>, <code>SiuReferred</code>, <code>SiuCleared</code>, <code>SiuSubstantiated</code></td></tr>
+  <tr><td><strong>Disability Management</strong></td><td><code>BenefitPeriodOpened</code>, <code>RecertificationDue</code>, <code>RecertificationReceived</code>, <code>ReturnToWorkRecorded</code>, <code>BenefitOffsetApplied</code>, <code>BenefitEnded</code></td></tr>
+  <tr><td><strong>Payments &amp; Money Movement</strong></td><td><code>PaymentScheduled</code>, <code>PaymentHeld</code>, <code>PaymentSettled</code>, <code>PaymentFailed</code></td></tr>
+  <tr><td><strong>Correspondence</strong></td><td><code>CorrespondenceRequested</code>, <code>CorrespondenceDelivered</code> <span class="m">(inbound variants share the topic)</span></td></tr>
+</table>
+
+<h3>Canonical event envelope</h3>
+<p>Every event shares a CloudEvents-style envelope so consumers, the DLQ, and the audit store can treat all events uniformly. Domain payload is nested under <code>data</code>.</p>
+<pre><span class="c">// envelope is identical across all 36 event types</span>
+{
+  <span class="k">"id"</span>: <span class="s">"01HZX9...ULID"</span>,                <span class="c">// globally unique, sortable</span>
+  <span class="k">"type"</span>: <span class="s">"claims.decision.ClaimAutoApproved"</span>,
+  <span class="k">"source"</span>: <span class="s">"svc-decisioning"</span>,
+  <span class="k">"subject"</span>: <span class="s">"CLM-2026-018342"</span>,             <span class="c">// claim_id (partition key)</span>
+  <span class="k">"time"</span>: <span class="s">"2026-06-03T14:22:07Z"</span>,
+  <span class="k">"specversion"</span>: <span class="s">"1.0"</span>,
+  <span class="k">"schemaversion"</span>: <span class="s">"v1"</span>,
+  <span class="k">"correlationid"</span>: <span class="s">"01HZX1...ULID"</span>,         <span class="c">// the originating FNOL event id</span>
+  <span class="k">"causationid"</span>: <span class="s">"01HZX8...ULID"</span>,            <span class="c">// the event that caused this one</span>
+  <span class="k">"data"</span>: { <span class="c">/* typed Avro domain payload */</span> }
+}</pre>
+
+<div class="note"><strong>Correlation vs. causation:</strong> <code>correlationid</code> stays constant for the whole claim journey (traceability); <code>causationid</code> points at the immediate predecessor event. Together they let you reconstruct the exact causal chain of a decision — essential for a regulator or a disputed denial.</div>
+
+<!-- EVENT SOURCING + CQRS -->
+<div class="page-break"></div>
+<h1>3. Event Sourcing &amp; CQRS</h1>
+
+<h3>Write side — the aggregate</h3>
+<p>The <strong>Claim</strong> aggregate is rehydrated by replaying its events from <code>claims.lifecycle.v1</code> (a <span class="pill p-key">compacted</span> topic keyed by <code>claim_id</code>). A command handler validates an incoming command against the rehydrated state, then appends new events. No in-place mutation ever occurs.</p>
+
+<div class="flow">
+<span class="m"># Command path (write side)</span>
+<span class="b">cmd.adjudicate.v1</span>  ─►  Command Handler  ─►  rehydrate Claim from <span class="g">claims.lifecycle.v1</span>
+                                      │
+                                      ├─ validate invariant (e.g. cannot approve a contestable claim w/o review)
+                                      └─ append  <span class="y">StpEligibilityScored</span> → <span class="y">ClaimAutoApproved</span>  to <span class="g">claims.lifecycle.v1</span>
+
+<span class="m"># Query path (read side) — built by stream processors, never by the writer</span>
+<span class="g">claims.lifecycle.v1</span>  ─►  Projector (Kafka Streams)  ─►  <span class="b">claim_summary</span> read model (Postgres / DynamoDB)
+                                                  └─►  <span class="b">advisor_worklist</span> read model (Elasticsearch)
+</div>
+
+<h3>Read models (projections)</h3>
+<table>
+  <tr><th>Read Model</th><th>Store</th><th>Built From</th><th>Serves</th></tr>
+  <tr><td><code>claim_summary</code></td><td>PostgreSQL</td><td>claims.lifecycle, decision, payment</td><td>Client portal + advisor desktop claim view</td></tr>
+  <tr><td><code>advisor_worklist</code></td><td>Elasticsearch</td><td>claims.lifecycle, requirements</td><td>Service-rep / advisor task queues, search</td></tr>
+  <tr><td><code>di_benefit_ledger</code></td><td>PostgreSQL</td><td>di.benefit.v1</td><td>Recurring DI benefit schedule &amp; history</td></tr>
+  <tr><td><code>fraud_case_view</code></td><td>DynamoDB</td><td>claims.fraud.scored, lifecycle</td><td>SIU case management UI</td></tr>
+  <tr><td><code>payment_ledger</code></td><td>PostgreSQL</td><td>payment.disbursement.v1</td><td>Treasury reconciliation &amp; 1099-R reporting</td></tr>
+</table>
+
+<div class="note"><strong>Rebuild safety:</strong> because read models are pure projections, any one can be dropped and rebuilt by replaying the log from offset 0. This is the operational escape hatch — a projection bug is fixed by deploying the corrected projector and replaying, not by data-patching production rows.</div>
+
+<h1>4. Schema Registry &amp; Evolution</h1>
+<h2>Avro on the wire, governed by a Schema Registry with enforced compatibility.</h2>
+
+<table>
+  <tr><th>Topic Group</th><th>Compatibility Mode</th><th>Rationale</th></tr>
+  <tr><td>Event (fact) topics</td><td><strong>BACKWARD_TRANSITIVE</strong></td><td>New consumers must read all historical events. Producers may add optional fields; never remove or repurpose a field.</td></tr>
+  <tr><td>Command topics</td><td><strong>FORWARD</strong></td><td>Old producers must keep working as the handler evolves; the consumer (handler) is upgraded first.</td></tr>
+  <tr><td>CDC topics (<code>policy.snapshot</code>)</td><td><strong>BACKWARD</strong></td><td>Source schema is owned by Policy Admin; downstream absorbs additive change.</td></tr>
+</table>
+
+<h3>Evolution rules (enforced in CI, not by convention)</h3>
+<ul style="font-size:12px; line-height:1.7; margin:8px 0 8px 22px;">
+  <li>Adding a field requires a default — older consumers read the default.</li>
+  <li>Removing or renaming a field is forbidden in <code>v1</code>; it forces a new <code>.v2</code> topic and a dual-write migration window.</li>
+  <li>Enum values are append-only; consumers handle an <code>UNKNOWN</code> default for forward safety.</li>
+  <li>The build fails if a producer publishes a schema the registry rejects — schema breakage cannot reach production.</li>
+</ul>
+
+<!-- DELIVERY GUARANTEES -->
+<div class="page-break"></div>
+<h1>5. Delivery Guarantees &amp; the Outbox</h1>
+
+<h3>Exactly-once where it matters</h3>
+<p>Stream processors that both read and write Kafka (decisioning, fraud scoring, projections) run with <span class="pill p-eos">EOS</span> — <code>processing.guarantee=exactly_once_v2</code> — so a consume→transform→produce cycle is atomic. Idempotent producers + transactional writes prevent duplicates on retry.</p>
+
+<h3>Transactional outbox for the edges</h3>
+<p>Where the platform must change a relational store <em>and</em> emit an event (e.g. intake writing a claim row and emitting <code>FnolCaptured</code>), it never dual-writes. It writes the event to an <strong>outbox</strong> table in the same DB transaction; a Kafka Connect outbox connector tails it. This removes the “DB committed but Kafka publish failed” failure mode.</p>
+
+<div class="flow">
+<span class="m"># Outbox pattern — no distributed transaction, no lost events</span>
+Intake Service  ─►  BEGIN TX
+                      INSERT claim row
+                      INSERT outbox(event=<span class="y">FnolCaptured</span>)
+                    COMMIT TX
+                         │
+   Kafka Connect (CDC)  ◄┘  ─►  publish to <span class="g">claims.fnol.v1</span>  ─►  delete/mark outbox row
+</div>
+
+<h3>Poison-message handling</h3>
+<p>A consumer that cannot process an event retries with backoff via the tiered retry topics (<code>claims.retry.1m/5m/30m</code>). After the final tier it lands in <code>claims.dlq.v1</code> with failure headers (<code>x-exception</code>, <code>x-original-topic</code>, <code>x-retry-count</code>). The DLQ is monitored (see Observability) and drained by an operator tool, never auto-replayed blindly.</p>
+
+<h1>6. Stream Processing Topology</h1>
+<h2>Kafka Streams for stateful per-key logic; Flink for windowed cross-claim analytics.</h2>
+
+<table>
+  <tr><th>Processor</th><th>Engine</th><th>Reads</th><th>Writes</th><th>State</th></tr>
+  <tr><td>STP Decisioning</td><td>Kafka Streams</td><td>claims.lifecycle, policy.snapshot, party.identity</td><td>claims.decision.v1</td><td>Co-partitioned KTable join on claim_id / policy_id</td></tr>
+  <tr><td>Fraud Scoring</td><td>Flink</td><td>claims.lifecycle, claims.requirements</td><td>claims.fraud.scored.v1</td><td>Keyed + windowed (velocity over 30/90d)</td></tr>
+  <tr><td>DI Recertification Timer</td><td>Kafka Streams</td><td>di.benefit.v1</td><td>di.benefit.v1 (RecertificationDue)</td><td>Punctuated wall-clock timers per benefit</td></tr>
+  <tr><td>Projectors (×5)</td><td>Kafka Streams</td><td>claims.* / payment.*</td><td>read-model stores</td><td>Stateless map → upsert</td></tr>
+  <tr><td>Correspondence Trigger</td><td>Kafka Streams</td><td>claims.decision, requirements, di.benefit</td><td>correspondence.v1</td><td>Stateless rule mapping</td></tr>
+</table>
+
+<div class="note"><strong>Why a join needs co-partitioning:</strong> the STP processor joins claim events with the policy snapshot. For a Kafka Streams join both inputs must be co-partitioned on the same key. Because <code>policy.snapshot.v1</code> is keyed by <code>policy_id</code> and claims by <code>claim_id</code>, the claim stream is first re-keyed to <code>policy_id</code> through a repartition topic before the KTable join — a deliberate, documented hop rather than an accidental shuffle.</div>
+
+<h1>7. What Stays Off Kafka</h1>
+<p>Event streaming is not a document store and not a money-mover of record. Three deliberate boundaries:</p>
+<ul style="font-size:12px; line-height:1.7; margin:8px 0 8px 22px;">
+  <li><strong>Large documents</strong> (death certificates, medical records, attending-physician statements) live in the ECM/object store; events carry a <em>reference and hash</em>, not the binary.</li>
+  <li><strong>The actual debit/credit</strong> happens in the treasury/disbursement platform; Kafka carries the <em>command and the settled fact</em>, and the platform reconciles — Kafka is not the ledger of record for cash.</li>
+  <li><strong>PII minimization</strong>: SSNs and medical detail are tokenized; the event carries a token, and the vault resolves it under access control (see Security &amp; Regulatory Compliance).</li>
+</ul>
+
+<br><br><hr>
+<p style="text-align:center;color:#999;font-size:11px;">Event Streaming Architecture — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</body>
+</html>
