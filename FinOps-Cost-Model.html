@@ -34,7 +34,7 @@
 </div>
 
 <div class="note">
-  <strong>Note on estimates:</strong> these are order-of-magnitude ranges for a vendor-neutral reference architecture, based on public Confluent/AWS pricing signals and typical enterprise staffing. They are planning inputs, not a quote, and should be validated against actual volumes and contracts.
+  <strong>Note on estimates:</strong> these are order-of-magnitude ranges for a vendor-neutral reference architecture, based on typical streaming-platform and cloud pricing and typical enterprise staffing. They are planning inputs, not a quote, and should be validated against actual volumes and contracts.
 </div>
 
 <h1>1. Cost Components</h1>
@@ -42,24 +42,24 @@
 <h3>Event Streaming Platform (the backbone)</h3>
 <table>
   <tr><th>Component</th><th>Pricing Model</th><th>Key Driver</th><th>Optimization Lever</th></tr>
-  <tr><td>Kafka — Confluent Cloud or Amazon MSK</td><td>Per broker-hour (MSK) or per eCKU + throughput/storage (Confluent)</td><td>Partition count, throughput, retention, connectors</td><td>Right-size partitions; tiered storage; compact where possible</td></tr>
+  <tr><td>Kafka cluster (managed or self-run)</td><td>Per broker-hour, or per throughput unit + storage</td><td>Partition count, throughput, retention, connectors</td><td>Right-size partitions; tiered storage; compact where possible</td></tr>
   <tr><td>Schema Registry</td><td>Bundled or per-instance</td><td>Schema count / request volume</td><td>Negligible; keep one governed registry</td></tr>
   <tr><td>Stream compute (Kafka Streams / Flink)</td><td>Compute hours / task slots</td><td>Stateful joins (decisioning), windowed fraud, projectors</td><td>Right-size parallelism per processor; scale fraud windows by volume</td></tr>
   <tr><td>Kafka Connect (CDC + outbox)</td><td>Connector tasks</td><td>Policy CDC volume; number of sink connectors</td><td>Single-message-transform filtering; batch sinks</td></tr>
 </table>
 
-<h3>AWS supporting infrastructure</h3>
+<h3>Supporting infrastructure</h3>
 <table>
-  <tr><th>Service</th><th>Usage Pattern</th><th>Est. Monthly</th><th>Optimization</th></tr>
-  <tr><td>Amazon MSK (if self-hosted Kafka)</td><td>3 brokers, ~50k claim events/day peak</td><td>$1,500 – $2,800</td><td>Tiered storage; right-size broker type</td></tr>
-  <tr><td>Compute (EKS/Fargate for processors &amp; APIs)</td><td>Stream processors + Domain APIs + Intake</td><td>$2,000 – $4,000</td><td>Autoscale on lag; spot for non-critical projectors</td></tr>
-  <tr><td>RDS / DynamoDB (read models)</td><td>5 read models, mixed</td><td>$800 – $1,500</td><td>Right-size; archive closed-claim projections</td></tr>
-  <tr><td>API Gateway</td><td>~500k calls/day across channels</td><td>$200 – $500</td><td>Cache GET /claims; HTTP API type</td></tr>
-  <tr><td>ElastiCache (Redis)</td><td>Session + hot read cache</td><td>$200 – $500</td><td>Monitor eviction; right-size</td></tr>
-  <tr><td>S3 + ECM references</td><td>Document refs/hashes (not binaries)</td><td>&lt; $100</td><td>Lifecycle to Glacier for closed claims</td></tr>
-  <tr><td>Observability (Datadog / CloudWatch / X-Ray)</td><td>Metrics, logs, traces</td><td>$1,500 – $3,000</td><td>90-day log retention; sample traces; no PII in logs</td></tr>
-  <tr><td>KMS / Secrets / WAF</td><td>Encryption, secrets, edge</td><td>$300 – $600</td><td>Security is non-negotiable — don't over-optimize</td></tr>
-  <tr><td><strong>AWS Total (est.)</strong></td><td></td><td><strong>$6,600 – $13,000/month</strong></td><td></td></tr>
+  <tr><th>Component</th><th>Usage Pattern</th><th>Est. Monthly</th><th>Optimization</th></tr>
+  <tr><td>Kafka brokers (if self-run)</td><td>3 brokers, ~50k claim events/day peak</td><td>$1,500 – $2,800</td><td>Tiered storage; right-size broker type</td></tr>
+  <tr><td>Compute for processors &amp; APIs</td><td>Stream processors + Domain APIs + Intake</td><td>$2,000 – $4,000</td><td>Autoscale on lag; cheaper spare capacity for non-critical projectors</td></tr>
+  <tr><td>Read-model stores (relational + key-value)</td><td>5 read models, mixed</td><td>$800 – $1,500</td><td>Right-size; archive closed-claim projections</td></tr>
+  <tr><td>API gateway</td><td>~500k calls/day across channels</td><td>$200 – $500</td><td>Cache GET /claims; lightweight gateway tier</td></tr>
+  <tr><td>In-memory cache</td><td>Session + hot read cache</td><td>$200 – $500</td><td>Monitor eviction; right-size</td></tr>
+  <tr><td>Object storage (document refs/hashes)</td><td>References, not binaries</td><td>&lt; $100</td><td>Lifecycle to cold storage for closed claims</td></tr>
+  <tr><td>Observability tooling</td><td>Metrics, logs, traces</td><td>$1,500 – $3,000</td><td>90-day log retention; sample traces; no PII in logs</td></tr>
+  <tr><td>Security services (key mgmt, secrets, firewall)</td><td>Encryption, secrets, edge</td><td>$300 – $600</td><td>Security is non-negotiable — don't over-optimize</td></tr>
+  <tr><td><strong>Infrastructure Total (est.)</strong></td><td></td><td><strong>$6,600 – $13,000/month</strong></td><td></td></tr>
 </table>
 
 <!-- COST BY PHASE -->
@@ -69,8 +69,8 @@
 <div class="phase-header">Phase 1 — Year 1 (Backbone + First Signal)</div>
 <div class="cost-box">
   <h3>Year 1 Estimated Annual Cost</h3>
-  <div class="cost-row"><span>Event streaming platform (Confluent/MSK) + Schema Registry</span><span>$120k – $220k</span></div>
-  <div class="cost-row"><span>AWS infrastructure (compute, read models, observability)</span><span>$90k – $150k</span></div>
+  <div class="cost-row"><span>Event streaming platform (Kafka) + schema registry</span><span>$120k – $220k</span></div>
+  <div class="cost-row"><span>Cloud infrastructure (compute, read models, observability)</span><span>$90k – $150k</span></div>
   <div class="cost-row"><span>Implementation — platform + Intake + Life happy-path (incremental eng.)</span><span>$700k – $1.1M</span></div>
   <div class="cost-row"><span>Identity / KYC + external data (DMF, MIB) integration</span><span>$50k – $120k</span></div>
   <div class="cost-total"><span>Year 1 Total (est.)</span><span>$1.0M – $1.6M</span></div>
@@ -81,7 +81,7 @@
 <div class="cost-box">
   <h3>Year 2 Estimated Annual Cost</h3>
   <div class="cost-row"><span>Event streaming platform (scaled to all 9 contexts, DI volume)</span><span>$180k – $300k</span></div>
-  <div class="cost-row"><span>AWS infrastructure (more processors, money-movement, correspondence)</span><span>$140k – $230k</span></div>
+  <div class="cost-row"><span>Cloud infrastructure (more processors, money-movement, correspondence)</span><span>$140k – $230k</span></div>
   <div class="cost-row"><span>Implementation — DI, saga, omnichannel correspondence, fraud rules</span><span>$500k – $800k</span></div>
   <div class="cost-row"><span>Stable run team (no incremental hire)</span><span>$0 incremental</span></div>
   <div class="cost-total"><span>Year 2 Total (est.)</span><span>$820k – $1.33M</span></div>
@@ -91,7 +91,7 @@
 <div class="cost-box">
   <h3>Year 3 Estimated Annual Cost</h3>
   <div class="cost-row"><span>Event streaming + ML compute (fraud/STP models, feature store)</span><span>$220k – $380k</span></div>
-  <div class="cost-row"><span>AWS infrastructure (expanded, ML serving)</span><span>$180k – $300k</span></div>
+  <div class="cost-row"><span>Cloud infrastructure (expanded, ML serving)</span><span>$180k – $300k</span></div>
   <div class="cost-row"><span>Implementation — ML, self-service FNOL, predictive recert</span><span>$400k – $700k</span></div>
   <div class="cost-row"><span>Legacy claims-system decommission (one-time savings offset)</span><span>($150k – $400k savings)</span></div>
   <div class="cost-total"><span>Year 3 Total (est.)</span><span>$650k – $1.0M (net of legacy savings)</span></div>
@@ -117,7 +117,7 @@
 <div class="lever"><strong>1 · Topic retention &amp; compaction</strong> — Compact the event-sourced log (<code>claims.lifecycle</code>, <code>policy.snapshot</code>) and time-bound high-volume delete topics (<code>claims.fnol</code> 7d). Archive closed-claim history to cheap object storage for the statutory retention period.</div>
 <div class="lever"><strong>2 · Kafka tiered storage</strong> — Move older segments off broker disk to object storage; large reduction on long-retention cost without losing replay.</div>
 <div class="lever"><strong>3 · Right-size stream parallelism</strong> — Decisioning and fraud are the compute-heavy processors; low-volume projectors don't need the same parallelism. Tune per processor, review quarterly.</div>
-<div class="lever"><strong>4 · API Gateway caching</strong> — Cache GET /claims/{id} with a short TTL aligned to projection lag; cuts read-model query load for repeat status checks (clients refresh the same claim repeatedly).</div>
+<div class="lever"><strong>4 · API-gateway caching</strong> — Cache GET /claims/{id} with a short TTL aligned to projection lag; cuts read-model query load for repeat status checks (clients refresh the same claim repeatedly).</div>
 <div class="lever"><strong>5 · Autoscale on consumer lag</strong> — Scale processor replicas on lag, not a fixed schedule; scale to zero for batch-like jobs (DI monthly benefit run) between runs.</div>
 <div class="lever"><strong>6 · Observability hygiene</strong> — 90-day log retention, trace sampling, metric filters instead of logging raw payloads. Observability is often the second-largest line after Kafka — keep it deliberate.</div>
 <div class="lever"><strong>7 · Defer ML to Year 3</strong> — ML compute and a feature store are real cost. Rule-based decisioning/fraud carries Years 1–2 with no training-data spend and full explainability; ML earns its cost only once labeled history exists.</div>
@@ -126,7 +126,7 @@
 <table>
   <tr><th>Practice</th><th>Cadence</th><th>Owner</th></tr>
   <tr><td>Kafka usage review — partitions, retention, connectors</td><td>Monthly</td><td>Platform Eng + FinOps</td></tr>
-  <tr><td>AWS cost anomaly alert (&gt; 30% spike)</td><td>Automated</td><td>FinOps — P4</td></tr>
+  <tr><td>Cloud cost anomaly alert (&gt; 30% spike)</td><td>Automated</td><td>FinOps — P4</td></tr>
   <tr><td>Retention/compaction audit vs. statutory minimums</td><td>Quarterly</td><td>Data Engineering + Compliance</td></tr>
   <tr><td>Stream parallelism right-sizing</td><td>Quarterly</td><td>Platform Engineering</td></tr>
   <tr><td>ROI report — STP rate, cycle time, fraud savings vs. spend</td><td>Quarterly</td><td>Product + Architecture → CIO/CFO</td></tr>

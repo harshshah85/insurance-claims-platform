@@ -15,9 +15,9 @@ Reference documents for a **Kafka event-driven Life &amp; Disability Income (DI)
 | [Correspondence-and-Money-Movement.html](Correspondence-and-Money-Movement.html) | Event-driven inbound/outbound correspondence (client, advisor, service reps), the omnichannel preference center, and the money-movement saga — dual control, OFAC, payment holds, tax withholding, idempotent disbursement, treasury reconciliation. |
 | [Security-and-Regulatory-Compliance.html](Security-and-Regulatory-Compliance.html) | 7-layer security design plus the Life/DI regulatory map — UCSPA prompt-pay, contestability, DMF/escheatment, ERISA, HIPAA/GLBA, OFAC/AML, SOX over money movement, and the immutable audit model. |
 | [Observability-Monitoring.html](Observability-Monitoring.html) | Event-freshness and decisioning SLOs, consumer-lag and DLQ alerting, money-movement watch metrics, STP-rate / cycle-time business SLOs, P1–P4 alert routing, dashboards per role, and the blameless incident process. |
-| [FinOps-Cost-Model.html](FinOps-Cost-Model.html) | Confluent / MSK and AWS cost components, phase cost estimates (Year 1–3), the ROI framework driven by STP automation and cycle-time reduction, 7 optimization levers, and cost governance. |
+| [FinOps-Cost-Model.html](FinOps-Cost-Model.html) | Kafka and cloud-infrastructure cost components, phase cost estimates (Year 1–3), the ROI framework driven by automation and faster cycle time, 7 optimization levers, and cost governance. |
 | [Claims-Onboarding-Workflow.html](Claims-Onboarding-Workflow.html) | New product/plan vs. new claim-intake onboarding workflows, automated vs. manual steps, quarantine recovery for unresolved policy numbers, and the Year 3 self-service FNOL vision. |
-| [Event-Driven-Decision-Records.html](Event-Driven-Decision-Records.html) | Architecture Decision Records — event sourcing vs. CRUD, choreography vs. orchestration, Kafka vs. Kinesis vs. EventBridge, Avro vs. Protobuf, saga vs. 2PC for money movement, with a decision matrix per ADR. |
+| [Event-Driven-Decision-Records.html](Event-Driven-Decision-Records.html) | Short decision records — events vs. overwriting rows, services reacting vs. a central coordinator, a durable log vs. a managed streaming service, the message format, and small reversible steps vs. one big transaction for payments. |
 
 ## Platform Architecture Overview
 

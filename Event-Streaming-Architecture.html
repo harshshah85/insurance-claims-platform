@@ -113,18 +113,18 @@
                                       └─ append  <span class="y">StpEligibilityScored</span> → <span class="y">ClaimAutoApproved</span>  to <span class="g">claims.lifecycle.v1</span>
 
 <span class="m"># Query path (read side) — built by stream processors, never by the writer</span>
-<span class="g">claims.lifecycle.v1</span>  ─►  Projector (Kafka Streams)  ─►  <span class="b">claim_summary</span> read model (Postgres / DynamoDB)
-                                                  └─►  <span class="b">advisor_worklist</span> read model (Elasticsearch)
+<span class="g">claims.lifecycle.v1</span>  ─►  Projector (Kafka Streams)  ─►  <span class="b">claim_summary</span> read model (relational store)
+                                                  └─►  <span class="b">advisor_worklist</span> read model (search index)
 </div>
 
 <h3>Read models (projections)</h3>
 <table>
   <tr><th>Read Model</th><th>Store</th><th>Built From</th><th>Serves</th></tr>
-  <tr><td><code>claim_summary</code></td><td>PostgreSQL</td><td>claims.lifecycle, decision, payment</td><td>Client portal + advisor desktop claim view</td></tr>
-  <tr><td><code>advisor_worklist</code></td><td>Elasticsearch</td><td>claims.lifecycle, requirements</td><td>Service-rep / advisor task queues, search</td></tr>
-  <tr><td><code>di_benefit_ledger</code></td><td>PostgreSQL</td><td>di.benefit.v1</td><td>Recurring DI benefit schedule &amp; history</td></tr>
-  <tr><td><code>fraud_case_view</code></td><td>DynamoDB</td><td>claims.fraud.scored, lifecycle</td><td>SIU case management UI</td></tr>
-  <tr><td><code>payment_ledger</code></td><td>PostgreSQL</td><td>payment.disbursement.v1</td><td>Treasury reconciliation &amp; 1099-R reporting</td></tr>
+  <tr><td><code>claim_summary</code></td><td>Relational DB</td><td>claims.lifecycle, decision, payment</td><td>Client portal + advisor desktop claim view</td></tr>
+  <tr><td><code>advisor_worklist</code></td><td>Search index</td><td>claims.lifecycle, requirements</td><td>Service-rep / advisor task queues, search</td></tr>
+  <tr><td><code>di_benefit_ledger</code></td><td>Relational DB</td><td>di.benefit.v1</td><td>Recurring DI benefit schedule &amp; history</td></tr>
+  <tr><td><code>fraud_case_view</code></td><td>Key-value store</td><td>claims.fraud.scored, lifecycle</td><td>SIU case management UI</td></tr>
+  <tr><td><code>payment_ledger</code></td><td>Relational DB</td><td>payment.disbursement.v1</td><td>Treasury reconciliation &amp; 1099-R reporting</td></tr>
 </table>
 
 <div class="note"><strong>Rebuild safety:</strong> because read models are pure projections, any one can be dropped and rebuilt by replaying the log from offset 0. This is the operational escape hatch — a projection bug is fixed by deploying the corrected projector and replaying, not by data-patching production rows.</div>

@@ -78,21 +78,21 @@
   <span class="y">Policy Admin</span> ──CDC──► Kafka Connect ──────────────┘                                  └─► <span class="p">Correspondence Trigger</span>
 
   <span class="m">READ MODELS (CQRS)                 SERVING                     OUTBOUND</span>
-  <span class="g">claim_summary</span> (Postgres)  ─┐
-  <span class="g">advisor_worklist</span> (ES)     ─┼─► <span class="b">Claims Domain APIs</span> ─► <span class="b">API Gateway</span> ─► channels
-  <span class="g">di_benefit_ledger</span> (PG)    ─┤
-  <span class="g">fraud_case_view</span> (Dynamo)  ─┤      <span class="y">Correspondence Engine</span> ─► Email/SMS/Secure/Print
-  <span class="g">payment_ledger</span> (PG)       ─┘      <span class="y">Payment Saga</span> ─► Treasury / EFT / Check
+  <span class="g">claim_summary</span> (relational) ─┐
+  <span class="g">advisor_worklist</span> (search) ─┼─► <span class="b">Claims Domain APIs</span> ─► <span class="b">API gateway</span> ─► channels
+  <span class="g">di_benefit_ledger</span> (rel.)  ─┤
+  <span class="g">fraud_case_view</span> (key-val) ─┤      <span class="y">Correspondence Engine</span> ─► Email/SMS/Secure/Print
+  <span class="g">payment_ledger</span> (rel.)     ─┘      <span class="y">Payment Saga</span> ─► Treasury / EFT / Check
 </div>
 
 <table>
   <tr><th>Container</th><th>Tech</th><th>Responsibility</th></tr>
   <tr><td>Intake API</td><td>Stateless service + transactional outbox</td><td>Accept FNOL from any channel; emit <code>claims.fnol.v1</code> reliably</td></tr>
-  <tr><td>Kafka backbone</td><td>Apache Kafka (Confluent/MSK) + Schema Registry</td><td>14 topics; the event-sourced system of record</td></tr>
+  <tr><td>Kafka backbone</td><td>Apache Kafka + a schema registry</td><td>14 topics; the event-sourced system of record</td></tr>
   <tr><td>Kafka Connect</td><td>CDC + outbox connectors</td><td>Stream Policy Admin changes into <code>policy.snapshot.v1</code>; drain outboxes</td></tr>
   <tr><td>Stream processors</td><td>Kafka Streams + Flink</td><td>Decisioning, fraud, DI timers, projections, correspondence triggers</td></tr>
-  <tr><td>Read models</td><td>Postgres / Elasticsearch / DynamoDB</td><td>CQRS projections rebuilt from the log</td></tr>
-  <tr><td>Claims Domain APIs</td><td>REST/GraphQL behind API Gateway</td><td>Versioned read access for all channels — never the raw log</td></tr>
+  <tr><td>Read models</td><td>Relational DB / search index / key-value store</td><td>CQRS projections rebuilt from the log</td></tr>
+  <tr><td>Claims Domain APIs</td><td>REST/GraphQL behind an API gateway</td><td>Versioned read access for all channels — never the raw log</td></tr>
   <tr><td>Correspondence Engine</td><td>Templating + delivery service</td><td>Omnichannel outbound honoring preference &amp; consent</td></tr>
   <tr><td>Payment Saga</td><td>Saga orchestrator + idempotent commands</td><td>Controlled money movement to treasury</td></tr>
 </table>

@@ -74,17 +74,17 @@
 <div class="page-break"></div>
 
 <div class="adr">
-  <h3>ADR-04 — Kafka vs. Kinesis vs. EventBridge <span class="status">ACCEPTED</span></h3>
-  <p class="ctx"><strong>Context:</strong> need a durable, replayable, ordered log as the system of record — not just transport — with a rich stream-processing and connector ecosystem.</p>
+  <h3>ADR-04 — A durable log (Kafka) vs. a managed streaming service vs. an event router <span class="status">ACCEPTED</span></h3>
+  <p class="ctx"><strong>Context:</strong> we need a durable, replayable, ordered log that <em>is</em> the system of record — not just a way to move messages around — with a mature stream-processing and connector ecosystem.</p>
   <table>
-    <tr><th>Capability</th><th class="winner">Kafka (Confluent/MSK)</th><th>Kinesis</th><th>EventBridge</th></tr>
-    <tr><td>Long retention as system of record</td><td>Yes (compaction + tiered storage)</td><td>Limited retention</td><td>No (router, not a log)</td></tr>
-    <tr><td>Ordered, keyed partitions</td><td>Yes</td><td>Yes (shards)</td><td>No ordering guarantee</td></tr>
-    <tr><td>Replay from arbitrary offset</td><td>Yes</td><td>Within retention</td><td>No</td></tr>
-    <tr><td>Stream processing &amp; joins</td><td>Streams + Flink, mature</td><td>KCL / Flink</td><td>N/A</td></tr>
-    <tr><td>Schema Registry &amp; connectors</td><td>Rich ecosystem</td><td>Smaller</td><td>Schema registry, limited connectors</td></tr>
+    <tr><th>Capability</th><th class="winner">Durable log (Kafka)</th><th>Managed streaming service</th><th>Event router / bus</th></tr>
+    <tr><td>Long retention as the record</td><td>Yes (compaction + tiered storage)</td><td>Limited retention</td><td>No — it routes, it doesn't store</td></tr>
+    <tr><td>Ordered, keyed partitions</td><td>Yes</td><td>Yes (sharded)</td><td>No ordering guarantee</td></tr>
+    <tr><td>Replay from any point</td><td>Yes</td><td>Only within retention</td><td>No</td></tr>
+    <tr><td>Stream processing &amp; joins</td><td>Mature (Kafka Streams + Flink)</td><td>Library-based</td><td>N/A</td></tr>
+    <tr><td>Schema registry &amp; connectors</td><td>Rich ecosystem</td><td>Smaller</td><td>Limited connectors</td></tr>
   </table>
-  <div class="decision"><span class="winner">Decision:</span> Kafka — the only option that is a true replayable log of record with the processing/connector ecosystem the platform depends on. EventBridge may still front simple AWS-native fan-out at the edges.</div>
+  <div class="decision"><span class="winner">Decision:</span> Kafka — the only option that is a true replayable log of record with the processing and connector ecosystem the platform leans on. A managed event router can still handle simple fan-out at the edges.</div>
 </div>
 
 <div class="adr">
