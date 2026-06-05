@@ -33,11 +33,11 @@
 </div>
 
 <div class="note">
-  <strong>Two scores, one gate.</strong> Every claim is scored twice: an <strong>STP eligibility score</strong> (how clean and automatable is this claim?) and a <strong>fraud risk score</strong> (how suspicious is it?). The low-touch / auto-ticketing path opens only when STP is high <em>and</em> fraud is low. Fraud risk is a hard gate — it can veto automation no matter how clean the claim looks.
+  <strong>Two scores, one gate.</strong> Every claim gets two scores: an <strong>STP score</strong> (how clean and safe to automate?) and a <strong>fraud score</strong> (how suspicious?). The auto-ticket path opens only when the STP score is high <em>and</em> the fraud score is low. Fraud is a hard gate — a suspicious claim never auto-pays, no matter how clean it otherwise looks.
 </div>
 
-<h1>1. STP Eligibility Score</h1>
-<h2>Determines whether a claim can be straight-through-processed (auto-adjudicated and auto-ticketed) or needs human touch.</h2>
+<h1>1. STP Score — Can We Auto-Ticket It?</h1>
+<h2>Decides whether a claim can run straight through with no human (auto-ticketed) or needs a person to look at it. "STP" = straight-through processing.</h2>
 
 <div class="formula">
 STP = (policy_in_force × 0.25)<br>

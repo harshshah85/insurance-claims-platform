@@ -1,6 +1,6 @@
 # Life &amp; DI Claims Platform — Event-Driven Reference Architecture
 
-Architecture and domain-modeling reference documents for a **Kafka event-driven Life &amp; Disability Income (DI) claims platform**. Vendor-neutral reference design — event sourcing + CQRS, straight-through low-touch adjudication, fraud scoring, omnichannel correspondence, and controlled money movement.
+Reference documents for a **Kafka event-driven Life &amp; Disability Income (DI) claims platform** — a vendor-neutral design that takes a claim from the moment it's filed through review, fraud checks, letters, and payment, with a low-touch "auto-ticket" path for the clean ones. **Life (death) claims are filed by a beneficiary; DI claims by the policyholder** — the platform handles both, and that one difference shapes much of the design.
 
 🔗 **Live:** https://harshshah85.github.io/insurance-claims-platform/
 
@@ -21,7 +21,7 @@ Architecture and domain-modeling reference documents for a **Kafka event-driven 
 
 ## Platform Architecture Overview
 
-**Life &amp; DI Claims Platform** — an event-driven platform that takes a claim from First Notice of Loss (FNOL) through adjudication, correspondence, and disbursement, with a low-touch straight-through path for clean claims and an SIU path for high-risk ones.
+**Life &amp; DI Claims Platform** — an event-driven platform that takes a claim from first filing through review, letters, and payment, with a fast automatic path for clean claims and a fraud-investigation path for risky ones. ("First filing" is the insurance term *First Notice of Loss / FNOL*.)
 
 ```
 Client / Advisor / Service Rep (FNOL) → Intake API → Kafka (event-sourced claim) → STP Decisioning → Decision
@@ -31,11 +31,11 @@ Policy Admin System (CDC) ──────────────────
 ```
 
 ### Key Design Decisions
-- **Event sourcing as system of record**: the ordered event log is the source of truth; read models are CQRS projections rebuilt from it — a natural regulatory audit trail.
-- **Policy Admin stays the golden record**: in-force status, coverage and contestability dates flow in via Kafka Connect CDC (`policy.snapshot.v1`); FNOL with unresolved policy numbers is quarantined.
-- **Low-touch path via STP score**: STP ≥ 85 auto-adjudicates and auto-tickets; 65–84 assisted; 40–64 standard; &lt; 40 complex / SIU. Rules first, ML in Year 3.
-- **STP eligibility formula**: `(policy_in_force × 0.25) + (coverage_clear × 0.20) + (doc_completeness × 0.20) + (identity_verified × 0.15) + (fraud_inverse × 0.10) + (amount_in_band × 0.10)`
-- **Money movement as a saga, never 2PC**: choreographed disbursement with compensation, dual-control approval, OFAC screening, idempotent payment commands, treasury reconciliation.
+- **Store the claim as a list of events**: we keep the ordered list of what happened to a claim instead of a row we overwrite; screens read simple copies built from it. A complete, tamper-evident history comes for free.
+- **The policy system stays the source of truth**: we don't own policy data — we read a live feed of changes from the existing policy admin system. A claim that can't be matched to a policy is held for research, not dropped.
+- **Auto-ticket the clean claims**: a simple score (the STP score) sorts claims — ≥ 85 fully automatic, 65–84 quick human sign-off, 40–64 full review, &lt; 40 complex / fraud unit. Plain rules first, machine learning later.
+- **STP score formula**: `(policy_in_force × 0.25) + (coverage_clear × 0.20) + (doc_completeness × 0.20) + (identity_verified × 0.15) + (fraud_inverse × 0.10) + (amount_in_band × 0.10)`
+- **Pay out in small, reversible steps**: paying out spans our platform, treasury, and a bank, so each step is its own tracked stage that can be undone — with two approvers for large payments, sanctions screening, and no chance of paying twice.
 
 ---
 *Prepared by Harsh Shah — June 2026*

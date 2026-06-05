@@ -69,8 +69,27 @@
 
 <!-- LIFECYCLE -->
 <div class="page-break"></div>
-<h1>3. Claim Lifecycle — Life (Death/Mortality)</h1>
-<h2>A Life claim is terminal: it pays a face amount once and closes. Contestability is the defining branch.</h2>
+<h1>3. How Life and DI Claims Differ</h1>
+<h2>Same platform, two very different jobs. The biggest difference is who starts the claim — and that one fact drives nearly everything else.</h2>
+
+<p style="font-size:12px;line-height:1.7;">A <strong>life (death) claim is beneficiary-driven</strong>: the insured has died, so someone else — a spouse, a child, the estate — files it. That person usually isn't in our systems and may not even know the policy number. A <strong>DI claim is client-initiated</strong>: the living policyholder files their own claim because they can't work, and they're already a known, logged-in customer. Most of the differences below fall out of that one fact.</p>
+
+<table>
+  <tr><th>&nbsp;</th><th>Life — death claim (beneficiary-driven)</th><th>Disability Income — DI (client-initiated)</th></tr>
+  <tr><td><strong>Who files it</strong></td><td>A beneficiary or the estate — often a stranger to us, grieving, may not know policy details</td><td>The policyholder themselves — an existing, authenticated customer</td></tr>
+  <tr><td><strong>What we're really doing</strong></td><td>Verify the death and who's entitled, then pay a lump sum once</td><td>Confirm they can't work, then pay a monthly benefit and keep checking it stays correct</td></tr>
+  <tr><td><strong>The hard part to build</strong></td><td>The front door: proving the identity of an unknown filer, resolving who the beneficiary is, verifying the death, and finding the policy from the decedent's name/SSN</td><td>The long tail: recurring payments, periodic re-checks, return-to-work, and reducing the benefit for other income (e.g. Social Security) over months or years</td></tr>
+  <tr><td><strong>Shape</strong></td><td>One-time — pays once and closes</td><td>Long-running — an open case that pays each period until recovery or the benefit ends</td></tr>
+  <tr><td><strong>Defining gate</strong></td><td>Contestability — within 2 years of issue we may review the original application before paying</td><td>Recertification — each period we re-confirm they're still eligible before the next payment</td></tr>
+  <tr><td><strong>Where fraud shows up</strong></td><td>Misrepresentation on the application, a faked death, the wrong beneficiary</td><td>Disability claimed after recovery, unreported income, missed offsets</td></tr>
+  <tr><td><strong>Business case</strong></td><td>Low volume, large payout, one shot. The win is <em>speed and getting it right</em> in a hard moment — a brand and advisor-retention moment for the family</td><td>Higher touch, runs for years. The win is <em>stopping leakage</em> — catching return-to-work, applying offsets, not overpaying month after month</td></tr>
+  <tr><td><strong>Mostly handled in</strong></td><td>Onboarding (intake identity + quarantine recovery), Decisioning (the contestability gate)</td><td>Money Movement (the recurring payment saga + offsets) and the Disability Management context below</td></tr>
+</table>
+
+<div class="note"><strong>One nuance:</strong> "life claim" here means the <em>death</em> claim — the common, beneficiary-driven case. Living/accelerated benefits on a life policy are filed by the insured themselves, so they behave more like the client-initiated side. We treat the death claim as the primary life flow.</div>
+
+<h3>The two lifecycles</h3>
+<p style="font-size:12px;">A life claim is mostly a straight line that ends in one payment. Contestability is the branch that can pull it out of the fast path.</p>
 
 <div class="sm">
 <span class="b">NOTIFIED</span>
@@ -86,10 +105,7 @@
    <span class="m">side states: WITHDRAWN, REOPENED (e.g. additional beneficiary), QUARANTINE</span>
 </div>
 
-<div class="note"><strong>Contestability is the Life-specific gate:</strong> within the 2-year contestability window, an approval cannot be straight-through — the claim is forced into <code>CONTESTABILITY_REVIEW</code> regardless of STP score, because the insurer may investigate material misrepresentation on the application. The STP path resumes only for non-contestable claims.</div>
-
-<h1>4. Claim Lifecycle — Disability Income (DI)</h1>
-<h2>A DI claim is durative: after approval it pays a recurring benefit and must be periodically recertified until return-to-work, benefit exhaustion, or termination.</h2>
+<p style="font-size:12px;">A DI claim opens and then loops — paying and re-checking each period until the person returns to work or the benefit ends. That re-check loop (the <code>RecertificationDue</code> timer) is the heartbeat of an active DI claim.</p>
 
 <div class="sm">
 <span class="b">NOTIFIED</span> ─► <span class="b">INTAKE</span> ─► <span class="b">ELIGIBILITY_REVIEW</span>  <span class="m">(elimination period, occupation definition, APS)</span>
@@ -103,12 +119,10 @@
               └─► <span class="r">DENIED</span> ─► <span class="b">CLOSED</span>
 </div>
 
-<div class="note"><strong>Why DI gets its own context (Disability Management):</strong> Life closes after one payment; DI runs for months or years with recurring money movement and recurring regulatory recertification. The <code>RecertificationDue</code> timer (a punctuated Kafka Streams wall-clock timer, see Event Streaming Architecture §6) is the heartbeat of an active DI claim.</div>
-
 <!-- READ MODELS / SERVING -->
 <div class="page-break"></div>
-<h1>5. From Events to Read Models</h1>
-<h2>The domain model is written as events; consumers see CQRS projections. The mapping is explicit so each channel gets a fit-for-purpose view.</h2>
+<h1>4. From Events to Read Models</h1>
+<h2>The claim is stored as a list of events; each screen reads from its own simple copy (a CQRS read model) built from those events.</h2>
 
 <table>
   <tr><th>Consumer</th><th>Read Model</th><th>What They See</th></tr>

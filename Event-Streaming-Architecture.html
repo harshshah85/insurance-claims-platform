@@ -38,7 +38,7 @@
 </div>
 
 <div class="note">
-  <strong>Design stance:</strong> Kafka is the <em>backbone</em>, not a side-channel. Each claim is an event-sourced aggregate whose ordered event log is the system of record. Everything downstream — decisioning, fraud, correspondence, money movement, analytics — is a consumer of that log. This document defines the topics, the event contracts, and the processing topology that make that safe at insurer scale.
+  <strong>The idea in one line:</strong> Kafka isn't a side-channel here — it's the backbone. Each claim is stored as its ordered list of events, and that list is the official record. Everything else — auto-ticketing, fraud checks, letters, payments, reporting — simply reads from it. This document covers the topics, the message formats, and how the stream processing is wired together.
 </div>
 
 <h1>1. Topic Taxonomy — 14 Core Topics</h1>

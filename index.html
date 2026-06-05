@@ -92,13 +92,13 @@
 <div class="hero">
   <div class="hero-tag">Architecture Reference</div>
   <h1>Life &amp; Disability Income<br><span>Claims Platform</span></h1>
-  <p>End-to-end reference architecture for an event-driven Life &amp; DI claims platform — Kafka event backbone, event sourcing + CQRS, straight-through low-touch adjudication, fraud scoring, omnichannel correspondence, and controlled money movement.</p>
+  <p>A reference design for handling life and disability income claims as a stream of events on Kafka — from a claim being filed, through review and fraud checks, to letters and payment — with a low-touch "auto-ticket" path for the clean, simple ones. Life (death) claims are filed by a beneficiary; DI claims by the policyholder. The platform handles both.</p>
   <div class="hero-meta">
     <span><span class="dot"></span> Apache Kafka</span>
-    <span><span class="dot" style="background:#457b9d"></span> Event Sourcing + CQRS</span>
-    <span><span class="dot" style="background:#d4a017"></span> STP Decisioning</span>
-    <span><span class="dot" style="background:#e63946"></span> Fraud / SIU</span>
-    <span><span class="dot" style="background:#6d3fa0"></span> Money Movement</span>
+    <span><span class="dot" style="background:#457b9d"></span> Event sourcing</span>
+    <span><span class="dot" style="background:#d4a017"></span> Auto-ticket / low-touch</span>
+    <span><span class="dot" style="background:#e63946"></span> Fraud checks</span>
+    <span><span class="dot" style="background:#6d3fa0"></span> Payments</span>
   </div>
 </div>
 
@@ -336,23 +336,23 @@
   <div class="decision-grid">
     <div class="decision-item">
       <div class="decision-num">Decision 01</div>
-      <h3>Event Sourcing as System of Record</h3>
-      <p>Each claim is an event-sourced aggregate; the ordered event log is the source of truth, not a mutable row. Read models are CQRS projections rebuilt from the log. This gives a natural regulatory audit trail and time-travel for disputes.</p>
+      <h3>Store the claim as a list of events</h3>
+      <p>We keep each claim as the ordered list of things that happened to it, instead of a row we overwrite. Screens read from simple copies built from that list. The payoff: a complete, tamper-evident history for free — exactly what regulators and disputes need.</p>
     </div>
     <div class="decision-item">
       <div class="decision-num">Decision 02</div>
-      <h3>Policy Admin Stays the Golden Record</h3>
-      <p>The Policy Admin System remains the system of record for in-force status, coverage and contestability dates. The platform consumes it via Kafka Connect CDC into <code>policy.snapshot.v1</code>. FNOL events with unresolved policy numbers are quarantined, not dropped.</p>
+      <h3>The policy system stays the source of truth</h3>
+      <p>We don't copy or own policy data. The existing policy admin system stays the authority on what's in force, what's covered, and the key dates; we just read a live feed of its changes. If a filed claim can't be matched to a policy, we hold it for research rather than drop it.</p>
     </div>
     <div class="decision-item">
       <div class="decision-num">Decision 03</div>
-      <h3>Low-Touch Path via STP Score</h3>
-      <p>Clean, low-risk claims are auto-adjudicated and auto-ticketed. STP eligibility ≥ 85 routes to straight-through approval; 65–84 assisted; 40–64 standard; &lt; 40 complex / SIU. Rules first, ML propensity in Year 3.</p>
+      <h3>Auto-ticket the clean claims</h3>
+      <p>Clean, low-risk claims are decided automatically and auto-ticketed — no queue, no human. A simple score (we call it the STP score) sorts them: ≥ 85 fully automatic, 65–84 a quick human sign-off, 40–64 full review, &lt; 40 complex / fraud unit. Plain rules first, machine learning later.</p>
     </div>
     <div class="decision-item">
       <div class="decision-num">Decision 04</div>
-      <h3>Claims Domain APIs as Abstraction Layer</h3>
-      <p>Consuming apps (client portal, advisor desktop, service-rep tools) never read the event log directly. They query CQRS read models through versioned Claims Domain APIs, decoupling channels from the internal event model.</p>
+      <h3>Apps read through one stable set of APIs</h3>
+      <p>The client portal, advisor desktop, and service-rep tools never touch the raw event stream. They go through one versioned set of claims APIs, so we can change how things work inside without breaking the screens.</p>
     </div>
     <div class="decision-item">
       <div class="decision-num">Decision 05</div>
@@ -361,8 +361,8 @@
     </div>
     <div class="decision-item">
       <div class="decision-num">Decision 06</div>
-      <h3>Money Movement as a Saga, Never 2PC</h3>
-      <p>Disbursement is a choreographed saga with compensation, not a distributed transaction. Dual-control approval, OFAC screening, payment holds, and tax withholding are explicit states. Payment commands are idempotent and reconciled against treasury.</p>
+      <h3>Pay out in small, reversible steps</h3>
+      <p>Paying out crosses our platform, the treasury system, and a bank — so we never wrap it in one big transaction. Each step is its own tracked stage that can be undone if a later one fails. Two approvers for large payments, sanctions screening, holds, and tax handling are all explicit steps — and a payment can never go out twice.</p>
     </div>
   </div>
 </div>
