@@ -103,8 +103,8 @@ Fraud = (velocity × 0.25)<br>
 <h1>3. Rules First, ML Later</h1>
 <table>
   <tr><th>Phase</th><th>Decisioning</th><th>Fraud</th><th>Why</th></tr>
-  <tr><td>Year 1–2</td><td>Deterministic weighted rules (the formulas above), tuned with adjudicators</td><td>Rule-based signals + external data hits</td><td>Explainable from day one; regulators and adjudicators can audit every decision. No training data yet.</td></tr>
-  <tr><td>Year 3</td><td>ML propensity replaces the soft factors; hard guardrails stay as rules</td><td>Supervised fraud model trained on 18+ months of labeled SIU outcomes</td><td>Enough labeled history to train without noise. Guardrails never move to ML — they must stay auditable.</td></tr>
+  <tr><td>At launch</td><td>Deterministic weighted rules (the formulas above), tuned with adjudicators</td><td>Rule-based signals + external data hits</td><td>Explainable from day one; regulators and adjudicators can audit every decision. No training data yet.</td></tr>
+  <tr><td>Once labeled history exists</td><td>ML propensity replaces the soft factors; hard guardrails stay as rules</td><td>Supervised fraud model trained on a meaningful stretch of labeled SIU outcomes</td><td>Enough labeled history to train without noise. Guardrails never move to ML — they must stay auditable.</td></tr>
 </table>
 
 <div class="note"><strong>Design principle — never let ML decide a denial alone.</strong> ML can <em>raise</em> a claim out of the low-touch path (more scrutiny) but cannot be the sole basis of a denial. A denial always cites a coded reason mapped to a policy provision, decided by a human with authority. This keeps the platform defensible under UCSPA and state market-conduct exams.</div>
@@ -147,7 +147,7 @@ Fraud = (velocity × 0.25)<br>
 <h1>6. What Good Looks Like</h1>
 <table>
   <tr><th>Metric</th><th>Target</th><th>Meaning</th></tr>
-  <tr><td>STP rate (auto + assisted)</td><td>40–55% of eligible claims by Year 2</td><td>Share of clean claims handled with little/no manual adjudication</td></tr>
+  <tr><td>STP rate (auto + assisted)</td><td>40–55% of eligible claims as the low-touch path matures</td><td>Share of clean claims handled with little/no manual adjudication</td></tr>
   <tr><td>Auto-decision latency (p95)</td><td>&lt; 5 seconds end-to-end</td><td>FNOL → decision for low-touch claims</td></tr>
   <tr><td>False-auto rate</td><td>&lt; 0.5%</td><td>Auto-approved claims later found to need review (the number to never let creep)</td></tr>
   <tr><td>SIU hit rate on referrals</td><td>Track &amp; tune</td><td>If too low, the fraud threshold is over-referring and burning investigator time</td></tr>

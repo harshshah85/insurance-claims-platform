@@ -97,34 +97,38 @@
   <tr><td>Payment Saga</td><td>Saga orchestrator + idempotent commands</td><td>Controlled money movement to treasury</td></tr>
 </table>
 
-<!-- ROADMAP -->
+<!-- ROLLOUT -->
 <div class="page-break"></div>
-<h1>3. Phased Strategy — 3-Year Roadmap</h1>
-<h2>Deliver a measurable signal early; defer ML until there is clean labeled history.</h2>
+<h1>3. Rollout — A Thin Slice First</h1>
+<h2>Sequenced by what unlocks what, not by the calendar. How long each step takes depends on the organization; the order is what matters.</h2>
 
 <div class="roadmap-phase">
-  <h3>Year 1 — Backbone &amp; First Signal</h3>
-  <p>Stand up the Kafka backbone, Schema Registry, and the event-sourced Claim aggregate. Ship FNOL intake across the primary channels and the <strong>Life death-claim happy path</strong> with rule-based STP. Policy Admin CDC live. Read models for client/advisor status. <em>Value:</em> faster acknowledgement and visible status — measurable cycle-time improvement before any ML spend.</p>
+  <h3>Stage A — Walking skeleton</h3>
+  <p>One claim type — the <strong>Life death claim</strong> — happy path, end to end: FNOL intake → the event-sourced claim → a rule-based decision → payment, with client/advisor status read models. Thin but complete. This is the step that proves the backbone is real and de-risks everything after it.</p>
 </div>
 <div class="roadmap-phase" style="border-color:#2a9d8f;">
-  <h3>Year 2 — Full Domain &amp; Money Movement</h3>
-  <p>Add <strong>DI claims</strong> (recurring benefit, recertification, offsets), the full <strong>money-movement saga</strong>, <strong>omnichannel correspondence</strong> with preference/consent, and <strong>rule-based fraud scoring + SIU routing</strong>. All 9 bounded contexts in production. <em>Value:</em> rising STP rate, controlled disbursement, fraud leakage reduction.</p>
+  <h3>Stage B — Breadth</h3>
+  <p>Add <strong>DI claims</strong> (recurring benefit, recertification, offsets), the rest of the 9 contexts, the full <strong>money-movement saga</strong>, and <strong>omnichannel correspondence</strong> with preference/consent. Now the platform covers both lines and the regulated, hard parts.</p>
+</div>
+<div class="roadmap-phase" style="border-color:#d4a017;">
+  <h3>Stage C — Automation depth</h3>
+  <p>Push the <strong>auto-ticket rate</strong> up by widening the low-touch path, add <strong>rule-based fraud scoring + SIU routing</strong>, and harden operations. The value here is fewer manual touches and less leakage — all still with explainable rules.</p>
 </div>
 <div class="roadmap-phase" style="border-color:#6d3fa0;">
-  <h3>Year 3 — Intelligence &amp; Decommission</h3>
-  <p>Introduce <strong>ML propensity</strong> for STP soft-factors and a supervised <strong>fraud model</strong> trained on 18+ months of labeled SIU outcomes (hard guardrails stay as rules). Predictive DI recertification. <strong>Self-service FNOL</strong>. Begin <strong>legacy claims-system decommission</strong>. <em>Value:</em> higher automation, lower run cost.</p>
+  <h3>Stage D — Intelligence (when earned)</h3>
+  <p>Add <strong>ML</strong> for fraud and STP soft-factors <em>once there is enough labeled claims history to train on</em> — typically a stretch of real operations, not a date on a plan. Hard guardrails (contestability, OFAC, limits) stay as rules. This stage is optional and gated on data, never on a calendar.</p>
 </div>
 
-<h3>Why this sequencing</h3>
+<h3>Why this order</h3>
 <table>
   <tr><th>Principle</th><th>Rationale</th></tr>
-  <tr><td>Event backbone before features</td><td>Every later capability is just another consumer of the log — the backbone is the leverage point</td></tr>
-  <tr><td>Life before DI</td><td>Life is terminal and simpler; it proves the platform before the durative DI complexity (recertification, offsets) is added</td></tr>
+  <tr><td>Backbone before features</td><td>Every later capability is just another consumer of the event log — the backbone is the leverage point</td></tr>
+  <tr><td>Life before DI</td><td>The death claim pays once and is simpler; it proves the platform before DI's long-running complexity (recertification, offsets) is added</td></tr>
   <tr><td>Rules before ML</td><td>Explainable from day one for regulators; ML needs labeled history that doesn't exist at launch</td></tr>
-  <tr><td>Measurable Year-1 ROI</td><td>Cycle-time and acknowledgement improvements sustain executive sponsorship through the larger Year-3 investment</td></tr>
+  <tr><td>A thin slice before breadth</td><td>One claim type all the way through finds the real integration problems early, while the blast radius is still small</td></tr>
 </table>
 
 <br><br><hr>
-<p style="text-align:center;color:#999;font-size:11px;">Architecture Diagrams L1 &amp; L2 + Phased Strategy — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+<p style="text-align:center;color:#999;font-size:11px;">Architecture Diagrams L1 &amp; L2 + Rollout — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
 </body>
 </html>

@@ -46,7 +46,7 @@
 <div class="step"><strong>Step 6 — Money-movement &amp; tax config</strong> <span class="auto">[semi-auto]</span><br>Payment methods, withholding/1099-R treatment (Life death benefit typically non-taxable; DI taxability depends on premium funding), auto-approval limit for STP.</div>
 <div class="step"><strong>Step 7 — Shadow &amp; go-live</strong> <span class="manual">[manual]</span><br>Run new-product claims in shadow (decisions computed, not actioned) to validate STP scoring, then enable. First live claims watched closely.</div>
 
-<div class="note">By Year 3 most of Scenario A is configuration, not code: product rules, requirement templates, and timers are data. Adding a product becomes a config change validated in shadow rather than a release.</div>
+<div class="note">As the platform matures, most of Scenario A becomes configuration, not code: product rules, requirement templates, and timers are data. Adding a product becomes a config change validated in shadow rather than a release.</div>
 
 <!-- SCENARIO B -->
 <div class="page-break"></div>
@@ -92,9 +92,9 @@
 </div>
 <div class="note"><strong>Why this matters:</strong> in Life claims the most common quarantine cause is a beneficiary who has the policy number slightly wrong or only knows the insured's name. The recovery flow keeps the regulatory acknowledgement clock honest while research happens in the background — the claim is never silently stuck.</div>
 
-<h1>4. Year-3 Self-Service FNOL Vision</h1>
+<h1>4. Self-Service FNOL — the Later Vision</h1>
 <table>
-  <tr><th>Capability</th><th>Today (Yr 1–2)</th><th>Year 3</th></tr>
+  <tr><th>Capability</th><th>Now</th><th>Later (with ML)</th></tr>
   <tr><td>Intake</td><td>Guided forms per channel</td><td>Conversational / assisted FNOL; document auto-classification &amp; extraction</td></tr>
   <tr><td>Requirements</td><td>Templated per product</td><td>Predicted per claim — only ask for what's actually needed</td></tr>
   <tr><td>Status</td><td>Read-model status view</td><td>Proactive, plain-language nudges to client &amp; advisor</td></tr>
