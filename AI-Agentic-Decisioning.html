@@ -90,7 +90,7 @@
   <tr><td><strong>Correspondence</strong></td><td>Correspondence</td><td><code>LetterDrafted</code></td><td>Drafts; a human releases</td></tr>
 </table>
 
-<div class="note"><strong>How this fits the event backbone.</strong> The AI layer is a <em>cross-cutting assist layer</em>, not a new bounded context or aggregate — it adds no row to the canonical domain model. AI outputs ride a dedicated <code>claims.ai.*</code> topic family that is purely additive: removing it would slow adjudicators down but would not break a single existing flow. The core decision, fraud, and money-movement events are unchanged.</div>
+<div class="note"><strong>How this fits the event backbone.</strong> The agent workers are <em>first-class processors</em> that reason off the committed log and draft onto a dedicated <code>claims.ai.*</code> stream — derived the way CQRS read models are derived. By design they speed up the existing nine contexts rather than forming a tenth, and authority stays with people: the core decision, fraud, and money-movement events remain owned by their contexts and are produced by a human or the deterministic auto-ticket lane. Agents reason, people decide.</div>
 
 <!-- SKILLS & TOOLS -->
 <div class="page-break"></div>

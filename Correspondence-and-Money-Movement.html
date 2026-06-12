@@ -65,6 +65,8 @@
 
 <div class="chan"><strong>Advisor &amp; service-rep loop:</strong> advisors see their clients' claim correspondence in their desktop and can act (nudge a requirement, request a status). Service reps work from the same <code>advisor_worklist</code> read model. Both are first-class correspondence audiences, not afterthoughts — important for an advice-led distribution model.</div>
 
+<div class="note"><strong>Agent-assisted drafting.</strong> The Correspondence agent drafts outbound letter copy — acknowledgement, requirements, decision and payment notices — from the triggering event, so a person reviews ready text instead of writing from scratch. Regulated notices (a denial with its reason code and appeal rights) are always reviewed and released by a human before the Engine delivers them: the agent drafts, a person approves — agents reason, people decide. Drafts ride the advisory <code>claims.ai.v1</code> stream; the delivered communication remains a <code>correspondence.v1</code> fact. <strong>Money movement is never agent-initiated</strong> — the disbursement saga's dual control and OFAC gates below are unchanged.</div>
+
 <!-- MONEY MOVEMENT -->
 <div class="page-break"></div>
 <h1>2. Money Movement — the Disbursement Saga</h1>

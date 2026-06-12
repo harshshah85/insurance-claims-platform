@@ -36,7 +36,7 @@
   <strong>Modeling approach:</strong> Domain-Driven Design over an event-sourced core. The model is defined as <strong>9 bounded contexts</strong>, <strong>11 aggregates</strong>, and a <strong>36-event domain catalog</strong> (defined in the Event Streaming Architecture doc). Life (death/mortality) and DI (income replacement) share one platform but have distinct lifecycle state machines, modeled explicitly below.</div>
 
 <div class="note">
-  <strong>Where the AI assist layer sits in the model:</strong> it doesn't change the model. The LLM / agent assist layer is <strong>cross-cutting</strong> — it reads the same events and read models and drafts recommendations for humans. It adds <em>no new bounded context and no new aggregate</em>; the 9 / 11 / 36 counts are unchanged. The model's invariants still hold because the model still owns every authoritative decision — the Decision aggregate's "a denial must carry a reason code and cite the policy provision," for instance, is enforced against a human's decision, not the model's recommendation. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)
+  <strong>How the agents map to the model:</strong> the platform is <strong>agent-assisted by design</strong>. Each agent worker is a first-class collaborator scoped to a context it serves, drafting recommendations a human acts on — so the agents <em>operate the existing nine contexts faster</em> rather than forming a tenth. Authority is unchanged: every authoritative decision still belongs to its aggregate (a denial on the Decision aggregate must carry a reason code and cite the provision), enforced against a human's decision. Agents reason, people decide. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)
 </div>
 
 <h1>1. Bounded Contexts</h1>
@@ -51,6 +51,19 @@
 <div class="ctx-box"><h3>7 · Disability Management</h3><p>DI-only. Manages recurring benefit periods, periodic recertification, return-to-work, benefit offsets (e.g. Social Security, other coverage), and benefit termination.</p></div>
 <div class="ctx-box"><h3>8 · Payments &amp; Money Movement</h3><p>Owns the disbursement saga: schedule, hold, dual-control approval, OFAC, tax withholding, settlement, and reconciliation. (Detailed in Correspondence &amp; Money Movement.)</p></div>
 <div class="ctx-box"><h3>9 · Correspondence &amp; Compliance</h3><p>Drives inbound/outbound correspondence and enforces regulatory timers (acknowledge, decide, pay) and the immutable audit record. (Detailed in its own docs.)</p></div>
+
+<h3>Agent workers mapped to the contexts they serve</h3>
+<p>Agent-assisted by design — each agent worker is scoped to a context and drafts recommendations a human acts on. No agent forms a new context; they speed up the nine that already exist.</p>
+<table>
+  <tr><th>Agent worker</th><th>Context it serves</th><th>Drafts (advisory)</th></tr>
+  <tr><td><strong>Intake &amp; Triage</strong></td><td>1 · Intake &amp; FNOL</td><td>Claim classification, structured fact-sheet, missing-item list</td></tr>
+  <tr><td><strong>Policy &amp; Coverage</strong></td><td>2 · Policy &amp; Coverage</td><td>In-force / coverage / contestability findings from the CDC read model</td></tr>
+  <tr><td><strong>Document Intelligence</strong></td><td>4 · Requirements</td><td>Extraction + cross-document reconciliation (feeds <code>documentation_inconsistency</code>)</td></tr>
+  <tr><td><strong>Decisioning</strong></td><td>5 · Adjudication &amp; Decisioning</td><td>Decision packet — recommendation + cited rationale + confidence</td></tr>
+  <tr><td><strong>Fraud / SIU copilot</strong></td><td>6 · Fraud &amp; SIU</td><td>Investigator-ready narrative; never refers or clears on its own</td></tr>
+  <tr><td><strong>Correspondence</strong></td><td>9 · Correspondence &amp; Compliance</td><td>Claimant / beneficiary / advisor letter drafts for human release</td></tr>
+</table>
+<div class="note">A human (or the deterministic auto-ticket lane) still owns every authoritative event — agents reason, people decide. The agents draft onto a derived <code>claims.ai.v1</code> stream; the canonical 9 contexts · 11 aggregates · 36 events are unchanged.</div>
 
 <h1>2. Aggregates &amp; Their Invariants</h1>
 <h2>Eleven aggregates. Each is a consistency boundary — commands are validated against the rehydrated aggregate before new events are appended.</h2>

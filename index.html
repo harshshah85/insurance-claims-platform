@@ -97,13 +97,14 @@
 <div class="hero">
   <div class="hero-tag">Architecture Reference</div>
   <h1>Life &amp; Disability Income<br><span>Claims Platform</span></h1>
-  <p>A reference design for handling life and disability income claims as a stream of events on Kafka — from a claim being filed, through review and fraud checks, to letters and payment — with a low-touch "auto-ticket" path for the clean, simple ones. Life (death) claims are filed by a beneficiary; DI claims by the policyholder. The platform handles both.</p>
+  <p>A reference design for handling life and disability income claims as a stream of events on Kafka — from a claim being filed, through review and fraud checks, to letters and payment — with a low-touch "auto-ticket" path for the clean, simple ones. LLM agent workers read documents, reconcile facts, and draft a recommended decision for a person to approve — agent-assisted by design, with people holding decision authority. Life (death) claims are filed by a beneficiary; DI claims by the policyholder. The platform handles both.</p>
   <div class="hero-meta">
     <span><span class="dot"></span> Apache Kafka</span>
     <span><span class="dot" style="background:#457b9d"></span> Event sourcing</span>
     <span><span class="dot" style="background:#d4a017"></span> Auto-ticket / low-touch</span>
     <span><span class="dot" style="background:#e63946"></span> Fraud checks</span>
     <span><span class="dot" style="background:#6d3fa0"></span> Payments</span>
+    <span><span class="dot" style="background:#00b4d8"></span> Agent-assisted (human-in-the-loop)</span>
   </div>
 </div>
 
@@ -346,7 +347,7 @@
 <span class="hl2">claims.*</span>  ──►  <span class="hl">STP Decisioning</span>  ──►  <span class="hl3">claims.decision.v1</span>   <span class="comment">// low-touch auto-ticket ≥ 85</span>
 <span class="hl2">claims.*</span>  ──►  <span class="hl">Fraud Scoring</span>  ──►  <span class="hl3">claims.fraud.scored.v1</span>  ──►  <span class="hl2">SIU Case</span>  <span class="comment">// risk ≥ 60</span>
 
-<span class="comment">// AI assist layer (LLM agents) — additive, rides the same backbone</span>
+<span class="comment">// Agent workers (LLM) — first-class processors, advisory by design</span>
 <span class="hl2">claims.*</span>  ──►  <span class="hl4">LLM Agents</span> (read · reconcile · draft)  ──►  <span class="hl3">claims.ai.*</span>  ──►  <span class="hl">Adjudicator review / auto-prepared packet</span>  <span class="comment">// human-in-the-loop</span>
 
 <span class="comment">// Read models (CQRS) &amp; serving</span>

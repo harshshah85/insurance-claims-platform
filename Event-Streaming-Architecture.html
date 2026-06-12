@@ -64,8 +64,8 @@
 
 <div class="note"><strong>Why <code>claim_id</code> keying matters:</strong> partitioning on <code>claim_id</code> guarantees per-claim ordering — every event for one claim lands on one partition and is processed in sequence. This is what makes the event-sourced aggregate deterministic. Cross-claim ordering is never assumed.</div>
 
-<h3>Assist-layer topic (additive — not one of the 14 core)</h3>
-<p>The LLM / agent assist layer publishes its analysis and recommendations to a separate, additive topic. It is deliberately <em>outside</em> the 14 core topics and is <strong>not part of the system of record</strong> — the canonical decision still lands on <code>claims.decision.v1</code>, signed by a human (or by the rules on the auto-ticket lane).</p>
+<h3>Agentic decisioning topic — a derived advisory stream</h3>
+<p>The agent workers publish their analysis and recommendations to a dedicated topic. By design it is a <strong>derived stream</strong> — separate from the system-of-record topics the same way CQRS read models are derived from the log — so the canonical decision still lands on <code>claims.decision.v1</code>, signed by a human (or by the rules on the auto-ticket lane). It sits alongside the 14 core topics rather than inside them, by intent.</p>
 <table>
   <tr><th>Topic</th><th>Class</th><th>Key</th><th>Partitions</th><th>Retention / Cleanup</th><th>Purpose</th></tr>
   <tr><td><code>claims.ai.v1</code></td><td>Event (advisory)</td><td>claim_id</td><td>12</td><td>90d delete</td><td>LLM analysis, proposed decision packets (rationale + citations + confidence), and escalation/abstention events. Consumed by adjudicator worklists; never auto-decides or moves money.</td></tr>
@@ -87,7 +87,7 @@
   <tr><td><strong>Correspondence</strong></td><td><code>CorrespondenceRequested</code>, <code>CorrespondenceDelivered</code> <span class="m">(inbound variants share the topic)</span></td></tr>
 </table>
 
-<div class="note"><strong>AI assist events are advisory, not domain facts.</strong> The LLM/agent layer emits its own events on <code>claims.ai.v1</code> — e.g. <code>DecisionProposed</code>, <code>EscalatedToManualReview</code> — but these are <em>recommendations and hand-offs</em>, not part of this 36-event domain catalog. The authoritative facts (<code>ClaimApproved</code>, <code>ClaimDenied</code>, <code>ClaimAutoApproved</code>) remain owned by the Adjudication context and are produced by a human decision or the deterministic auto-ticket lane — never by the model. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)</div>
+<div class="note"><strong>Agentic decisioning events are recommendations by design.</strong> The agent workers emit their own events on <code>claims.ai.v1</code> — e.g. <code>DecisionProposed</code>, <code>EscalatedToManualReview</code> — as <em>recommendations and hand-offs</em>, distinct from the 36-event catalog of authoritative facts. Those facts (<code>ClaimApproved</code>, <code>ClaimDenied</code>, <code>ClaimAutoApproved</code>) stay owned by the Adjudication context and are produced by a human decision or the deterministic auto-ticket lane — agents reason, people decide. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)</div>
 
 <h3>Canonical event envelope</h3>
 <p>Every event shares a CloudEvents-style envelope so consumers, the DLQ, and the audit store can treat all events uniformly. Domain payload is nested under <code>data</code>.</p>
@@ -189,9 +189,9 @@ Intake Service  ─►  BEGIN TX
   <tr><td>DI Recertification Timer</td><td>Kafka Streams</td><td>di.benefit.v1</td><td>di.benefit.v1 (RecertificationDue)</td><td>Punctuated wall-clock timers per benefit</td></tr>
   <tr><td>Projectors (×5)</td><td>Kafka Streams</td><td>claims.* / payment.*</td><td>read-model stores</td><td>Stateless map → upsert</td></tr>
   <tr><td>Correspondence Trigger</td><td>Kafka Streams</td><td>claims.decision, requirements, di.benefit</td><td>correspondence.v1</td><td>Stateless rule mapping</td></tr>
-  <tr><td>LLM Agent Workers <span class="pill p-cmp">assist</span></td><td>Service (LLM + skills/tools)</td><td>claims.lifecycle, requirements, policy.snapshot, document refs</td><td>claims.ai.v1</td><td>Stateless per-claim run; reads only, never writes the record</td></tr>
+  <tr><td>Agent Workers <span class="pill p-cmp">agentic</span></td><td>Service (LLM + skills/tools)</td><td>claims.lifecycle, requirements, policy.snapshot, document refs</td><td>claims.ai.v1</td><td>Stateless per-claim run; reasons off committed facts, writes its advisory stream</td></tr>
 </table>
-<div class="note"><strong>Outside the EOS write-path.</strong> The agent workers consume committed facts and publish advisory output to <code>claims.ai.v1</code>; they are not part of any consume→transform→produce cycle that mutates the system of record, so they sit outside the exactly-once decisioning/fraud/projection transactions below. A slow or failed agent degrades adjudicator assist — it cannot corrupt or block a claim's authoritative history.</div>
+<div class="note"><strong>Resilience by design — agents reason off the committed log.</strong> The agent workers consume committed facts and publish advisory output to <code>claims.ai.v1</code>; because they don't mutate the system of record, they run independently of the exactly-once decisioning/fraud/projection transactions below. The payoff is deliberate: a slow or failed agent degrades adjudicator assist but can never corrupt or block a claim's authoritative history.</div>
 
 <div class="note"><strong>Why a join needs co-partitioning:</strong> the STP processor joins claim events with the policy snapshot. For a Kafka Streams join both inputs must be co-partitioned on the same key. Because <code>policy.snapshot.v1</code> is keyed by <code>policy_id</code> and claims by <code>claim_id</code>, the claim stream is first re-keyed to <code>policy_id</code> through a repartition topic before the KTable join — a deliberate, documented hop rather than an accidental shuffle.</div>
 

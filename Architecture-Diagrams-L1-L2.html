@@ -32,7 +32,7 @@
 </div>
 
 <div class="note">
-  <strong>C4 model, two levels.</strong> L1 (System Context) shows the platform as one box surrounded by the people and external systems it talks to. L2 (Container) opens the box into its runtime pieces — the Kafka backbone, the 9 bounded-context services, the read models, and the serving APIs. Lower levels (component / code) are intentionally out of scope for a reference architecture. A cross-cutting <strong>LLM assist layer</strong> (agent workers) also rides this backbone — it reads facts and drafts recommendations for humans to approve, and appears at L2 as an additive container, never the system of record.
+  <strong>C4 model, two levels.</strong> L1 (System Context) shows the platform as one box surrounded by the people and external systems it talks to. L2 (Container) opens the box into its runtime pieces — the Kafka backbone, the 9 bounded-context services, the <strong>agent workers</strong>, the read models, and the serving APIs. Lower levels (component / code) are intentionally out of scope for a reference architecture. This platform is <strong>agent-assisted and human-in-the-loop by design</strong>: LLM agent workers are first-class containers that read facts and draft recommendations, and a person (or the deterministic auto-ticket lane) holds decision authority. The split is deliberate — agents do the reasoning, people own the decision — not a bolt-on.
 </div>
 
 <h1>1. L1 — System Context</h1>
@@ -41,13 +41,14 @@
 <div class="diagram"><span class="m">                          ┌───────────────────────────────────────────────┐</span>
 <span class="b">  Client</span>          ──FNOL──►   │                                               │   ◄──CDC──  <span class="y">Policy Admin System</span>
 <span class="b">  Advisor</span>         ──────►   │        <span class="g">LIFE &amp; DI CLAIMS PLATFORM</span>            │   ◄──────►  <span class="y">Document / ECM Store</span>
-<span class="b">  Service Rep</span>     ──────►   │     event-driven · event-sourced · CQRS       │   ──cmd──►  <span class="y">Treasury / Disbursement</span>
+<span class="b">  Service Rep</span>     ──────►   │     event-driven · agent-assisted · HITL      │   ──cmd──►  <span class="y">Treasury / Disbursement</span>
 <span class="b">  Adjudicator</span>     ──────►   │                                               │   ◄──────►  <span class="r">Fraud / External Data (MIB, DMF)</span>
 <span class="b">  SIU Investigator</span> ──────►   │                                               │   ◄──────►  <span class="y">Identity / KYC Provider</span>
 <span class="b">  Treasury Ops</span>    ──────►   │                                               │   ──notify─►  <span class="r">Regulators / Auditors</span>
 <span class="m">                          └───────────────────────────────────────────────┘</span>
                                           │
                                   emits <span class="g">domain events</span> ──►  <span class="y">Enterprise Data Lake / BI</span>
+                                  calls <span class="p">LLM inference</span> ◄──►  <span class="y">LLM / Model-Serving Platform</span>
 </div>
 
 <table>
@@ -62,6 +63,7 @@
   <tr><td><strong>Fraud / External Data</strong></td><td>MIB, Death Master File (DMF), watchlists, known-fraud networks</td></tr>
   <tr><td><strong>Identity / KYC Provider</strong></td><td>Verifies claimant &amp; payee identity (IDV/KYC)</td></tr>
   <tr><td><strong>Enterprise Data Lake / BI</strong></td><td>Subscribes to the same domain events for analytics &amp; ML training — no separate ETL</td></tr>
+  <tr><td><strong>LLM / Model-Serving Platform</strong></td><td>Hosts the language models the agent workers call to read documents, reconcile facts, and draft recommendations — a swappable, vendor-neutral inference dependency; sees tokenized data only</td></tr>
 </table>
 
 <!-- L2 -->
@@ -75,7 +77,8 @@
   <span class="b">Service Desktop</span> ─┤        (outbox)        <span class="r">policy.snapshot.v1</span> (CDC)              ├─► <span class="p">Fraud Scoring</span> (Flink)
   <span class="b">IVR / Mail/Fax</span>  ─┘                          <span class="r">claims.decision / fraud / di.benefit</span>   ├─► <span class="p">DI Recert Timer</span> (Streams)
                                                 <span class="r">correspondence / payment.disbursement</span> ├─► <span class="p">Projectors ×5</span>
-  <span class="y">Policy Admin</span> ──CDC──► Kafka Connect ──────────────┘                                  └─► <span class="p">Correspondence Trigger</span>
+  <span class="y">Policy Admin</span> ──CDC──► Kafka Connect ──────────────┘                                  ├─► <span class="p">Correspondence Trigger</span>
+                                                                                      └─► <span class="p">Agent Workers</span> (LLM · skills · tools) ─► <span class="r">claims.ai.v1</span>
 
   <span class="m">READ MODELS (CQRS)                 SERVING                     OUTBOUND</span>
   <span class="g">claim_summary</span> (relational) ─┐
@@ -84,8 +87,7 @@
   <span class="g">fraud_case_view</span> (key-val) ─┤      <span class="y">Correspondence Engine</span> ─► Email/SMS/Secure/Print
   <span class="g">payment_ledger</span> (rel.)     ─┘      <span class="y">Payment Saga</span> ─► Treasury / EFT / Check
 
-  <span class="m">ASSIST LAYER (additive — reads &amp; drafts, never the record)</span>
-  <span class="p">LLM Agent Workers</span> (per-claim orchestrator + skills/tools) ─► <span class="r">claims.ai.*</span> ─► adjudicator review / auto-prepared packet  <span class="m">[human-in-the-loop]</span>
+  <span class="m">Agent Workers read claims.* + document refs, draft a packet on claims.ai.v1 → human review.  Decision authority stays with people, by design.</span>
 </div>
 
 <table>
@@ -98,7 +100,7 @@
   <tr><td>Claims Domain APIs</td><td>REST/GraphQL behind an API gateway</td><td>Versioned read access for all channels — never the raw log</td></tr>
   <tr><td>Correspondence Engine</td><td>Templating + delivery service</td><td>Omnichannel outbound honoring preference &amp; consent</td></tr>
   <tr><td>Payment Saga</td><td>Saga orchestrator + idempotent commands</td><td>Controlled money movement to treasury</td></tr>
-  <tr><td>LLM Agent Workers <span style="color:#6d3fa0;">(assist)</span></td><td>Stateless per-claim orchestrator + LLM, skills &amp; tools</td><td>Read documents, reconcile facts, draft a decision packet with cited rationale + confidence for human review; emit <code>claims.ai.*</code>. Additive assist layer — never the system of record, never moves money on its own</td></tr>
+  <tr><td>Agent Workers</td><td>Per-claim agent orchestrator + LLM, skills &amp; tools</td><td>First-class processors that read documents and committed facts, reconcile them, and draft a decision packet with cited rationale + confidence on <code>claims.ai.v1</code> for human review. <strong>Advisory by design</strong> — the agents reason, a person (or the auto-ticket rules) decides; they never move money</td></tr>
 </table>
 
 <!-- ROLLOUT -->
