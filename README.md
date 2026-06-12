@@ -2,6 +2,8 @@
 
 Reference documents for a **Kafka event-driven Life &amp; Disability Income (DI) claims platform** — a vendor-neutral design that takes a claim from the moment it's filed through review, fraud checks, letters, and payment, with a low-touch "auto-ticket" path for the clean ones. **Life (death) claims are filed by a beneficiary; DI claims by the policyholder** — the platform handles both, and that one difference shapes much of the design.
 
+On top of the event backbone sits an **LLM / agent assist layer**: every claim still runs the full deterministic check pipeline, but AI agents read documents, reconcile facts, and draft a recommended decision *with cited detail* for a human to consume. **Today a human is the decision-maker** on every AI-touched claim; as the model proves out, it can graduate to directly deciding the clean ones — a deliberate, governed step. The AI layer is additive (`claims.ai.*`): it adds no bounded context or aggregate and is never the system of record.
+
 🔗 **Live:** https://harshshah85.github.io/insurance-claims-platform/
 
 ## Documents
@@ -29,6 +31,8 @@ Client / Advisor / Service Rep (FNOL) → Intake API → Kafka (event-sourced cl
 Policy Admin System (CDC) ─────────────────────────────────────────────────────────────────────────────↑
                                                               ↓
                           Fraud Scoring → SIU   |   Correspondence Engine → Client/Advisor   |   Payment Saga → Treasury
+
+  assist layer (additive):  Kafka (claims.*) → LLM Agent Workers (read · reconcile · draft) → claims.ai.* → human review
 ```
 
 ### Key Design Decisions
@@ -37,6 +41,7 @@ Policy Admin System (CDC) ──────────────────
 - **Auto-ticket the clean claims**: a simple score (the STP score) sorts claims — ≥ 85 fully automatic, 65–84 quick human sign-off, 40–64 full review, &lt; 40 complex / fraud unit. Plain rules first, machine learning later.
 - **STP score formula**: `(policy_in_force × 0.25) + (coverage_clear × 0.20) + (doc_completeness × 0.20) + (identity_verified × 0.15) + (fraud_inverse × 0.10) + (amount_in_band × 0.10)`
 - **Pay out in small, reversible steps**: paying out spans our platform, treasury, and a bank, so each step is its own tracked stage that can be undone — with two approvers for large payments, sanctions screening, and no chance of paying twice.
+- **AI advises, humans decide**: an LLM / agent layer reads documents, reconciles facts, and drafts a recommended decision with cited rationale and confidence — but a human is the decision-maker on every AI-touched claim today, no denial is ever model-only, and autonomy on clean claims is an earned, governed step. The layer is additive (`claims.ai.*`) and never the system of record.
 
 ---
 *Prepared by Harsh Shah — June 2026*
