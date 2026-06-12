@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI-Assisted &amp; Agentic Decisioning — Life &amp; DI Claims Platform</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
+  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #00b4d8; padding-bottom: 8px; margin-top: 40px; }
+  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
+  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
+  .page-break { page-break-before: always; }
+  .cover { text-align: center; padding: 60px 0 40px 0; }
+  .cover h1 { border: none; font-size: 28px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
+  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
+  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7f9fc; }
+  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
+  .key { background: #e6f7fb; border-left: 4px solid #00b4d8; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
+  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
+  pre { background: #1a1a2e; color: #e6edf3; border-radius: 8px; padding: 16px 18px; overflow-x: auto; font-size: 11.5px; line-height: 1.55; margin: 14px 0; }
+  pre .c { color: #6a9955; } pre .k { color: #4fc1ff; } pre .s { color: #ce9178; }
+  .auto { color: #2a9d8f; font-weight: bold; } .manual { color: #e63946; font-weight: bold; }
+  .tier { display:inline-block; border-radius: 4px; padding: 2px 9px; font-size: 11px; font-weight: bold; color: white; }
+  .t-auto { background:#2a9d8f; } .t-assist { background:#457b9d; } .t-std { background:#d4a017; } .t-cx { background:#e63946; }
+  .pill { display:inline-block; border-radius: 20px; padding: 1px 9px; font-size: 10.5px; font-weight: bold; }
+  .p-tool { background:#eef2f7; color:#0f3460; } .p-skill { background:#e6f7fb; color:#0a6e85; }
+  .flow { font-family: 'SF Mono','Courier New',monospace; font-size: 11.5px; background: #0d1117; color: #c9d1d9; border-radius: 8px; padding: 18px 20px; overflow-x: auto; line-height: 1.85; margin: 14px 0; }
+  .flow .g { color: #2a9d8f; } .flow .r { color: #e63946; } .flow .y { color: #d4a017; } .flow .b { color: #7ab8d8; } .flow .ai { color: #4ad6f0; } .flow .m { color: #6e7681; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>AI-Assisted &amp; Agentic Decisioning</h1>
+  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — Where AI Helps, Where a Person Decides, and Where It Hands Off</p>
+  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</div>
+
+<div class="key">
+  <strong>The principle in one line.</strong> Every claim still runs the <em>full</em> check pipeline — all the deterministic policy, coverage, identity, fraud and compliance checks, with the same complete event trail. AI doesn't skip any of that. It does the <strong>judgment-shaped work</strong> that today eats adjudicator time — reading documents, reconciling facts, drafting a decision with a cited rationale, writing letters — and it produces <strong>proposed findings, not authority</strong>. A person reviews the findings and approves on the assisted path; the clean auto-ticket path stays rule-decided; and anything the AI can't ground or is unsure about is handed to a human.
+</div>
+
+<h1>1. A Third Decision Layer — Not a Replacement</h1>
+<h2>The AI sits on top of the existing two-score model. It feeds and explains the decision; it never becomes the guardrail.</h2>
+
+<table>
+  <tr><th>Layer</th><th>Who runs it</th><th>What it does</th><th>Can it be wrong &amp; recover?</th></tr>
+  <tr><td><strong>Guardrails</strong></td><td>Deterministic rules (code)</td><td>Non-negotiable gates — contestability window, fraud ≥ 60, OFAC hit, amount over the auto-approval limit, beneficiary dispute. Pure policy.</td><td>Never delegated to a model. Same code as today.</td></tr>
+  <tr><td><strong>Scoring</strong></td><td>Rules → ML (existing)</td><td>The STP eligibility score and the fraud risk score already documented in <em>Claims Decisioning &amp; Fraud</em>.</td><td>Explainable; auditable per factor.</td></tr>
+  <tr><td><strong>Reasoning</strong> <span class="pill p-skill">new</span></td><td>LLM agents + skills</td><td>Extract from documents, reconcile across them, assemble the STP factors into a decision packet with a cited rationale and a confidence, draft correspondence.</td><td>Cites its sources, reports confidence, and can <strong>abstain</strong> → escalate.</td></tr>
+</table>
+
+<div class="key"><strong>Today: the LLM recommends, a human decides.</strong> The LLM's job right now is to produce a full <strong>analysis and a recommended decision, with the supporting detail</strong> — extracted facts, cited evidence, the per-factor reasoning, and a confidence — packaged for a human to consume and act on. A <strong>person is the decision-maker</strong> on every claim the model's judgment touches. The rule-based auto-ticket lane (deterministic STP + guardrails, no LLM) stays as it is; the model's <em>judgment</em> does not auto-approve or auto-deny while it is still maturing.</div>
+
+<h3>Maturity path — from recommend to decide</h3>
+<table>
+  <tr><th>Stage</th><th>What the LLM does</th><th>Who decides</th></tr>
+  <tr><td><strong>Now</strong></td><td>Analyzes the claim and recommends a decision <em>with full detail</em> for a human to review</td><td><span class="manual">Human</span> — the decision-maker on every AI-touched claim</td></tr>
+  <tr><td><strong>As the model proves out</strong></td><td>Same analysis, measured against human decisions; acceptance and accuracy tracked</td><td><span class="manual">Human</span>, with confidence and override metrics building the evidence base</td></tr>
+  <tr><td><strong>As AI matures</strong></td><td>Directly processes and decides the clean, well-grounded claims within the guardrails</td><td><span class="auto">AI auto-approves / denies</span> the clean ones; humans handle the exceptions</td></tr>
+</table>
+<div class="note">The progression is deliberate and one-directional: we only let the model decide a class of claims once its recommendations have been right, at volume, against human reviewers — and the hard guardrails (contestability, fraud, OFAC, amount limits) and the human-authored-denial rule stay in force at every stage. Moving a claim class from "recommend" to "decide" is an explicit, governed step, not a default.</div>
+
+<h1>2. Agent Topology</h1>
+<h2>A supervisor orchestrator per claim, fanning out to single-responsibility specialist agents that mirror the bounded contexts. Every agent subscribes to events and emits events — so every AI action lands in the log and is auditable forever.</h2>
+
+<div class="flow">
+<span class="b">FNOL + uploaded documents</span>  ─►  <span class="ai">Orchestrator</span> <span class="m">(one run per claim)</span>
+        │
+        ├─► <span class="ai">Intake &amp; Triage agent</span>     ─► classify Life/DI, identify filer, build fact-sheet, list missing items
+        ├─► <span class="ai">Document Intelligence agent</span> ─► extract + reconcile dates/amounts across docs  <span class="m">(feeds documentation_inconsistency)</span>
+        ├─► <span class="ai">Policy &amp; Coverage agent</span>    ─► in-force, coverage match, exclusions, contestability proximity
+        ├─► <span class="ai">Decisioning agent</span>          ─► <span class="y">DecisionProposed</span>  <span class="m">(recommendation + cited rationale + confidence)</span>
+        ├─► <span class="ai">Fraud / SIU copilot</span>        ─► investigator-ready narrative  <span class="m">(assists; never refers or clears on its own)</span>
+        └─► <span class="ai">Correspondence agent</span>       ─► letter drafts  <span class="m">(claimant / beneficiary / advisor)</span>
+        │
+        ▼
+  low confidence · conflicting evidence · guardrail trip · poor doc quality
+        └─────────────────────────────────────────────► <span class="r">EscalatedToManualReview</span>
+</div>
+
+<table>
+  <tr><th>Agent</th><th>Bounded context</th><th>Emits</th><th>Authority</th></tr>
+  <tr><td><strong>Intake &amp; Triage</strong></td><td>Intake / FNOL</td><td><code>ClaimFactsExtracted</code></td><td>Drafts facts only</td></tr>
+  <tr><td><strong>Document Intelligence</strong></td><td>Requirements / Documents</td><td><code>DocFindings</code></td><td>Drafts findings only</td></tr>
+  <tr><td><strong>Policy &amp; Coverage</strong></td><td>Policy / Coverage</td><td><code>CoverageFindings</code></td><td>Reads CDC model; asserts nothing it can't ground</td></tr>
+  <tr><td><strong>Decisioning</strong></td><td>Decisioning</td><td><code>DecisionProposed</code></td><td>Proposes; never the final authority</td></tr>
+  <tr><td><strong>Fraud / SIU copilot</strong></td><td>Fraud &amp; SIU</td><td><code>FraudNarrativeDrafted</code></td><td>Assists the investigator</td></tr>
+  <tr><td><strong>Correspondence</strong></td><td>Correspondence</td><td><code>LetterDrafted</code></td><td>Drafts; a human releases</td></tr>
+</table>
+
+<div class="note"><strong>How this fits the event backbone.</strong> The AI layer is a <em>cross-cutting assist layer</em>, not a new bounded context or aggregate — it adds no row to the canonical domain model. AI outputs ride a dedicated <code>claims.ai.*</code> topic family that is purely additive: removing it would slow adjudicators down but would not break a single existing flow. The core decision, fraud, and money-movement events are unchanged.</div>
+
+<!-- SKILLS & TOOLS -->
+<div class="page-break"></div>
+<h1>3. Skills &amp; Tools</h1>
+<h2>Split the way the agent world does. A <span class="pill p-tool">tool</span> is a deterministic integration with no judgment. A <span class="pill p-skill">skill</span> is a reusable, model-driven procedure. Money-moving and state-changing tools always sit behind a human gate or a guardrail.</h2>
+
+<table>
+  <tr><th>Capability</th><th>Type</th><th>Used by</th><th>Notes</th></tr>
+  <tr><td>Policy-admin read-model lookup</td><td><span class="pill p-tool">tool</span></td><td>Policy, Decisioning</td><td>Reads the CDC projection; never writes</td></tr>
+  <tr><td>OFAC / watchlist / DMF / industry-data screening</td><td><span class="pill p-tool">tool</span></td><td>Fraud, Decisioning</td><td>Deterministic match; a hit is a hard guardrail</td></tr>
+  <tr><td>Payment / disbursement saga initiation</td><td><span class="pill p-tool">tool</span></td><td>Decisioning</td><td><strong>Human-gated</strong> above the auto-approval limit</td></tr>
+  <tr><td>Document extraction (OCR + structured pull)</td><td><span class="pill p-skill">skill</span></td><td>Document Intelligence</td><td>Every field carries a source citation</td></tr>
+  <tr><td>Cross-document reconciliation</td><td><span class="pill p-skill">skill</span></td><td>Document Intelligence</td><td>Dates / amounts / providers must agree</td></tr>
+  <tr><td>Beneficiary-designation validation</td><td><span class="pill p-skill">skill</span></td><td>Decisioning</td><td>Shares sum to 100%; dispute check</td></tr>
+  <tr><td>Contestability-window calculation</td><td><span class="pill p-skill">skill</span></td><td>Policy, Decisioning</td><td>Proximity feeds both scores</td></tr>
+  <tr><td>Decision-packet composition</td><td><span class="pill p-skill">skill</span></td><td>Decisioning</td><td>Rationale + per-factor citations + confidence</td></tr>
+  <tr><td>Letter drafting</td><td><span class="pill p-skill">skill</span></td><td>Correspondence</td><td>Tone + compliance templates; human releases</td></tr>
+</table>
+
+<div class="key"><strong>The dividing rule.</strong> Skills produce <em>drafts and findings</em>. Tools that move money or change claim state are reached only through a human gate or a deterministic guardrail. An agent can read freely; it cannot act on the world on its own.</div>
+
+<h1>4. Human-in-the-Loop Gates</h1>
+<h2>Mapped onto the four decision tiers that already exist. The further down the tiers, the more the human leads and the AI only assists.</h2>
+
+<table>
+  <tr><th>Tier</th><th>What the AI does</th><th>The human gate</th></tr>
+  <tr><td><span class="tier t-auto">AUTO &nbsp;≥ 85</span></td><td>Prepares the full packet; rules + scores make the auto-ticket call inside the guardrails</td><td><strong>No per-claim human.</strong> But: a confidence floor is required, the AI can never deny, and a <strong>sampled share is pulled for human QA</strong> to catch drift</td></tr>
+  <tr><td><span class="tier t-assist">ASSISTED &nbsp;65–84</span></td><td>Delivers a complete decision packet — recommendation, evidence, citations, confidence</td><td><strong>One-click confirm or correct.</strong> This is the core "review the AI's findings, then approve" loop</td></tr>
+  <tr><td><span class="tier t-std">STANDARD &nbsp;40–64</span></td><td>Copilot — extracts, summarizes, surfaces the facts and the score breakdown</td><td>Human adjudicates fully; the AI is assist-only</td></tr>
+  <tr><td><span class="tier t-cx">COMPLEX / SIU &nbsp;&lt; 40</span></td><td>Assembles the narrative and the evidence pack</td><td>Senior adjudicator / SIU decide; the AI never automates any part</td></tr>
+  <tr><td colspan="3" style="background:#fff5f5;"><strong>Any denial</strong> — the AI may draft the coded reason and rationale, but a <span class="manual">human with authority</span> always makes the call. ML can <em>raise</em> a claim out of the low-touch path; it can never be the sole basis of a denial. &nbsp; <strong>Money movement</strong> — the AI proposes; a human approves above threshold and the disbursement saga is unchanged (dual control stays).</td></tr>
+</table>
+
+<!-- ESCALATION -->
+<div class="page-break"></div>
+<h1>5. When the AI Hands Off</h1>
+<h2>Escalation is a normal, expected outcome — not a failure. The agent emits <code>EscalatedToManualReview</code> with a reason, and the claim joins the right human worklist.</h2>
+
+<table>
+  <tr><th>Trigger</th><th>Why it escalates</th></tr>
+  <tr><td>Confidence below threshold on any extraction or decision factor</td><td>An unsure model output is worth less than an honest "send this to a person"</td></tr>
+  <tr><td>Evidence conflicts / reconciliation fails</td><td>Dates, amounts, or provider details don't agree across documents</td></tr>
+  <tr><td>A hard guardrail trips</td><td>Contestability, fraud ≥ 60, OFAC, amount over limit, beneficiary dispute — policy, not model</td></tr>
+  <tr><td>Document quality too poor to extract reliably</td><td>Better to ask the claimant again than to guess</td></tr>
+  <tr><td>Out-of-distribution / novel claim pattern</td><td>The model has no business auto-handling something it hasn't seen</td></tr>
+  <tr><td>A required tool or data source is unavailable</td><td>Can't verify in-force → can't responsibly proceed</td></tr>
+  <tr><td>Decisioning and Fraud agents disagree</td><td>Conflict between agents is a signal for a human, not a tie to break automatically</td></tr>
+</table>
+
+<div class="key"><strong>Abstention is a first-class output.</strong> "I don't know — route this to a person" is an encouraged, well-rewarded agent result, not an error. The platform is tuned so that the cost of a wrong auto-decision is always higher than the cost of one more manual review.</div>
+
+<h1>6. Governance &amp; Guardrails for the AI Itself</h1>
+<h2>The part a regulator or a market-conduct examiner will ask about. Each of these is a non-negotiable property of the reasoning layer.</h2>
+
+<table>
+  <tr><th>Guardrail</th><th>What it means in practice</th></tr>
+  <tr><td><strong>Grounding</strong></td><td>Every finding cites the source document and field it came from. No free-floating assertions — if it can't be cited, it isn't asserted.</td></tr>
+  <tr><td><strong>Determinism stays in code</strong></td><td>The hard guardrails and the scoring math are never delegated to the model. The AI can recommend; it cannot redefine policy.</td></tr>
+  <tr><td><strong>Full audit metadata</strong></td><td>Every AI event records model version, the inputs it saw, its output, and its confidence — the same forever-auditable trail the scores already get.</td></tr>
+  <tr><td><strong>No model-only denial</strong></td><td>A denial always cites a coded reason mapped to a policy provision and is signed by a human with authority. Keeps the platform defensible under UCSPA and state market-conduct exams.</td></tr>
+  <tr><td><strong>Evaluation + sampled QA</strong></td><td>An offline evaluation harness plus a sampled human QA on the AUTO lane watches for drift; <code>false-auto rate</code> stays the number we never let creep.</td></tr>
+</table>
+
+<h1>7. Sample AI Events</h1>
+<p>The decisioning agent's proposed packet for an ASSISTED-tier Life claim. It carries the rationale, the per-factor citations, and a confidence, so the human review is just consuming and acting on it — and the reasoning is preserved in the log forever.</p>
+<pre>{
+  <span class="k">"type"</span>: <span class="s">"claims.ai.DecisionProposed"</span>,
+  <span class="k">"subject"</span>: <span class="s">"CLM-2026-021788"</span>,
+  <span class="k">"data"</span>: {
+    <span class="k">"claim_type"</span>: <span class="s">"LIFE"</span>,
+    <span class="k">"recommendation"</span>: <span class="s">"APPROVE"</span>,
+    <span class="k">"stp_tier"</span>: <span class="s">"ASSISTED"</span>,
+    <span class="k">"confidence"</span>: 0.82,
+    <span class="k">"rationale"</span>: [
+      { <span class="k">"factor"</span>: <span class="s">"policy_in_force"</span>, <span class="k">"finding"</span>: <span class="s">"in force on date of loss"</span>,
+        <span class="k">"cite"</span>: <span class="s">"policy.snapshot.v1#status"</span> },
+      { <span class="k">"factor"</span>: <span class="s">"doc_completeness"</span>, <span class="k">"finding"</span>: <span class="s">"death certificate + beneficiary form received"</span>,
+        <span class="k">"cite"</span>: <span class="s">"doc:DC-4471 p1, doc:BEN-2231"</span> }
+    ],
+    <span class="k">"needs_human"</span>: <span class="k">true</span>,
+    <span class="k">"authority"</span>: <span class="s">"AI_ASSIST"</span>,
+    <span class="k">"next"</span>: [ <span class="s">"adjudicator_confirm_or_correct"</span> ]
+  }
+}</pre>
+
+<p>When the agent can't responsibly proceed, it hands off instead — the reason is structured so the claim routes to the right worklist:</p>
+<pre>{
+  <span class="k">"type"</span>: <span class="s">"claims.ai.EscalatedToManualReview"</span>,
+  <span class="k">"subject"</span>: <span class="s">"CLM-2026-021903"</span>,
+  <span class="k">"data"</span>: {
+    <span class="k">"reason"</span>: <span class="s">"DOC_RECONCILIATION_CONFLICT"</span>,
+    <span class="k">"detail"</span>: <span class="s">"date of death differs between death certificate and APS"</span>,
+    <span class="k">"confidence"</span>: 0.41,
+    <span class="k">"route_to"</span>: <span class="s">"STANDARD_ADJUDICATION"</span>,
+    <span class="k">"authority"</span>: <span class="s">"AI_ASSIST"</span>
+  }
+}</pre>
+
+<h1>8. What Good Looks Like</h1>
+<table>
+  <tr><th>Metric</th><th>Target</th><th>Meaning</th></tr>
+  <tr><td>Packet acceptance rate (ASSISTED)</td><td>High &amp; rising</td><td>Share of AI decision packets a human confirms with no correction — the trust signal</td></tr>
+  <tr><td>Grounding rate</td><td>~100%</td><td>Findings that carry a valid source citation; ungrounded output should be near zero</td></tr>
+  <tr><td>Abstention precision</td><td>Track &amp; tune</td><td>When the AI escalates, how often a human agrees it truly needed a person</td></tr>
+  <tr><td>False-auto rate</td><td>&lt; 0.5%</td><td>Auto-ticketed claims later found to need review — the number to never let creep</td></tr>
+  <tr><td>Adjudicator time saved</td><td>Trend up</td><td>Cycle-time delta on AI-assisted vs. unassisted claims of the same tier</td></tr>
+</table>
+
+<br><br><hr>
+<p style="text-align:center;color:#999;font-size:11px;">AI-Assisted &amp; Agentic Decisioning — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</body>
+</html>

@@ -109,6 +109,8 @@ Fraud = (velocity × 0.25)<br>
 
 <div class="note"><strong>Design principle — never let ML decide a denial alone.</strong> ML can <em>raise</em> a claim out of the low-touch path (more scrutiny) but cannot be the sole basis of a denial. A denial always cites a coded reason mapped to a policy provision, decided by a human with authority. This keeps the platform defensible under UCSPA and state market-conduct exams.</div>
 
+<div class="note"><strong>The AI assist layer.</strong> On top of these scores sits an LLM/agent reasoning layer that reads documents, reconciles facts, and drafts a decision packet with a cited rationale and confidence — proposing, never deciding. The auto-ticket lane stays rule-decided; humans review and approve on the assisted path; low-confidence or conflicting claims escalate to manual review. See <a href="AI-Agentic-Decisioning.html"><strong>AI-Assisted &amp; Agentic Decisioning</strong></a>.</div>
+
 <!-- PAYLOADS -->
 <div class="page-break"></div>
 <h1>4. Sample Decision Event</h1>

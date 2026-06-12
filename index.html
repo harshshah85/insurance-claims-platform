@@ -54,12 +54,17 @@
   .card-adr .card-icon { background: rgba(109,63,160,0.15); }
   .card-adr:hover { border-color: #6d3fa0; }
 
+  .card-ai { border-top: 3px solid #00b4d8; }
+  .card-ai .card-icon { background: rgba(0,180,216,0.15); }
+  .card-ai:hover { border-color: #00b4d8; }
+
   /* Tag colors */
   .tag-arch { background: rgba(230,57,70,0.15); color: #e63946; }
   .tag-stream { background: rgba(42,157,143,0.15); color: #2a9d8f; }
   .tag-data { background: rgba(212,160,23,0.15); color: #d4a017; }
   .tag-ml { background: rgba(109,63,160,0.15); color: #b88ee8; }
   .tag-api { background: rgba(69,123,157,0.15); color: #7ab8d8; }
+  .tag-ai { background: rgba(0,180,216,0.15); color: #0a8aa6; }
 
   /* ARCHITECTURE OVERVIEW */
   .overview { background: #161b22; border: 1px solid #21262d; border-radius: 12px; padding: 32px; margin: 0 24px 40px; max-width: 1052px; margin-left: auto; margin-right: auto; }
@@ -184,6 +189,26 @@
         <span class="tag tag-ml">Fraud Risk</span>
         <span class="tag tag-data">Low-Touch Path</span>
         <span class="tag tag-stream">SIU Referral</span>
+      </div>
+    </a>
+
+    <!-- AI-Assisted & Agentic Decisioning -->
+    <a href="AI-Agentic-Decisioning.html" class="card card-ai">
+      <div class="card-header">
+        <div class="card-icon">🤖</div>
+        <div>
+          <div class="card-title">AI-Assisted &amp; Agentic Decisioning</div>
+          <div class="card-subtitle">LLM Agents, Skills &amp; Human-in-the-Loop</div>
+        </div>
+      </div>
+      <div class="card-body">
+        An LLM/agent assist layer on top of the event backbone — a supervisor orchestrator and specialist agents that read documents, reconcile facts, and draft a decision packet with cited rationale and confidence. The auto-ticket lane stays rule-decided; humans review and approve on the assisted path; low-confidence or conflicting claims escalate to manual review.
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-ai">LLM Agents</span>
+        <span class="tag tag-ai">Skills &amp; Tools</span>
+        <span class="tag tag-ml">Human-in-the-Loop</span>
+        <span class="tag tag-stream">claims.ai.* Events</span>
       </div>
     </a>
 
@@ -320,6 +345,9 @@
 <span class="comment">// Stream processing — Kafka Streams / Flink</span>
 <span class="hl2">claims.*</span>  ──►  <span class="hl">STP Decisioning</span>  ──►  <span class="hl3">claims.decision.v1</span>   <span class="comment">// low-touch auto-ticket ≥ 85</span>
 <span class="hl2">claims.*</span>  ──►  <span class="hl">Fraud Scoring</span>  ──►  <span class="hl3">claims.fraud.scored.v1</span>  ──►  <span class="hl2">SIU Case</span>  <span class="comment">// risk ≥ 60</span>
+
+<span class="comment">// AI assist layer (LLM agents) — additive, rides the same backbone</span>
+<span class="hl2">claims.*</span>  ──►  <span class="hl4">LLM Agents</span> (read · reconcile · draft)  ──►  <span class="hl3">claims.ai.*</span>  ──►  <span class="hl">Adjudicator review / auto-prepared packet</span>  <span class="comment">// human-in-the-loop</span>
 
 <span class="comment">// Read models (CQRS) &amp; serving</span>
 <span class="hl2">claims.*</span>  ──►  <span class="hl4">Projections</span>  ──►  <span class="hl4">Claims Domain APIs</span>  ──►  <span class="hl">Client Portal / Advisor Desktop</span>
