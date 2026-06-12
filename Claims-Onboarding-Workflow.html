@@ -82,6 +82,8 @@
   <tr><td>Decision</td><td><span class="auto">Auto if STP ≥ 85</span></td><td>Assisted / standard / complex / SIU otherwise</td></tr>
 </table>
 
+<div class="note"><strong>Agent assist at intake.</strong> Several of the "automated" steps are now <strong>agent-assisted</strong>: document auto-classification &amp; extraction (the Document Intelligence agent) and requirement prediction — asking only for what a claim actually needs — draft onto <code>claims.ai.v1</code> for confirmation. The agents speed intake; a human still confirms anything they surface, and decision authority is unchanged. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)</div>
+
 <h1>3. Quarantine Recovery (Unresolved Policy)</h1>
 <p>An FNOL whose policy number can't be resolved against <code>policy.snapshot.v1</code> is <strong>quarantined, never dropped</strong> — the claimant has already been told their claim is received, so losing it is unacceptable.</p>
 <div class="flow">
