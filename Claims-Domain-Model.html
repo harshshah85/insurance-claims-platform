@@ -33,7 +33,10 @@
 </div>
 
 <div class="note">
-  <strong>Modeling approach:</strong> Domain-Driven Design over an event-sourced core. The model is defined as <strong>9 bounded contexts</strong>, <strong>11 aggregates</strong>, and a <strong>36-event domain catalog</strong> (defined in the Event Streaming Architecture doc). Life (death/mortality) and DI (income replacement) share one platform but have distinct lifecycle state machines, modeled explicitly below.
+  <strong>Modeling approach:</strong> Domain-Driven Design over an event-sourced core. The model is defined as <strong>9 bounded contexts</strong>, <strong>11 aggregates</strong>, and a <strong>36-event domain catalog</strong> (defined in the Event Streaming Architecture doc). Life (death/mortality) and DI (income replacement) share one platform but have distinct lifecycle state machines, modeled explicitly below.</div>
+
+<div class="note">
+  <strong>Where the AI assist layer sits in the model:</strong> it doesn't change the model. The LLM / agent assist layer is <strong>cross-cutting</strong> — it reads the same events and read models and drafts recommendations for humans. It adds <em>no new bounded context and no new aggregate</em>; the 9 / 11 / 36 counts are unchanged. The model's invariants still hold because the model still owns every authoritative decision — the Decision aggregate's "a denial must carry a reason code and cite the policy provision," for instance, is enforced against a human's decision, not the model's recommendation. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)
 </div>
 
 <h1>1. Bounded Contexts</h1>

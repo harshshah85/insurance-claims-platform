@@ -78,6 +78,18 @@
   </table>
 </div>
 
+<div class="slo-box">
+  <h3>AI Assist SLOs — Trust &amp; Quality of the LLM Layer</h3>
+  <table>
+    <tr><th>Metric</th><th>Target</th><th>Why it's watched</th></tr>
+    <tr><td>Grounding rate (findings with a valid source citation)</td><td>~100%</td><td>An ungrounded assertion is a hallucination risk — it should never reach an adjudicator</td></tr>
+    <tr><td>Packet acceptance rate (ASSISTED, confirmed with no correction)</td><td>High &amp; rising</td><td>The core trust signal; a falling rate means the model is drifting from human judgment</td></tr>
+    <tr><td>Abstention precision (escalations a human agrees needed a person)</td><td>Track &amp; tune</td><td>Too low → the model over-escalates and saves no time; too high may mask under-escalation</td></tr>
+    <tr><td>Agent run latency (FNOL → packet on <code>claims.ai.v1</code>)</td><td>p95 &lt; 30s</td><td>Assist must be ready before the human picks up the claim</td></tr>
+    <tr><td>False-auto rate (shared with Business SLOs)</td><td>&lt; 0.5%</td><td>The number the AI layer must never let creep — sampled QA on the auto-ticket lane</td></tr>
+  </table>
+</div>
+
 <!-- ALERT ROUTING -->
 <div class="page-break"></div>
 <h1>3. Alert Routing &amp; On-Call</h1>
@@ -92,6 +104,9 @@
   <tr><td>Fraud scoring (Flink) job restart loop</td><td><span class="badge b-p2">P2</span></td><td>Data Engineering on-call</td><td>30 min</td></tr>
   <tr><td>Read-model projector lag &gt; 60s</td><td><span class="badge b-p3">P3</span></td><td>Data Engineering Slack</td><td>2 hours</td></tr>
   <tr><td>STP rate drops &gt; 20% week-over-week</td><td><span class="badge b-p3">P3</span></td><td>Decisioning / Data Science Slack</td><td>Next business day</td></tr>
+  <tr><td>AI packet acceptance rate drops &gt; 10 pts week-over-week</td><td><span class="badge b-p3">P3</span></td><td>Decisioning / Data Science Slack</td><td>Next business day</td></tr>
+  <tr><td>AI grounding rate &lt; 99% (ungrounded findings surfacing)</td><td><span class="badge b-p2">P2</span></td><td>Decisioning / Data Science on-call</td><td>30 min</td></tr>
+  <tr><td>LLM agent workers down / <code>claims.ai.v1</code> lag rising</td><td><span class="badge b-p3">P3</span></td><td>Decisioning / Data Science Slack</td><td>2 hours <span style="color:#888;">(assist degrades, claims still flow)</span></td></tr>
   <tr><td>Kafka / compute cost spike &gt; 30% vs 7-day avg</td><td><span class="badge b-p4">P4</span></td><td>FinOps team email</td><td>Next business day</td></tr>
   <tr><td>Anomalous bulk PHI read from one principal</td><td><span class="badge b-p1">P1</span></td><td>Security + Platform — immediate</td><td>15 min</td></tr>
 </table>
@@ -121,6 +136,14 @@
   <tr><td>Disbursement Pipeline</td><td>Scheduled → held → settled → failed; held-payment aging</td></tr>
   <tr><td>Reconciliation</td><td><code>payment_ledger</code> vs treasury settlement file; open breaks</td></tr>
   <tr><td>DI Benefit Run</td><td>Recurring DI disbursements due/sent; recert-blocked count</td></tr>
+</table>
+
+<h3>Decisioning / Data Science (AI assist quality)</h3>
+<table>
+  <tr><th>Panel</th><th>Metric</th></tr>
+  <tr><td>Acceptance &amp; Override</td><td>Packet acceptance rate by tier; correction reasons when a human overrides the recommendation</td></tr>
+  <tr><td>Grounding &amp; Abstention</td><td>Grounding rate; escalation/abstention volume and reasons (<code>claims.ai.v1</code>)</td></tr>
+  <tr><td>Model Drift Watch</td><td>Acceptance and false-auto trend by model version; sampled-QA findings on the auto-ticket lane</td></tr>
 </table>
 
 <h1>5. Incident Management</h1>

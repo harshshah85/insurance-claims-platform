@@ -59,7 +59,8 @@
   <tr><td>Object storage (document refs/hashes)</td><td>References, not binaries</td><td>&lt; $100</td><td>Lifecycle to cold storage for closed claims</td></tr>
   <tr><td>Observability tooling</td><td>Metrics, logs, traces</td><td>$1,500 – $3,000</td><td>90-day log retention; sample traces; no PII in logs</td></tr>
   <tr><td>Security services (key mgmt, secrets, firewall)</td><td>Encryption, secrets, edge</td><td>$300 – $600</td><td>Security is non-negotiable — don't over-optimize</td></tr>
-  <tr><td><strong>Infrastructure Total (est.)</strong></td><td></td><td><strong>$6,600 – $13,000/month</strong></td><td></td></tr>
+  <tr><td>LLM inference <span style="color:#6d3fa0;">(assist layer — Stage D)</span></td><td>Per-token / per-request; only on routed claims</td><td>$500 – $3,000</td><td>Gate by tier; triage with a smaller model; cap context; cache policy/coverage lookups</td></tr>
+  <tr><td><strong>Infrastructure Total (est.)</strong></td><td></td><td><strong>$7,100 – $16,000/month</strong> <span style="color:#888;font-weight:normal;">(incl. LLM assist when enabled)</span></td><td></td></tr>
 </table>
 
 <!-- COST SHAPE -->
@@ -84,6 +85,7 @@
 <table>
   <tr><th>Lever</th><th>How it pays back</th><th>Illustrative sizing</th></tr>
   <tr><td><strong>Auto-ticket deflection</strong></td><td>Clean claims handled with little or no manual adjudication</td><td>45% auto/assisted on 100k claims/yr × ~30 min saved × $50/hr ≈ $1.1M/yr</td></tr>
+  <tr><td><strong>AI-assisted adjudication</strong></td><td>LLM drafts the decision packet so a human confirms in seconds instead of assembling it from scratch</td><td>Throughput lift on the assisted tier; compounds the deflection lever above</td></tr>
   <tr><td><strong>Cycle-time reduction</strong></td><td>Faster decision/payment → lower prompt-pay interest + better retention</td><td>Avoided statutory interest + retention lift</td></tr>
   <tr><td><strong>Fraud leakage reduction</strong></td><td>More caught via scoring + SIU routing vs. baseline</td><td>Even a small % of paid claims is material at life face amounts</td></tr>
   <tr><td><strong>NIGO reduction</strong></td><td>Fewer "not in good order" rework loops via proactive requirements</td><td>Rework hours eliminated × labor rate</td></tr>
@@ -102,6 +104,7 @@
 <div class="lever"><strong>5 · Autoscale on consumer lag</strong> — Scale processor replicas on lag, not a fixed schedule; scale to zero for batch-like jobs (DI monthly benefit run) between runs.</div>
 <div class="lever"><strong>6 · Observability hygiene</strong> — 90-day log retention, trace sampling, metric filters instead of logging raw payloads. Observability is often the second-largest line after Kafka — keep it deliberate.</div>
 <div class="lever"><strong>7 · Defer ML until the data earns it</strong> — ML compute and a feature store are real cost. Rule-based decisioning/fraud carries the early stages with no training-data spend and full explainability; ML earns its cost only once there's enough labeled history to train on.</div>
+<div class="lever"><strong>8 · Spend LLM inference only where it pays</strong> — The agent assist layer is genuine per-token cost. Gate it to the tiers where a human is in the loop (skip the deterministic auto-ticket lane), triage with a smaller/cheaper model and escalate to a larger one only when needed, cap the context window, and cache deterministic lookups (policy/coverage) instead of re-prompting. Inference scales with claim volume, so right-sizing the per-claim token budget is the lever.</div>
 
 <h1>5. Cost Governance</h1>
 <table>

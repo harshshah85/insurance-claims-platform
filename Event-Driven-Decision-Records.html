@@ -110,6 +110,17 @@
   <div class="decision"><span class="winner">Decision:</span> Deterministic weighted scoring (STP + fraud) first; supervised ML only once there are enough labeled outcomes to train on. Hard guardrails (contestability, OFAC, limits) never move to ML. (See Claims Decisioning &amp; Fraud.)</div>
 </div>
 
+<div class="adr">
+  <h3>ADR-07 — LLM/agent assist as advisory vs. autonomous AI decisioning <span class="status">ACCEPTED</span></h3>
+  <p class="ctx"><strong>Context:</strong> an LLM/agent layer can read documents, reconcile facts, and draft a decision far faster than a person. The question is how much authority it holds — does it decide claims, or recommend to a human who decides?</p>
+  <table>
+    <tr><th>Option</th><th>Pros</th><th>Cons</th></tr>
+    <tr><td class="winner">Advisory now → governed graduation to deciding</td><td>Human stays accountable; every recommendation auditable; defensible under AI-governance rules; builds an evidence base (acceptance/accuracy) before any autonomy</td><td>Slower to full automation; humans still in the assisted loop</td></tr>
+    <tr><td>Autonomous AI decisioning from day one</td><td>Highest automation immediately</td><td>No accountable decision-maker; hard to defend a denial; unproven model deciding money movement; regulatory exposure</td></tr>
+  </table>
+  <div class="decision"><span class="winner">Decision:</span> The LLM produces analysis + a recommended decision with cited detail; a <strong>human is the decision-maker</strong> on every AI-touched claim, and the deterministic auto-ticket lane stays rule-decided. A claim class moves from "recommend" to "AI decides" only once the model has proven out against human reviewers — a deliberate, governed, one-directional step. Hard guardrails and the human-authored-denial rule hold at every stage. (Extends ADR-06; see AI-Assisted &amp; Agentic Decisioning.)</div>
+</div>
+
 <h1>Decision Status Legend</h1>
 <table>
   <tr><th>Status</th><th>Meaning</th></tr>
@@ -118,7 +129,7 @@
   <tr><td>SUPERSEDED</td><td>Replaced by a later ADR (linked)</td></tr>
 </table>
 
-<div class="note"><strong>How these connect:</strong> ADR-01 (event sourcing) makes ADR-04 (Kafka as log of record) almost forced. ADR-02/03 (choreography + saga) follow from having an event log. ADR-05 keeps it safe over time. ADR-06 keeps it defensible to regulators. The decisions reinforce each other — which is the point of recording them together.</div>
+<div class="note"><strong>How these connect:</strong> ADR-01 (event sourcing) makes ADR-04 (Kafka as log of record) almost forced. ADR-02/03 (choreography + saga) follow from having an event log. ADR-05 keeps it safe over time. ADR-06 keeps it defensible to regulators, and ADR-07 extends that same discipline to the LLM/agent layer — AI advises, humans decide, autonomy is earned. The decisions reinforce each other — which is the point of recording them together.</div>
 
 <br><br><hr>
 <p style="text-align:center;color:#999;font-size:11px;">Event-Driven Decision Records — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>

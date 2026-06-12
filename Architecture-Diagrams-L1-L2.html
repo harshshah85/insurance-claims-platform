@@ -32,7 +32,7 @@
 </div>
 
 <div class="note">
-  <strong>C4 model, two levels.</strong> L1 (System Context) shows the platform as one box surrounded by the people and external systems it talks to. L2 (Container) opens the box into its runtime pieces — the Kafka backbone, the 9 bounded-context services, the read models, and the serving APIs. Lower levels (component / code) are intentionally out of scope for a reference architecture.
+  <strong>C4 model, two levels.</strong> L1 (System Context) shows the platform as one box surrounded by the people and external systems it talks to. L2 (Container) opens the box into its runtime pieces — the Kafka backbone, the 9 bounded-context services, the read models, and the serving APIs. Lower levels (component / code) are intentionally out of scope for a reference architecture. A cross-cutting <strong>LLM assist layer</strong> (agent workers) also rides this backbone — it reads facts and drafts recommendations for humans to approve, and appears at L2 as an additive container, never the system of record.
 </div>
 
 <h1>1. L1 — System Context</h1>
@@ -83,6 +83,9 @@
   <span class="g">di_benefit_ledger</span> (rel.)  ─┤
   <span class="g">fraud_case_view</span> (key-val) ─┤      <span class="y">Correspondence Engine</span> ─► Email/SMS/Secure/Print
   <span class="g">payment_ledger</span> (rel.)     ─┘      <span class="y">Payment Saga</span> ─► Treasury / EFT / Check
+
+  <span class="m">ASSIST LAYER (additive — reads &amp; drafts, never the record)</span>
+  <span class="p">LLM Agent Workers</span> (per-claim orchestrator + skills/tools) ─► <span class="r">claims.ai.*</span> ─► adjudicator review / auto-prepared packet  <span class="m">[human-in-the-loop]</span>
 </div>
 
 <table>
@@ -95,6 +98,7 @@
   <tr><td>Claims Domain APIs</td><td>REST/GraphQL behind an API gateway</td><td>Versioned read access for all channels — never the raw log</td></tr>
   <tr><td>Correspondence Engine</td><td>Templating + delivery service</td><td>Omnichannel outbound honoring preference &amp; consent</td></tr>
   <tr><td>Payment Saga</td><td>Saga orchestrator + idempotent commands</td><td>Controlled money movement to treasury</td></tr>
+  <tr><td>LLM Agent Workers <span style="color:#6d3fa0;">(assist)</span></td><td>Stateless per-claim orchestrator + LLM, skills &amp; tools</td><td>Read documents, reconcile facts, draft a decision packet with cited rationale + confidence for human review; emit <code>claims.ai.*</code>. Additive assist layer — never the system of record, never moves money on its own</td></tr>
 </table>
 
 <!-- ROLLOUT -->
@@ -116,7 +120,7 @@
 </div>
 <div class="roadmap-phase" style="border-color:#6d3fa0;">
   <h3>Stage D — Intelligence (when earned)</h3>
-  <p>Add <strong>ML</strong> for fraud and STP soft-factors <em>once there is enough labeled claims history to train on</em> — typically a stretch of real operations, not a date on a plan. Hard guardrails (contestability, OFAC, limits) stay as rules. This stage is optional and gated on data, never on a calendar.</p>
+  <p>Add <strong>ML</strong> for fraud and STP soft-factors <em>once there is enough labeled claims history to train on</em> — typically a stretch of real operations, not a date on a plan. The same stage introduces the <strong>LLM / agent assist layer</strong>: models read documents, reconcile facts, and draft a recommended decision with cited detail for a human to approve — and only graduate to deciding clean claims once proven against human reviewers. Hard guardrails (contestability, OFAC, limits) stay as rules, and a human stays the decision-maker until the model has earned more. This stage is optional and gated on data and proof, never on a calendar. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)</p>
 </div>
 
 <h3>Why this order</h3>

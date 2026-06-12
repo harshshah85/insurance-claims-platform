@@ -72,9 +72,12 @@
   <tr><td><strong>IRS reporting</strong></td><td>1099-R for taxable DI benefits; correct withholding</td><td>Tax determination step before settlement; <code>payment_ledger</code> as 1099-R basis</td></tr>
   <tr><td><strong>SOX</strong> (financial controls)</td><td>Controls over disbursement; segregation of duties; auditability</td><td>Dual control, idempotent payments, immutable log, reconciliation</td></tr>
   <tr><td><strong>SOC 2</strong></td><td>Security/availability/confidentiality controls for the platform</td><td>The seven layers above + change management &amp; access reviews</td></tr>
+  <tr><td><strong>AI governance</strong> (NAIC Model Bulletin on the Use of AI Systems by Insurers; state adoptions)</td><td>Governance &amp; documentation of AI use in claims; human oversight; testing for unfair discrimination / bias; explainability of AI-influenced outcomes</td><td>Human-in-the-loop as decision-maker; <strong>no model-only denial</strong>; full audit metadata (model version, inputs, output, confidence) on <code>claims.ai.v1</code>; sampled QA + bias testing of the assist layer (see AI-Assisted &amp; Agentic Decisioning)</td></tr>
 </table>
 
 <div class="note"><strong>Why event sourcing helps compliance:</strong> a market-conduct examiner asking "show me every action on this claim and who took it, in order" gets a direct answer — the ordered event log <em>is</em> that record, with approver identities and causation links. There is no reconstructing history from mutable rows and scattered logs.</div>
+
+<div class="note"><strong>The same log makes AI defensible.</strong> Every LLM recommendation is itself an event on <code>claims.ai.v1</code> carrying the model version, the inputs it saw, its output, and its confidence — so "what did the AI suggest, and did a human decide?" is answerable for any claim. The model sees tokenized PII only (same layer-5 controls); prompts and outputs are logged without raw PII/PHI. Because a human (or the deterministic auto-ticket lane) owns every authoritative decision and no denial is ever model-only, an AI-influenced outcome is always traceable to an accountable decision-maker.</div>
 
 <h1>4. Data Classification &amp; Handling</h1>
 <table>
