@@ -55,8 +55,8 @@
   <tr><th>External Actor / System</th><th>Relationship</th></tr>
   <tr><td><strong>Client</strong></td><td>Files FNOL across channels; tracks status; receives correspondence &amp; payment</td></tr>
   <tr><td><strong>Advisor</strong></td><td>Files/assists on behalf of clients; sees their book's claims; nudges requirements</td></tr>
-  <tr><td><strong>Service Rep</strong></td><td>Works the human-touch queue; handles inbound calls; resolves NIGO items</td></tr>
-  <tr><td><strong>Adjudicator / SIU</strong></td><td>Decisions standard/complex claims; investigates referred fraud cases</td></tr>
+  <tr><td><strong>Service Rep</strong></td><td>Works the human-touch queue; handles inbound calls; resolves NIGO items; one-click confirms or corrects agent-drafted packets on assisted claims</td></tr>
+  <tr><td><strong>Adjudicator / SIU</strong></td><td><strong>Reviews and approves (or overrides) agent-drafted recommendations and holds decision authority</strong>; decisions standard/complex claims; investigates referred fraud cases</td></tr>
   <tr><td><strong>Policy Admin System</strong></td><td>Golden record for policy in-force, coverage, contestability, beneficiaries — consumed via Kafka Connect CDC</td></tr>
   <tr><td><strong>Treasury / Disbursement</strong></td><td>Executes the actual debit/credit on the bank rail; the cash ledger of record</td></tr>
   <tr><td><strong>Document / ECM Store</strong></td><td>Stores death certificates, APS, medical records; events carry references + hashes</td></tr>
@@ -69,7 +69,7 @@
 <!-- L2 -->
 <div class="page-break"></div>
 <h1>2. L2 — Container Diagram</h1>
-<h2>Inside the box: the Kafka backbone, context services as producers/consumers, the CQRS read models, and the serving layer.</h2>
+<h2>Inside the box: the Kafka backbone, context services as producers/consumers, the agent workers, the CQRS read models, and the serving layer.</h2>
 
 <div class="diagram"><span class="m">  CHANNELS                 INGRESS              EVENT BACKBONE (Apache Kafka)            STREAM PROCESSORS</span>
   <span class="b">Client Portal</span>   ─┐
@@ -82,21 +82,21 @@
 
   <span class="m">READ MODELS (CQRS)                 SERVING                     OUTBOUND</span>
   <span class="g">claim_summary</span> (relational) ─┐
-  <span class="g">advisor_worklist</span> (search) ─┼─► <span class="b">Claims Domain APIs</span> ─► <span class="b">API gateway</span> ─► channels
+  <span class="g">advisor_worklist</span> (search) ─┼─► <span class="b">Claims Domain APIs</span> ─► <span class="b">API gateway</span> ─► Client / Advisor / Service / <span class="b">Adjudicator</span> desktops
   <span class="g">di_benefit_ledger</span> (rel.)  ─┤
   <span class="g">fraud_case_view</span> (key-val) ─┤      <span class="y">Correspondence Engine</span> ─► Email/SMS/Secure/Print
   <span class="g">payment_ledger</span> (rel.)     ─┘      <span class="y">Payment Saga</span> ─► Treasury / EFT / Check
 
-  <span class="m">Agent Workers read claims.* + document refs, draft a packet on claims.ai.v1 → human review.  Decision authority stays with people, by design.</span>
+  <span class="m">AI review loop:</span>  <span class="p">Agent Workers</span> ─► <span class="r">claims.ai.v1</span> ─► <span class="p">Projectors</span> enrich <span class="g">claim_summary</span> + <span class="g">advisor_worklist</span> ─► <span class="b">Adjudicator / Service desktop</span> reviews &amp; decides ─► <span class="r">claims.decision.v1</span>   <span class="m">[agents reason, people decide]</span>
 </div>
 
 <table>
   <tr><th>Container</th><th>Tech</th><th>Responsibility</th></tr>
   <tr><td>Intake API</td><td>Stateless service + transactional outbox</td><td>Accept FNOL from any channel; emit <code>claims.fnol.v1</code> reliably</td></tr>
-  <tr><td>Kafka backbone</td><td>Apache Kafka + a schema registry</td><td>14 topics; the event-sourced system of record</td></tr>
+  <tr><td>Kafka backbone</td><td>Apache Kafka + a schema registry</td><td>14 core topics (the event-sourced system of record) + the derived <code>claims.ai.v1</code> advisory stream</td></tr>
   <tr><td>Kafka Connect</td><td>CDC + outbox connectors</td><td>Stream Policy Admin changes into <code>policy.snapshot.v1</code>; drain outboxes</td></tr>
   <tr><td>Stream processors</td><td>Kafka Streams + Flink</td><td>Decisioning, fraud, DI timers, projections, correspondence triggers</td></tr>
-  <tr><td>Read models</td><td>Relational DB / search index / key-value store</td><td>CQRS projections rebuilt from the log</td></tr>
+  <tr><td>Read models</td><td>Relational DB / search index / key-value store</td><td>CQRS projections rebuilt from the log; <code>claim_summary</code> &amp; <code>advisor_worklist</code> also surface the agent's recommendation from <code>claims.ai.v1</code> for the reviewer</td></tr>
   <tr><td>Claims Domain APIs</td><td>REST/GraphQL behind an API gateway</td><td>Versioned read access for all channels — never the raw log</td></tr>
   <tr><td>Correspondence Engine</td><td>Templating + delivery service</td><td>Omnichannel outbound honoring preference &amp; consent</td></tr>
   <tr><td>Payment Saga</td><td>Saga orchestrator + idempotent commands</td><td>Controlled money movement to treasury</td></tr>
