@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glossary — Life &amp; DI Claims Platform</title>
+<link rel="stylesheet" href="styles.css">
+<!--meta:injected-->
+<meta name="description" content="The insurance, event-driven, and AI terms used across these documents — defined once, in plain language.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:title" content="Glossary">
+<meta property="og:description" content="The insurance, event-driven, and AI terms used across these documents — defined once, in plain language.">
+<meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Glossary.html">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Glossary">
+<meta name="twitter:description" content="The insurance, event-driven, and AI terms used across these documents — defined once, in plain language.">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+</head>
+<body class="doc" style="--accent:#0d9488">
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home" href="index.html">← Claims Platform</a>
+    <span class="crumb">/ <b>Glossary</b></span>
+    <span class="spacer"></span>
+    <span class="accent-chip"></span>
+  </div>
+</div>
+
+<div class="doc-main">
+
+  <div class="doc-cover">
+    <div class="eyebrow">Reference</div>
+    <h1>Glossary</h1>
+    <p class="lede">The insurance, event-driven, and AI terms used across these documents — defined once, in plain language.</p>
+    <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
+  </div>
+
+  <div class="note accent">
+    <strong>One vocabulary.</strong> The platform spans three worlds — life &amp; disability claims, event-driven systems, and an LLM assist layer. This page defines the shorthand each document leans on so any one of them can be read on its own.
+  </div>
+
+  <h1><span class="n">1</span> Claims &amp; Insurance</h1>
+  <table>
+    <tr><th>Term</th><th>Meaning</th></tr>
+    <tr><td><strong>FNOL</strong> — First Notice of Loss</td><td>The moment a claim is first filed — a death reported, a disability claimed. The "front door" of the platform.</td></tr>
+    <tr><td><strong>Life (death) claim</strong></td><td>Filed by a <em>beneficiary</em> after the insured dies. One-time, large payout; the hard part is the front door (identity-proof an unknown filer, verify the death, find the policy).</td></tr>
+    <tr><td><strong>DI</strong> — Disability Income</td><td>Income-replacement claim filed by the <em>policyholder</em>. The hard part is the long tail — recurring payments, recertification, return-to-work, offsets.</td></tr>
+    <tr><td><strong>STP</strong> — Straight-Through Processing</td><td>A clean, low-risk claim decided automatically with no human touch — what we call the <em>auto-ticket</em> / <em>low-touch</em> path.</td></tr>
+    <tr><td><strong>Adjudication</strong></td><td>Deciding a claim — approve, deny, or pend pending more information.</td></tr>
+    <tr><td><strong>SIU</strong> — Special Investigations Unit</td><td>The fraud-investigation team. High-risk claims are referred here and have payment held.</td></tr>
+    <tr><td><strong>NIGO</strong> — Not In Good Order</td><td>A claim missing required documents or information; it can't proceed until resolved.</td></tr>
+    <tr><td><strong>IDV / KYC</strong></td><td>Identity Verification / Know Your Customer — proving the claimant and payee are who they say they are.</td></tr>
+    <tr><td><strong>Contestability</strong></td><td>An early window (typically the first two policy years) in which the insurer may contest a claim for misrepresentation. Contestable claims always get human review.</td></tr>
+    <tr><td><strong>DMF</strong> — Death Master File</td><td>An external death-records source used to verify a reported death.</td></tr>
+    <tr><td><strong>UCSPA / prompt-pay</strong></td><td>Unfair Claims Settlement Practices Act — state rules that require claims be handled and paid within set timeframes, with interest owed for late payment.</td></tr>
+    <tr><td><strong>Recertification</strong></td><td>Periodic proof, on a DI claim, that the claimant is still disabled and entitled to continued benefits.</td></tr>
+    <tr><td><strong>RTW / Offset</strong></td><td>Return To Work; and an <em>offset</em> reduces a DI benefit by other income (e.g. social-insurance payments).</td></tr>
+    <tr><td><strong>1099-R</strong></td><td>The U.S. tax form for reporting certain claim/retirement distributions; relevant to tax withholding on payouts.</td></tr>
+  </table>
+
+  <h1><span class="n">2</span> Event-Driven Architecture</h1>
+  <table>
+    <tr><th>Term</th><th>Meaning</th></tr>
+    <tr><td><strong>Event sourcing</strong></td><td>Storing a thing as the ordered list of events that happened to it, rather than a row you overwrite. The log is the system of record.</td></tr>
+    <tr><td><strong>CQRS</strong></td><td>Command Query Responsibility Segregation — the write side (append events) is separate from the read side (query simple projections built from those events).</td></tr>
+    <tr><td><strong>Read model / projection</strong></td><td>A query-friendly view (a table, a search index) built by replaying events. Disposable — drop it and rebuild from the log.</td></tr>
+    <tr><td><strong>Aggregate</strong></td><td>A consistency boundary — a cluster of data (e.g. the Claim) that enforces its own rules and is updated as a unit.</td></tr>
+    <tr><td><strong>Bounded context</strong></td><td>A self-contained slice of the domain with its own model and language (Intake, Decisioning, Payments…). This platform has 9.</td></tr>
+    <tr><td><strong>Topic / partition / key</strong></td><td>Kafka's units: events live on a <em>topic</em>, split across <em>partitions</em>; the <em>key</em> (e.g. claim_id) decides the partition and guarantees per-key ordering.</td></tr>
+    <tr><td><strong>Saga</strong></td><td>A long-running process done as small, individually reversible steps with compensations — used for money movement instead of one big distributed transaction.</td></tr>
+    <tr><td><strong>Transactional outbox</strong></td><td>A pattern that writes a row and its event in one database transaction, then publishes the event separately — so you never "commit the row but lose the event."</td></tr>
+    <tr><td><strong>CDC</strong> — Change Data Capture</td><td>Streaming another system's changes (here, the policy admin system) onto a topic as they happen, instead of batch ETL.</td></tr>
+    <tr><td><strong>EOS</strong> — Exactly-Once Semantics</td><td>A processing guarantee that a consume→transform→produce cycle happens once and only once, even on retry.</td></tr>
+    <tr><td><strong>Compaction vs retention</strong></td><td>Two cleanup policies: <em>retention</em> keeps the full history for a time window (used for the event log); <em>compaction</em> keeps only the latest value per key (used for latest-state topics). Compacting a log would discard history.</td></tr>
+    <tr><td><strong>Avro / Schema Registry</strong></td><td>A compact binary message format (Avro) plus a registry that enforces compatible schema evolution, so producers and consumers don't break each other.</td></tr>
+    <tr><td><strong>DLQ</strong> — Dead-Letter Queue</td><td>Where messages land after exhausting retries, with failure metadata, for an operator to inspect — never blindly auto-replayed.</td></tr>
+    <tr><td><strong>Correlation / Causation ID</strong></td><td>Trace fields on every event: <em>correlation</em> stays constant for a whole claim journey; <em>causation</em> points at the immediate predecessor event.</td></tr>
+  </table>
+
+  <h1><span class="n">3</span> AI &amp; Decisioning</h1>
+  <table>
+    <tr><th>Term</th><th>Meaning</th></tr>
+    <tr><td><strong>LLM</strong> — Large Language Model</td><td>The language model the agent workers call to read documents and draft reasoning. Vendor-neutral and swappable; it sees tokenized data only.</td></tr>
+    <tr><td><strong>Agent / agentic</strong></td><td>An LLM-driven worker that plans and acts over multiple steps (read a document, reconcile facts, draft a packet) rather than answering a single prompt.</td></tr>
+    <tr><td><strong>Skill vs tool</strong></td><td>A <em>tool</em> is a concrete callable action (look up a policy, fetch a document); a <em>skill</em> is a packaged procedure the agent follows to use tools toward a goal.</td></tr>
+    <tr><td><strong>HITL</strong> — Human-in-the-Loop</td><td>A person reviews and approves (or overrides) what the AI proposes. On this platform a human holds decision authority on every AI-touched claim.</td></tr>
+    <tr><td><strong>Grounding / citation</strong></td><td>Tying every AI claim back to a specific source in the record, so a recommendation is checkable rather than asserted.</td></tr>
+    <tr><td><strong>Abstention</strong></td><td>A first-class outcome where the AI declines to recommend on a low-confidence or conflicting claim and escalates it to manual review.</td></tr>
+    <tr><td><strong><code>claims.ai.*</code></strong></td><td>The derived advisory stream the agents write to — separate from the system-of-record topics, the way read models are derived from the log. Never auto-decides or moves money.</td></tr>
+    <tr><td><strong>ADR</strong> — Architecture Decision Record</td><td>A short, dated record of a significant design decision: the context, the options weighed, the choice, and the consequence.</td></tr>
+  </table>
+
+</div>
+
+<footer>
+  <p>Glossary — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
+</footer>
+
+<script src="app.js" defer></script>
+</body>
+</html>

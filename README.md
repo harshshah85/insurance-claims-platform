@@ -21,6 +21,7 @@ The platform is **agent-assisted and human-in-the-loop by design**: every claim 
 | [FinOps-Cost-Model.html](FinOps-Cost-Model.html) | Kafka and cloud-infrastructure cost drivers (incl. LLM inference for the assist layer), the cost shape (thin slice vs full platform), where the payback comes from, 8 optimization levers, and cost governance. |
 | [Claims-Onboarding-Workflow.html](Claims-Onboarding-Workflow.html) | New product/plan vs. new claim-intake onboarding workflows, automated vs. manual steps, quarantine recovery for unresolved policy numbers, and a later self-service FNOL vision. |
 | [Event-Driven-Decision-Records.html](Event-Driven-Decision-Records.html) | Short decision records — events vs. overwriting rows, services reacting vs. a central coordinator, a durable log vs. a managed streaming service, the message format, and small reversible steps vs. one big transaction for payments. |
+| [Glossary.html](Glossary.html) | Plain-language definitions of the insurance, event-driven, and AI terms used across these documents — FNOL, STP, DI, SIU, event sourcing, CQRS, saga, outbox, CDC, EOS, HITL, and more. |
 
 ## Platform Architecture Overview
 

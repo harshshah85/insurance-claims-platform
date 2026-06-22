@@ -2,40 +2,48 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Claims Onboarding Workflow — Life &amp; DI Claims Platform</title>
-<style>
-  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
-  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #6d3fa0; padding-bottom: 8px; margin-top: 40px; }
-  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
-  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
-  .page-break { page-break-before: always; }
-  .cover { text-align: center; padding: 60px 0 40px 0; }
-  .cover h1 { border: none; font-size: 28px; }
-  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
-  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
-  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
-  tr:nth-child(even) td { background: #f7f9fc; }
-  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
-  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
-  .auto { color: #2a9d8f; font-weight: bold; } .manual { color: #e63946; font-weight: bold; }
-  .step { background: #f4f0fa; border-left: 4px solid #6d3fa0; padding: 10px 14px; margin: 6px 0; font-size: 12px; }
-  .flow { font-family: 'SF Mono','Courier New',monospace; font-size: 11.5px; background: #0d1117; color: #c9d1d9; border-radius: 8px; padding: 18px 20px; overflow-x: auto; line-height: 1.85; margin: 14px 0; }
-  .flow .g { color: #2a9d8f; } .flow .r { color: #e63946; } .flow .y { color: #d4a017; } .flow .b { color: #7ab8d8; } .flow .m { color: #6e7681; }
-</style>
+<link rel="stylesheet" href="styles.css">
+<!--meta:injected-->
+<meta name="description" content="Life &amp; DI Claims Platform — New Product &amp; New Claim Intake Onboarding">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:title" content="Claims Onboarding Workflow">
+<meta property="og:description" content="Life &amp; DI Claims Platform — New Product &amp; New Claim Intake Onboarding">
+<meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Claims-Onboarding-Workflow.html">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Claims Onboarding Workflow">
+<meta name="twitter:description" content="Life &amp; DI Claims Platform — New Product &amp; New Claim Intake Onboarding">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
-<body>
+<body class="doc" style="--accent:#7c3aed">
 
-<div class="cover">
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home" href="index.html">← Claims Platform</a>
+    <span class="crumb">/ <b>Claims Onboarding Workflow</b></span>
+    <span class="spacer"></span>
+    <span class="accent-chip"></span>
+  </div>
+</div>
+
+<div class="doc-main">
+<div class="doc-cover">
+  <div class="eyebrow">Reference Document</div>
   <h1>Claims Onboarding Workflow</h1>
-  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — New Product &amp; New Claim Intake Onboarding</p>
-  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+  <p class="lede">Life &amp; DI Claims Platform — New Product &amp; New Claim Intake Onboarding</p>
+  <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
 </div>
 
 <div class="note">
   <strong>Two kinds of onboarding.</strong> <em>Scenario A</em> — onboarding a <strong>new product / plan</strong> (a new Life or DI product that can now be claimed against): a one-time engineering/config exercise. <em>Scenario B</em> — onboarding a <strong>new claim</strong> at intake (FNOL): the high-volume, per-claim runtime flow. They share the platform but differ entirely in cadence and who does the work.
 </div>
 
-<h1>1. Scenario A — New Product / Plan Onboarding</h1>
+<h1><span class="n">1</span> Scenario A — New Product / Plan Onboarding</h1>
 <h2>One-time. Performed by product + platform teams when a new Life/DI product becomes claimable.</h2>
 
 <div class="step"><strong>Step 1 — Map coverage to claim rules</strong> <span class="auto">[semi-auto]</span><br>Define which loss events the product covers, exclusions, elimination period (DI), face/benefit structure, and contestability terms. Encode as decisioning rules consumed by STP scoring.</div>
@@ -50,7 +58,7 @@
 
 <!-- SCENARIO B -->
 <div class="page-break"></div>
-<h1>2. Scenario B — New Claim Intake (FNOL)</h1>
+<h1><span class="n">2</span> Scenario B — New Claim Intake (FNOL)</h1>
 <h2>Per-claim, high-volume, mostly automated. This is the runtime onboarding of a claim into the platform.</h2>
 
 <div class="flow">
@@ -84,7 +92,7 @@
 
 <div class="note"><strong>Agent assist at intake.</strong> Several of the "automated" steps are now <strong>agent-assisted</strong>: document auto-classification &amp; extraction (the Document Intelligence agent) and requirement prediction — asking only for what a claim actually needs — draft onto <code>claims.ai.v1</code> for confirmation. The agents speed intake; a human still confirms anything they surface, and decision authority is unchanged. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)</div>
 
-<h1>3. Quarantine Recovery (Unresolved Policy)</h1>
+<h1><span class="n">3</span> Quarantine Recovery (Unresolved Policy)</h1>
 <p>An FNOL whose policy number can't be resolved against <code>policy.snapshot.v1</code> is <strong>quarantined, never dropped</strong> — the claimant has already been told their claim is received, so losing it is unacceptable.</p>
 <div class="flow">
 <span class="r">PolicyUnresolved</span> ─► quarantine read model (claim is live, status "in research")
@@ -94,7 +102,7 @@
 </div>
 <div class="note"><strong>Why this matters:</strong> in Life claims the most common quarantine cause is a beneficiary who has the policy number slightly wrong or only knows the insured's name. The recovery flow keeps the regulatory acknowledgement clock honest while research happens in the background — the claim is never silently stuck.</div>
 
-<h1>4. Self-Service FNOL — the Later Vision</h1>
+<h1><span class="n">4</span> Self-Service FNOL — the Later Vision</h1>
 <table>
   <tr><th>Capability</th><th>Now</th><th>Later (with ML)</th></tr>
   <tr><td>Intake</td><td>Guided forms per channel</td><td>Conversational / assisted FNOL; document auto-classification &amp; extraction</td></tr>
@@ -105,7 +113,13 @@
 
 <div class="note">Much of the "Later" column is delivered by the <strong>LLM / agent assist layer</strong>: document auto-classification &amp; extraction, predicting which requirements a claim actually needs, and drafting plain-language status nudges — each produced as a recommendation for a human to confirm, not an autonomous action. See <a href="AI-Agentic-Decisioning.html"><strong>AI-Assisted &amp; Agentic Decisioning</strong></a>.</div>
 
-<br><br><hr>
-<p style="text-align:center;color:#999;font-size:11px;">Claims Onboarding Workflow — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</div>
+
+<footer>
+  <p>Claims Onboarding Workflow — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
+</footer>
+
+<script src="app.js" defer></script>
 </body>
 </html>

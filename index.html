@@ -4,92 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Life &amp; DI Claims Platform — Event-Driven Architecture Reference</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; }
-
-  /* HERO */
-  .hero { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); padding: 64px 40px 56px; text-align: center; border-bottom: 1px solid #21262d; }
-  .hero-tag { display: inline-block; background: #e63946; color: white; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 4px; padding: 4px 12px; margin-bottom: 20px; }
-  .hero h1 { font-size: 36px; font-weight: 700; color: #ffffff; line-height: 1.2; margin-bottom: 12px; }
-  .hero h1 span { color: #a8dadc; }
-  .hero p { font-size: 16px; color: #8b949e; max-width: 640px; margin: 0 auto 28px; line-height: 1.6; }
-  .hero-meta { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; font-size: 12px; color: #8b949e; }
-  .hero-meta span { display: flex; align-items: center; gap: 6px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: #2a9d8f; display: inline-block; }
-
-  /* CARDS GRID */
-  .grid-section { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
-  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #8b949e; margin-bottom: 24px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-
-  .card { background: #161b22; border: 1px solid #21262d; border-radius: 12px; padding: 28px; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 12px; transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s; }
-  .card:hover { border-color: #457b9d; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
-  .card-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-  .card-header { display: flex; align-items: flex-start; gap: 14px; }
-  .card-title { font-size: 16px; font-weight: 700; color: #e6edf3; line-height: 1.3; }
-  .card-subtitle { font-size: 12px; color: #8b949e; margin-top: 2px; }
-  .card-body { font-size: 13px; color: #8b949e; line-height: 1.6; }
-  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-  .tag { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 20px; }
-
-  /* Card accent colors */
-  .card-arch { border-top: 3px solid #e63946; }
-  .card-arch .card-icon { background: rgba(230,57,70,0.15); }
-  .card-arch:hover { border-color: #e63946; }
-
-  .card-stream { border-top: 3px solid #2a9d8f; }
-  .card-stream .card-icon { background: rgba(42,157,143,0.15); }
-  .card-stream:hover { border-color: #2a9d8f; }
-
-  .card-domain { border-top: 3px solid #457b9d; }
-  .card-domain .card-icon { background: rgba(69,123,157,0.15); }
-  .card-domain:hover { border-color: #457b9d; }
-
-  .card-decision { border-top: 3px solid #d4a017; }
-  .card-decision .card-icon { background: rgba(212,160,23,0.15); }
-  .card-decision:hover { border-color: #d4a017; }
-
-  .card-adr { border-top: 3px solid #6d3fa0; }
-  .card-adr .card-icon { background: rgba(109,63,160,0.15); }
-  .card-adr:hover { border-color: #6d3fa0; }
-
-  .card-ai { border-top: 3px solid #00b4d8; }
-  .card-ai .card-icon { background: rgba(0,180,216,0.15); }
-  .card-ai:hover { border-color: #00b4d8; }
-
-  /* Tag colors */
-  .tag-arch { background: rgba(230,57,70,0.15); color: #e63946; }
-  .tag-stream { background: rgba(42,157,143,0.15); color: #2a9d8f; }
-  .tag-data { background: rgba(212,160,23,0.15); color: #d4a017; }
-  .tag-ml { background: rgba(109,63,160,0.15); color: #b88ee8; }
-  .tag-api { background: rgba(69,123,157,0.15); color: #7ab8d8; }
-  .tag-ai { background: rgba(0,180,216,0.15); color: #0a8aa6; }
-
-  /* ARCHITECTURE OVERVIEW */
-  .overview { background: #161b22; border: 1px solid #21262d; border-radius: 12px; padding: 32px; margin: 0 24px 40px; max-width: 1052px; margin-left: auto; margin-right: auto; }
-  .overview h2 { font-size: 16px; font-weight: 700; color: #e6edf3; margin-bottom: 20px; }
-  .flow { font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace; font-size: 12px; color: #8b949e; background: #0d1117; border: 1px solid #21262d; border-radius: 8px; padding: 20px 24px; overflow-x: auto; line-height: 1.9; }
-  .flow .hl { color: #2a9d8f; }
-  .flow .hl2 { color: #e63946; }
-  .flow .hl3 { color: #d4a017; }
-  .flow .hl4 { color: #a8dadc; }
-  .flow .comment { color: #484f58; }
-
-  /* KEY DECISIONS */
-  .decisions { max-width: 1100px; margin: 0 auto; padding: 0 24px 48px; }
-  .decisions h2 { font-size: 16px; font-weight: 700; color: #e6edf3; margin-bottom: 20px; }
-  .decision-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-  .decision-item { background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 18px 20px; }
-  .decision-item h3 { font-size: 13px; font-weight: 700; color: #e6edf3; margin-bottom: 6px; }
-  .decision-item p { font-size: 12px; color: #8b949e; line-height: 1.6; }
-  .decision-num { font-size: 10px; font-weight: 700; color: #457b9d; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-
-  /* FOOTER */
-  footer { border-top: 1px solid #21262d; text-align: center; padding: 28px 24px; font-size: 12px; color: #484f58; }
-  footer a { color: #457b9d; text-decoration: none; }
-  footer a:hover { color: #a8dadc; }
-</style>
+<link rel="stylesheet" href="styles.css">
+<!--meta:injected-->
+<meta name="description" content="A vendor-neutral reference architecture for handling life &amp; disability income claims as events on Kafka — auto-ticket STP, fraud checks, correspondence, money movement, and an agent-assisted, human-in-the-loop decisioning layer.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:title" content="Life &amp; DI Claims Platform">
+<meta property="og:description" content="A vendor-neutral reference architecture for handling life &amp; disability income claims as events on Kafka — auto-ticket STP, fraud checks, correspondence, money movement, and an agent-assisted, human-in-the-loop decisioning layer.">
+<meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/index.html">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Life &amp; DI Claims Platform">
+<meta name="twitter:description" content="A vendor-neutral reference architecture for handling life &amp; disability income claims as events on Kafka — auto-ticket STP, fraud checks, correspondence, money movement, and an agent-assisted, human-in-the-loop decisioning layer.">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
 <body>
 
@@ -99,22 +28,22 @@
   <h1>Life &amp; Disability Income<br><span>Claims Platform</span></h1>
   <p>A reference design for handling life and disability income claims as a stream of events on Kafka — from a claim being filed, through review and fraud checks, to letters and payment — with a low-touch "auto-ticket" path for the clean, simple ones. LLM agent workers read documents, reconcile facts, and draft a recommended decision for a person to approve — agent-assisted by design, with people holding decision authority. Life (death) claims are filed by a beneficiary; DI claims by the policyholder. The platform handles both.</p>
   <div class="hero-meta">
-    <span><span class="dot"></span> Apache Kafka</span>
-    <span><span class="dot" style="background:#457b9d"></span> Event sourcing</span>
-    <span><span class="dot" style="background:#d4a017"></span> Auto-ticket / low-touch</span>
-    <span><span class="dot" style="background:#e63946"></span> Fraud checks</span>
-    <span><span class="dot" style="background:#6d3fa0"></span> Payments</span>
-    <span><span class="dot" style="background:#00b4d8"></span> Agent-assisted (human-in-the-loop)</span>
+    <span><span class="dot" style="background:#0d9488"></span> Apache Kafka</span>
+    <span><span class="dot" style="background:#2563eb"></span> Event sourcing</span>
+    <span><span class="dot" style="background:#d97706"></span> Auto-ticket / low-touch</span>
+    <span><span class="dot" style="background:#e11d48"></span> Fraud checks</span>
+    <span><span class="dot" style="background:#7c3aed"></span> Payments</span>
+    <span><span class="dot" style="background:#0ea5e9"></span> Agent-assisted (human-in-the-loop)</span>
   </div>
 </div>
 
 <!-- DOCUMENT CARDS -->
-<div class="grid-section">
+<div class="wrap section">
   <div class="section-label">Reference Documents</div>
   <div class="grid">
 
     <!-- L1 & L2 Diagrams -->
-    <a href="Architecture-Diagrams-L1-L2.html" class="card card-arch">
+    <a href="Architecture-Diagrams-L1-L2.html" class="card" style="--cat:var(--c-arch)">
       <div class="card-header">
         <div class="card-icon">📐</div>
         <div>
@@ -134,7 +63,7 @@
     </a>
 
     <!-- Event Streaming Architecture -->
-    <a href="Event-Streaming-Architecture.html" class="card card-stream">
+    <a href="Event-Streaming-Architecture.html" class="card" style="--cat:var(--c-stream)">
       <div class="card-header">
         <div class="card-icon">🔀</div>
         <div>
@@ -154,7 +83,7 @@
     </a>
 
     <!-- Claims Domain Model -->
-    <a href="Claims-Domain-Model.html" class="card card-domain">
+    <a href="Claims-Domain-Model.html" class="card" style="--cat:var(--c-domain)">
       <div class="card-header">
         <div class="card-icon">🧩</div>
         <div>
@@ -174,7 +103,7 @@
     </a>
 
     <!-- Decisioning & Fraud -->
-    <a href="Claims-Decisioning-and-Fraud.html" class="card card-decision">
+    <a href="Claims-Decisioning-and-Fraud.html" class="card" style="--cat:var(--c-data)">
       <div class="card-header">
         <div class="card-icon">🎯</div>
         <div>
@@ -194,7 +123,7 @@
     </a>
 
     <!-- AI-Assisted & Agentic Decisioning -->
-    <a href="AI-Agentic-Decisioning.html" class="card card-ai">
+    <a href="AI-Agentic-Decisioning.html" class="card" style="--cat:var(--c-ai)">
       <div class="card-header">
         <div class="card-icon">🤖</div>
         <div>
@@ -214,9 +143,9 @@
     </a>
 
     <!-- Security & Regulatory -->
-    <a href="Security-and-Regulatory-Compliance.html" class="card" style="border-top:3px solid #e63946;">
+    <a href="Security-and-Regulatory-Compliance.html" class="card" style="--cat:var(--c-arch)">
       <div class="card-header">
-        <div class="card-icon" style="background:rgba(230,57,70,0.15);">🔐</div>
+        <div class="card-icon">🔐</div>
         <div>
           <div class="card-title">Security &amp; Regulatory Compliance</div>
           <div class="card-subtitle">7-Layer Security + Life/DI Regulatory Map</div>
@@ -234,9 +163,9 @@
     </a>
 
     <!-- Correspondence & Money Movement -->
-    <a href="Correspondence-and-Money-Movement.html" class="card" style="border-top:3px solid #e76f51;">
+    <a href="Correspondence-and-Money-Movement.html" class="card" style="--cat:#ea7a45">
       <div class="card-header">
-        <div class="card-icon" style="background:rgba(231,111,81,0.15);">💸</div>
+        <div class="card-icon" style="background:rgba(234,122,69,0.12)">💸</div>
         <div>
           <div class="card-title">Correspondence &amp; Money Movement</div>
           <div class="card-subtitle">Omnichannel Comms + Disbursement Saga</div>
@@ -254,9 +183,9 @@
     </a>
 
     <!-- Observability -->
-    <a href="Observability-Monitoring.html" class="card" style="border-top:3px solid #2a9d8f;">
+    <a href="Observability-Monitoring.html" class="card" style="--cat:var(--c-stream)">
       <div class="card-header">
-        <div class="card-icon" style="background:rgba(42,157,143,0.15);">📊</div>
+        <div class="card-icon">📊</div>
         <div>
           <div class="card-title">Observability &amp; Monitoring</div>
           <div class="card-subtitle">SLOs, Consumer Lag &amp; Alert Routing</div>
@@ -274,9 +203,9 @@
     </a>
 
     <!-- FinOps -->
-    <a href="FinOps-Cost-Model.html" class="card" style="border-top:3px solid #d4a017;">
+    <a href="FinOps-Cost-Model.html" class="card" style="--cat:var(--c-data)">
       <div class="card-header">
-        <div class="card-icon" style="background:rgba(212,160,23,0.15);">💰</div>
+        <div class="card-icon">💰</div>
         <div>
           <div class="card-title">FinOps &amp; Cost Architecture</div>
           <div class="card-subtitle">Cost Model by Phase &amp; ROI Framework</div>
@@ -293,9 +222,9 @@
     </a>
 
     <!-- Onboarding -->
-    <a href="Claims-Onboarding-Workflow.html" class="card" style="border-top:3px solid #6d3fa0;">
+    <a href="Claims-Onboarding-Workflow.html" class="card" style="--cat:var(--c-ml)">
       <div class="card-header">
-        <div class="card-icon" style="background:rgba(109,63,160,0.15);">🚀</div>
+        <div class="card-icon">🚀</div>
         <div>
           <div class="card-title">Claims Onboarding Workflow</div>
           <div class="card-subtitle">New Product &amp; New Claim Intake Onboarding</div>
@@ -313,7 +242,7 @@
     </a>
 
     <!-- Decision Records -->
-    <a href="Event-Driven-Decision-Records.html" class="card card-adr">
+    <a href="Event-Driven-Decision-Records.html" class="card" style="--cat:var(--c-ml)">
       <div class="card-header">
         <div class="card-icon">⚖️</div>
         <div>
@@ -331,13 +260,33 @@
       </div>
     </a>
 
+    <!-- Glossary -->
+    <a href="Glossary.html" class="card" style="--cat:#0d9488">
+      <div class="card-header">
+        <div class="card-icon">📖</div>
+        <div>
+          <div class="card-title">Glossary</div>
+          <div class="card-subtitle">Claims, Event-Driven &amp; AI Terms</div>
+        </div>
+      </div>
+      <div class="card-body">
+        Plain-language definitions of the insurance, event-driven, and AI shorthand used across these documents — FNOL, STP, DI, SIU, event sourcing, CQRS, saga, outbox, CDC, EOS, HITL, and more.
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-stream">Insurance</span>
+        <span class="tag tag-api">Architecture</span>
+        <span class="tag tag-ai">AI</span>
+      </div>
+    </a>
+
   </div>
 </div>
 
 <!-- ARCHITECTURE OVERVIEW -->
-<div class="overview">
-  <h2>Platform Architecture Overview</h2>
-  <div class="flow">
+<div class="wrap section" style="padding-top:0;">
+  <div class="panel">
+    <h2>Platform Architecture Overview</h2>
+    <div class="flow">
 <span class="comment">// Event Flow — Life &amp; DI Claims Platform</span>
 
 <span class="hl">Client / Advisor / Service Rep</span>  ──(FNOL, omnichannel)──►  <span class="hl4">Intake API</span>  ──►  <span class="hl2">claims.fnol.v1</span>  ──►  <span class="hl">Claim Aggregate (event-sourced)</span>
@@ -356,12 +305,13 @@
 <span class="comment">// Outbound — correspondence &amp; money movement (saga)</span>
 <span class="hl3">claims.decision.v1</span>  ──►  <span class="hl2">Correspondence Engine</span>  ──►  <span class="hl">Email / SMS / Secure Msg / Print</span>
 <span class="hl3">claims.decision.approved</span>  ──►  <span class="hl2">Payment Saga</span>  (dual control · OFAC · 1099-R)  ──►  <span class="hl">Treasury / EFT / Check</span>  ──►  <span class="hl3">payment.settled.v1</span>
+    </div>
   </div>
 </div>
 
 <!-- KEY DESIGN DECISIONS -->
-<div class="decisions">
-  <h2>Key Design Decisions</h2>
+<div class="wrap section" style="padding-top:0;">
+  <h2 style="font-size:17px;font-weight:700;color:var(--ink);margin-bottom:20px;">Key Design Decisions</h2>
   <div class="decision-grid">
     <div class="decision-item">
       <div class="decision-num">Decision 01</div>
@@ -403,9 +353,10 @@
 
 <!-- FOOTER -->
 <footer>
-  <p>Life &amp; DI Claims Platform — Event-Driven Architecture Reference &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+  <p>Life &amp; DI Claims Platform — Event-Driven Architecture Reference <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="https://github.com/harshshah85/insurance-claims-platform">github.com/harshshah85/insurance-claims-platform</a></p>
 </footer>
 
+<script src="app.js" defer></script>
 </body>
 </html>

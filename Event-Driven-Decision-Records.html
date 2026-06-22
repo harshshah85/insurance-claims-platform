@@ -2,35 +2,41 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Event-Driven Decision Records — Life &amp; DI Claims Platform</title>
-<style>
-  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
-  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #6d3fa0; padding-bottom: 8px; margin-top: 40px; }
-  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
-  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
-  .page-break { page-break-before: always; }
-  .cover { text-align: center; padding: 60px 0 40px 0; }
-  .cover h1 { border: none; font-size: 28px; }
-  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
-  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
-  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
-  tr:nth-child(even) td { background: #f7f9fc; }
-  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
-  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
-  .adr { border: 1px solid #ddd; border-left: 5px solid #6d3fa0; border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 18px 0; }
-  .adr h3 { margin: 0 0 4px 0; color: #1a1a2e; font-size: 14px; }
-  .adr .status { display:inline-block; background:#2a9d8f; color:white; font-size:10px; font-weight:bold; padding:2px 8px; border-radius:4px; margin-left:8px; vertical-align:middle; }
-  .adr .ctx { font-size:12px; color:#555; margin:6px 0; }
-  .decision { background:#eef8f5; border-left:4px solid #2a9d8f; padding:8px 12px; margin:8px 0; font-size:12px; }
-  .winner { color:#2a9d8f; font-weight:bold; }
-</style>
+<link rel="stylesheet" href="styles.css">
+<!--meta:injected-->
+<meta name="description" content="Life &amp; DI Claims Platform — Architecture Decision Reference">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:title" content="Event-Driven Decision Records">
+<meta property="og:description" content="Life &amp; DI Claims Platform — Architecture Decision Reference">
+<meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Event-Driven-Decision-Records.html">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Event-Driven Decision Records">
+<meta name="twitter:description" content="Life &amp; DI Claims Platform — Architecture Decision Reference">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
-<body>
+<body class="doc" style="--accent:#7c3aed">
 
-<div class="cover">
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home" href="index.html">← Claims Platform</a>
+    <span class="crumb">/ <b>Event-Driven Decision Records</b></span>
+    <span class="spacer"></span>
+    <span class="accent-chip"></span>
+  </div>
+</div>
+
+<div class="doc-main">
+<div class="doc-cover">
+  <div class="eyebrow">Reference Document</div>
   <h1>Event-Driven Decision Records</h1>
-  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — Architecture Decision Reference</p>
-  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+  <p class="lede">Life &amp; DI Claims Platform — Architecture Decision Reference</p>
+  <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
 </div>
 
 <div class="note">
@@ -78,7 +84,7 @@
   <p class="ctx"><strong>Context:</strong> we need a durable, replayable, ordered log that <em>is</em> the system of record — not just a way to move messages around — with a mature stream-processing and connector ecosystem.</p>
   <table>
     <tr><th>Capability</th><th class="winner">Durable log (Kafka)</th><th>Managed streaming service</th><th>Event router / bus</th></tr>
-    <tr><td>Long retention as the record</td><td>Yes (compaction + tiered storage)</td><td>Limited retention</td><td>No — it routes, it doesn't store</td></tr>
+    <tr><td>Long retention as the record</td><td>Yes (long retention + tiered storage)</td><td>Limited retention</td><td>No — it routes, it doesn't store</td></tr>
     <tr><td>Ordered, keyed partitions</td><td>Yes</td><td>Yes (sharded)</td><td>No ordering guarantee</td></tr>
     <tr><td>Replay from any point</td><td>Yes</td><td>Only within retention</td><td>No</td></tr>
     <tr><td>Stream processing &amp; joins</td><td>Mature (Kafka Streams + Flink)</td><td>Library-based</td><td>N/A</td></tr>
@@ -131,7 +137,13 @@
 
 <div class="note"><strong>How these connect:</strong> ADR-01 (event sourcing) makes ADR-04 (Kafka as log of record) almost forced. ADR-02/03 (choreography + saga) follow from having an event log. ADR-05 keeps it safe over time. ADR-06 keeps it defensible to regulators, and ADR-07 extends that same discipline to the LLM/agent layer — AI advises, humans decide, autonomy is earned. The decisions reinforce each other — which is the point of recording them together.</div>
 
-<br><br><hr>
-<p style="text-align:center;color:#999;font-size:11px;">Event-Driven Decision Records — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</div>
+
+<footer>
+  <p>Event-Driven Decision Records — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
+</footer>
+
+<script src="app.js" defer></script>
 </body>
 </html>

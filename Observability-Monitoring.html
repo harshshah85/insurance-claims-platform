@@ -2,45 +2,51 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Observability &amp; Monitoring — Life &amp; DI Claims Platform</title>
-<style>
-  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
-  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #2a9d8f; padding-bottom: 8px; margin-top: 40px; }
-  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
-  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
-  .page-break { page-break-before: always; }
-  .cover { text-align: center; padding: 60px 0 40px 0; }
-  .cover h1 { border: none; font-size: 28px; }
-  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
-  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
-  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
-  tr:nth-child(even) td { background: #f7f9fc; }
-  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
-  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
-  .slo-box { background: #eef8f5; border: 1px solid #2a9d8f; border-radius: 8px; padding: 14px 18px; margin: 10px 0; }
-  .slo-box h3 { color: #2a9d8f; margin: 0 0 8px 0; }
-  .badge { display: inline-block; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: bold; color: white; }
-  .b-p1 { background: #e63946; } .b-p2 { background: #f4a261; } .b-p3 { background: #457b9d; } .b-p4 { background: #888; }
-  .pillar { background: #f0f4f8; border-left: 5px solid #457b9d; border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 12px 0; }
-  .pillar h3 { margin: 0 0 6px 0; }
-</style>
+<link rel="stylesheet" href="styles.css">
+<!--meta:injected-->
+<meta name="description" content="Life &amp; DI Claims Platform — SLOs, Consumer Lag &amp; Alert Routing">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:title" content="Observability &amp; Monitoring">
+<meta property="og:description" content="Life &amp; DI Claims Platform — SLOs, Consumer Lag &amp; Alert Routing">
+<meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Observability-Monitoring.html">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Observability &amp; Monitoring">
+<meta name="twitter:description" content="Life &amp; DI Claims Platform — SLOs, Consumer Lag &amp; Alert Routing">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
-<body>
+<body class="doc" style="--accent:#0d9488">
 
-<div class="cover">
-  <h1>Observability &amp; Monitoring</h1>
-  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — SLOs, Consumer Lag &amp; Alert Routing</p>
-  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home" href="index.html">← Claims Platform</a>
+    <span class="crumb">/ <b>Observability &amp; Monitoring</b></span>
+    <span class="spacer"></span>
+    <span class="accent-chip"></span>
+  </div>
 </div>
 
-<h1>1. The Three Pillars + the Fourth</h1>
+<div class="doc-main">
+<div class="doc-cover">
+  <div class="eyebrow">Reference Document</div>
+  <h1>Observability &amp; Monitoring</h1>
+  <p class="lede">Life &amp; DI Claims Platform — SLOs, Consumer Lag &amp; Alert Routing</p>
+  <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
+</div>
+
+<h1><span class="n">1</span> The Three Pillars + the Fourth</h1>
 
 <div class="pillar"><h3>Metrics — what is happening right now?</h3><p>Throughput per topic, consumer lag, processor latency, API latency/error rate, STP rate, payment success rate. Collected every 60s. Used for SLO burn-rate alerting and capacity planning.</p></div>
-<div class="pillar" style="border-color:#2a9d8f;"><h3>Logs — why did it happen?</h3><p>Structured JSON logs from intake, processors, APIs, correspondence, payment saga. Centralized; 90-day retention; <strong>no raw PII/PHI</strong> in logs (tokens only). Searched for root cause.</p></div>
-<div class="pillar" style="border-color:#6d3fa0;"><h3>Traces — where did the request go?</h3><p>Distributed tracing with <code>correlationid</code> propagated FNOL → API → processor → read model. Identifies latency hotspots across service and topic boundaries.</p></div>
-<div class="pillar" style="border-color:#d4a017;"><h3>Event lineage — the fourth pillar</h3><p>Unique to event sourcing: the <code>correlationid</code>/<code>causationid</code> chain lets you replay exactly how any decision or payment came to be. This is both an ops tool and the regulatory audit answer.</p></div>
+<div class="pillar" style="border-left-color:#0d9488;"><h3>Logs — why did it happen?</h3><p>Structured JSON logs from intake, processors, APIs, correspondence, payment saga. Centralized; 90-day retention; <strong>no raw PII/PHI</strong> in logs (tokens only). Searched for root cause.</p></div>
+<div class="pillar" style="border-left-color:#7c3aed;"><h3>Traces — where did the request go?</h3><p>Distributed tracing with <code>correlationid</code> propagated FNOL → API → processor → read model. Identifies latency hotspots across service and topic boundaries.</p></div>
+<div class="pillar" style="border-left-color:#d97706;"><h3>Event lineage — the fourth pillar</h3><p>Unique to event sourcing: the <code>correlationid</code>/<code>causationid</code> chain lets you replay exactly how any decision or payment came to be. This is both an ops tool and the regulatory audit answer.</p></div>
 
-<h1>2. SLOs — Service Level Objectives</h1>
+<h1><span class="n">2</span> SLOs — Service Level Objectives</h1>
 <h2>Agreed with business stakeholders. Customer-facing SLAs are the contractual subset.</h2>
 
 <div class="slo-box">
@@ -92,7 +98,7 @@
 
 <!-- ALERT ROUTING -->
 <div class="page-break"></div>
-<h1>3. Alert Routing &amp; On-Call</h1>
+<h1><span class="n">3</span> Alert Routing &amp; On-Call</h1>
 <table>
   <tr><th>Alert</th><th>Severity</th><th>Route To</th><th>Response</th></tr>
   <tr><td>Payment saga failure / stuck disbursement</td><td><span class="badge b-p1">P1</span></td><td>Platform + Treasury on-call — immediate page</td><td>15 min</td></tr>
@@ -111,7 +117,7 @@
   <tr><td>Anomalous bulk PHI read from one principal</td><td><span class="badge b-p1">P1</span></td><td>Security + Platform — immediate</td><td>15 min</td></tr>
 </table>
 
-<h1>4. Dashboards by Team</h1>
+<h1><span class="n">4</span> Dashboards by Team</h1>
 
 <h3>Platform Engineering (operational health)</h3>
 <table>
@@ -146,7 +152,7 @@
   <tr><td>Model Drift Watch</td><td>Acceptance and false-auto trend by model version; sampled-QA findings on the auto-ticket lane</td></tr>
 </table>
 
-<h1>5. Incident Management</h1>
+<h1><span class="n">5</span> Incident Management</h1>
 <table>
   <tr><th>Phase</th><th>Action</th></tr>
   <tr><td><strong>Detect</strong></td><td>Automated alert pages the on-call engineer; ack within 15 min (P1) / 30 min (P2)</td></tr>
@@ -159,7 +165,13 @@
 
 <div class="note"><strong>Replay is the superpower and the footgun:</strong> a projection bug is fixed by rebuilding the read model from the log — safe, because projections are derived. But replaying anything that triggers <em>side effects</em> (correspondence, payments) must run against idempotent consumers or with side effects disabled, or you re-send letters and re-pay beneficiaries. The platform marks side-effecting consumers explicitly so replays are scoped.</div>
 
-<br><br><hr>
-<p style="text-align:center;color:#999;font-size:11px;">Observability &amp; Monitoring — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</div>
+
+<footer>
+  <p>Observability &amp; Monitoring — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
+</footer>
+
+<script src="app.js" defer></script>
 </body>
 </html>

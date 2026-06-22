@@ -2,34 +2,41 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Claims Domain Model — Life &amp; DI Claims Platform</title>
-<style>
-  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
-  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #457b9d; padding-bottom: 8px; margin-top: 40px; }
-  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
-  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
-  .page-break { page-break-before: always; }
-  .cover { text-align: center; padding: 60px 0 40px 0; }
-  .cover h1 { border: none; font-size: 28px; }
-  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
-  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
-  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
-  tr:nth-child(even) td { background: #f7f9fc; }
-  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
-  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
-  .ctx-box { background: #f0f4f8; border-left: 5px solid #457b9d; border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 10px 0; }
-  .ctx-box h3 { margin: 0 0 4px 0; color: #457b9d; }
-  .ctx-box p { font-size: 12px; color: #333; line-height: 1.6; margin: 0; }
-  .sm { font-family: 'SF Mono','Courier New',monospace; font-size: 11.5px; background: #0d1117; color: #c9d1d9; border-radius: 8px; padding: 18px 20px; overflow-x: auto; line-height: 1.85; margin: 14px 0; }
-  .sm .g { color: #2a9d8f; } .sm .r { color: #e63946; } .sm .y { color: #d4a017; } .sm .b { color: #7ab8d8; } .sm .m { color: #484f58; }
-</style>
+<link rel="stylesheet" href="styles.css">
+<!--meta:injected-->
+<meta name="description" content="Life &amp; DI Claims Platform — Bounded Contexts, Aggregates &amp; Lifecycle">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:title" content="Claims Domain Model">
+<meta property="og:description" content="Life &amp; DI Claims Platform — Bounded Contexts, Aggregates &amp; Lifecycle">
+<meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Claims-Domain-Model.html">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Claims Domain Model">
+<meta name="twitter:description" content="Life &amp; DI Claims Platform — Bounded Contexts, Aggregates &amp; Lifecycle">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
-<body>
+<body class="doc" style="--accent:#2563eb">
 
-<div class="cover">
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home" href="index.html">← Claims Platform</a>
+    <span class="crumb">/ <b>Claims Domain Model</b></span>
+    <span class="spacer"></span>
+    <span class="accent-chip"></span>
+  </div>
+</div>
+
+<div class="doc-main">
+<div class="doc-cover">
+  <div class="eyebrow">Reference Document</div>
   <h1>Claims Domain Model</h1>
-  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — Bounded Contexts, Aggregates &amp; Lifecycle</p>
-  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+  <p class="lede">Life &amp; DI Claims Platform — Bounded Contexts, Aggregates &amp; Lifecycle</p>
+  <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
 </div>
 
 <div class="note">
@@ -39,7 +46,7 @@
   <strong>How the agents map to the model:</strong> the platform is <strong>agent-assisted by design</strong>. Each agent worker is a first-class collaborator scoped to a context it serves, drafting recommendations a human acts on — so the agents <em>operate the existing nine contexts faster</em> rather than forming a tenth. Authority is unchanged: every authoritative decision still belongs to its aggregate (a denial on the Decision aggregate must carry a reason code and cite the provision), enforced against a human's decision. Agents reason, people decide. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)
 </div>
 
-<h1>1. Bounded Contexts</h1>
+<h1><span class="n">1</span> Bounded Contexts</h1>
 <h2>Nine contexts, each owning its events, its aggregates, and its team. Contexts integrate only through published events — never shared tables.</h2>
 
 <div class="ctx-box"><h3>1 · Intake &amp; FNOL</h3><p>Captures First Notice of Loss from every channel (client portal, advisor desktop, service-rep phone, secure message, mail/upload, IVR). Owns the channel-agnostic intake contract and the initial claim creation.</p></div>
@@ -65,7 +72,7 @@
 </table>
 <div class="note">A human (or the deterministic auto-ticket lane) still owns every authoritative event — agents reason, people decide. The agents draft onto a derived <code>claims.ai.v1</code> stream; the canonical 9 contexts · 11 aggregates · 36 events are unchanged.</div>
 
-<h1>2. Aggregates &amp; Their Invariants</h1>
+<h1><span class="n">2</span> Aggregates &amp; Their Invariants</h1>
 <h2>Eleven aggregates. Each is a consistency boundary — commands are validated against the rehydrated aggregate before new events are appended.</h2>
 
 <table>
@@ -85,7 +92,7 @@
 
 <!-- LIFECYCLE -->
 <div class="page-break"></div>
-<h1>3. How Life and DI Claims Differ</h1>
+<h1><span class="n">3</span> How Life and DI Claims Differ</h1>
 <h2>Same platform, two very different jobs. The biggest difference is who starts the claim — and that one fact drives nearly everything else.</h2>
 
 <p style="font-size:12px;line-height:1.7;">A <strong>life (death) claim is beneficiary-driven</strong>: the insured has died, so someone else — a spouse, a child, the estate — files it. That person usually isn't in our systems and may not even know the policy number. A <strong>DI claim is client-initiated</strong>: the living policyholder files their own claim because they can't work, and they're already a known, logged-in customer. Most of the differences below fall out of that one fact.</p>
@@ -137,7 +144,7 @@
 
 <!-- READ MODELS / SERVING -->
 <div class="page-break"></div>
-<h1>4. From Events to Read Models</h1>
+<h1><span class="n">4</span> From Events to Read Models</h1>
 <h2>The claim is stored as a list of events; each screen reads from its own simple copy (a CQRS read model) built from those events.</h2>
 
 <table>
@@ -161,7 +168,13 @@
   <tr><td><code>decision_reason</code></td><td>coded enum</td><td>Denials cite a reason code mapped to a policy provision</td></tr>
 </table>
 
-<br><br><hr>
-<p style="text-align:center;color:#999;font-size:11px;">Claims Domain Model — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</div>
+
+<footer>
+  <p>Claims Domain Model — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
+</footer>
+
+<script src="app.js" defer></script>
 </body>
 </html>

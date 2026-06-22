@@ -2,51 +2,60 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Security &amp; Regulatory Compliance — Life &amp; DI Claims Platform</title>
-<style>
-  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
-  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #e63946; padding-bottom: 8px; margin-top: 40px; }
-  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
-  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
-  .page-break { page-break-before: always; }
-  .cover { text-align: center; padding: 60px 0 40px 0; }
-  .cover h1 { border: none; font-size: 28px; }
-  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
-  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
-  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
-  tr:nth-child(even) td { background: #f7f9fc; }
-  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
-  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
-  .layer { background: #fdeeee; border-left: 5px solid #e63946; padding: 12px 16px; margin: 8px 0; border-radius: 0 8px 8px 0; }
-  .layer h3 { margin: 0 0 4px 0; color: #e63946; }
-  .layer p { margin: 0; font-size: 12px; line-height: 1.6; }
-</style>
+<link rel="stylesheet" href="styles.css">
+<!--meta:injected-->
+<meta name="description" content="Life &amp; DI Claims Platform — 7-Layer Security + Regulatory Map">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:title" content="Security &amp; Regulatory Compliance">
+<meta property="og:description" content="Life &amp; DI Claims Platform — 7-Layer Security + Regulatory Map">
+<meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Security-and-Regulatory-Compliance.html">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Security &amp; Regulatory Compliance">
+<meta name="twitter:description" content="Life &amp; DI Claims Platform — 7-Layer Security + Regulatory Map">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
-<body>
+<body class="doc" style="--accent:#e11d48">
 
-<div class="cover">
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home" href="index.html">← Claims Platform</a>
+    <span class="crumb">/ <b>Security &amp; Regulatory Compliance</b></span>
+    <span class="spacer"></span>
+    <span class="accent-chip"></span>
+  </div>
+</div>
+
+<div class="doc-main">
+<div class="doc-cover">
+  <div class="eyebrow">Reference Document</div>
   <h1>Security &amp; Regulatory Compliance</h1>
-  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — 7-Layer Security + Regulatory Map</p>
-  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+  <p class="lede">Life &amp; DI Claims Platform — 7-Layer Security + Regulatory Map</p>
+  <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
 </div>
 
 <div class="note">
   <strong>Two halves, one obligation.</strong> A Life &amp; DI claims platform moves money to grieving beneficiaries and disabled claimants using their most sensitive data. Part 1 is the technical security stack (edge to data). Part 2 is the regulatory map specific to life &amp; disability claims. The event-sourced log is a security asset here — it is the immutable audit trail regulators ask for.
 </div>
 
-<h1>1. Seven-Layer Security Design</h1>
+<h1><span class="n">1</span> Seven-Layer Security Design</h1>
 
 <div class="layer"><h3>Layer 1 — Edge &amp; Network</h3><p>WAF on all public ingress (intake, portals, APIs); rate limiting and bot defense on FNOL endpoints; private networking between services; no broker exposed publicly. DDoS protection on channel endpoints.</p></div>
 <div class="layer" style="border-color:#e76f51;"><h3>Layer 2 — Transport</h3><p>TLS 1.2+ everywhere. <strong>Kafka SASL/SSL</strong> with mTLS between services and brokers; client certificates per service identity. No plaintext on the wire, internal or external.</p></div>
-<div class="layer" style="border-color:#d4a017;"><h3>Layer 3 — Identity &amp; Access</h3><p><strong>OAuth 2.0 / OIDC</strong> per consumer type: clients (portal, step-up auth for payment changes), advisors/reps (workforce SSO + MFA), service-to-service (client-credentials, short-lived tokens). RBAC + attribute-based rules; least privilege per topic and per read model.</p></div>
-<div class="layer" style="border-color:#2a9d8f;"><h3>Layer 4 — Application</h3><p>Input validation and schema enforcement at every boundary; signed commands; idempotency keys on money-movement commands; dual control on disbursement; segregation of duties between adjudication and payment approval.</p></div>
-<div class="layer" style="border-color:#457b9d;"><h3>Layer 5 — Data</h3><p><strong>Field-level encryption</strong> of PII/PHI; SSN and medical detail <strong>tokenized at the edge</strong> — events carry tokens, the access-controlled vault resolves them. Encryption at rest for topics, read models, and documents. Keys held and rotated in a managed key-management service.</p></div>
-<div class="layer" style="border-color:#6d3fa0;"><h3>Layer 6 — Topic &amp; Stream Authorization</h3><p>Kafka ACLs per principal: producers write only their context's topics, consumers subscribe only to what they need. Data-classification tags on topics (e.g. PHI on <code>party.identity</code>, <code>di.benefit</code>) drive masking in non-prod and in analytics.</p></div>
+<div class="layer" style="border-left-color:#d97706;"><h3>Layer 3 — Identity &amp; Access</h3><p><strong>OAuth 2.0 / OIDC</strong> per consumer type: clients (portal, step-up auth for payment changes), advisors/reps (workforce SSO + MFA), service-to-service (client-credentials, short-lived tokens). RBAC + attribute-based rules; least privilege per topic and per read model.</p></div>
+<div class="layer" style="border-left-color:#0d9488;"><h3>Layer 4 — Application</h3><p>Input validation and schema enforcement at every boundary; signed commands; idempotency keys on money-movement commands; dual control on disbursement; segregation of duties between adjudication and payment approval.</p></div>
+<div class="layer" style="border-left-color:#2563eb;"><h3>Layer 5 — Data</h3><p><strong>Field-level encryption</strong> of PII/PHI; SSN and medical detail <strong>tokenized at the edge</strong> — events carry tokens, the access-controlled vault resolves them. Encryption at rest for topics, read models, and documents. Keys held and rotated in a managed key-management service.</p></div>
+<div class="layer" style="border-left-color:#7c3aed;"><h3>Layer 6 — Topic &amp; Stream Authorization</h3><p>Kafka ACLs per principal: producers write only their context's topics, consumers subscribe only to what they need. Data-classification tags on topics (e.g. PHI on <code>party.identity</code>, <code>di.benefit</code>) drive masking in non-prod and in analytics.</p></div>
 <div class="layer" style="border-color:#888;"><h3>Layer 7 — Audit &amp; Detection</h3><p>The event log is the immutable audit record. Plus: access logging on the token vault, anomaly detection (bulk reads, off-hours access), SIEM correlation, and alerting on money-movement and PHI access patterns.</p></div>
 
 <!-- STRIDE -->
 <div class="page-break"></div>
-<h1>2. STRIDE Threat Model (selected)</h1>
+<h1><span class="n">2</span> STRIDE Threat Model (selected)</h1>
 <table>
   <tr><th>Threat</th><th>Example</th><th>Mitigation</th></tr>
   <tr><td><strong>S</strong>poofing</td><td>Fraudster files FNOL as a beneficiary</td><td>IDV/KYC before disbursement; step-up auth; identity-verified invariant on payee</td></tr>
@@ -68,7 +77,7 @@
   <tr><td><strong>Tool abuse</strong></td><td>An agent tool is used beyond its intent — to write state or move money</td><td>Least-privilege, sandboxed tools; money-moving / state-changing tools are human-gated; agents read freely but cannot act on the world on their own</td></tr>
 </table>
 
-<h1>3. Regulatory Map — Life &amp; DI Claims</h1>
+<h1><span class="n">3</span> Regulatory Map — Life &amp; DI Claims</h1>
 <h2>Each obligation mapped to where the platform enforces it. Vendor-neutral; not legal advice.</h2>
 
 <table>
@@ -90,7 +99,7 @@
 
 <div class="note"><strong>The same log makes AI defensible.</strong> Every LLM recommendation is itself an event on <code>claims.ai.v1</code> carrying the model version, the inputs it saw, its output, and its confidence — so "what did the AI suggest, and did a human decide?" is answerable for any claim. The model sees tokenized PII only (same layer-5 controls); prompts and outputs are logged without raw PII/PHI. Because a human (or the deterministic auto-ticket lane) owns every authoritative decision and no denial is ever model-only, an AI-influenced outcome is always traceable to an accountable decision-maker.</div>
 
-<h1>4. Data Classification &amp; Handling</h1>
+<h1><span class="n">4</span> Data Classification &amp; Handling</h1>
 <table>
   <tr><th>Class</th><th>Examples</th><th>Handling</th></tr>
   <tr><td>Restricted (PHI/PII)</td><td>SSN, medical records, APS, bank details</td><td>Tokenized + field-encrypted; vault-resolved; masked in non-prod &amp; analytics</td></tr>
@@ -99,7 +108,13 @@
   <tr><td>Public</td><td>This reference architecture</td><td>No real data; illustrative values only</td></tr>
 </table>
 
-<br><br><hr>
-<p style="text-align:center;color:#999;font-size:11px;">Security &amp; Regulatory Compliance — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</div>
+
+<footer>
+  <p>Security &amp; Regulatory Compliance — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
+</footer>
+
+<script src="app.js" defer></script>
 </body>
 </html>

@@ -2,41 +2,48 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Claims Decisioning &amp; Fraud — Life &amp; DI Claims Platform</title>
-<style>
-  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
-  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #d4a017; padding-bottom: 8px; margin-top: 40px; }
-  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
-  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
-  .page-break { page-break-before: always; }
-  .cover { text-align: center; padding: 60px 0 40px 0; }
-  .cover h1 { border: none; font-size: 28px; }
-  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
-  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
-  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
-  tr:nth-child(even) td { background: #f7f9fc; }
-  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
-  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
-  pre { background: #1a1a2e; color: #e6edf3; border-radius: 8px; padding: 16px 18px; overflow-x: auto; font-size: 11.5px; line-height: 1.55; margin: 14px 0; }
-  pre .c { color: #6a9955; } pre .k { color: #4fc1ff; } pre .s { color: #ce9178; }
-  .formula { background: #1a1a2e; color: #d4a017; border-radius: 8px; padding: 16px 20px; font-family: 'SF Mono','Courier New',monospace; font-size: 13px; margin: 14px 0; line-height: 1.7; }
-  .tier { display:inline-block; border-radius: 4px; padding: 2px 9px; font-size: 11px; font-weight: bold; color: white; }
-  .t-auto { background:#2a9d8f; } .t-assist { background:#457b9d; } .t-std { background:#d4a017; } .t-cx { background:#e63946; }
-</style>
+<link rel="stylesheet" href="styles.css">
+<!--meta:injected-->
+<meta name="description" content="Life &amp; DI Claims Platform — STP Eligibility, Low-Touch Path &amp; SIU Routing">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:title" content="Claims Decisioning &amp; Fraud">
+<meta property="og:description" content="Life &amp; DI Claims Platform — STP Eligibility, Low-Touch Path &amp; SIU Routing">
+<meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Claims-Decisioning-and-Fraud.html">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Claims Decisioning &amp; Fraud">
+<meta name="twitter:description" content="Life &amp; DI Claims Platform — STP Eligibility, Low-Touch Path &amp; SIU Routing">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
-<body>
+<body class="doc" style="--accent:#d97706">
 
-<div class="cover">
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home" href="index.html">← Claims Platform</a>
+    <span class="crumb">/ <b>Claims Decisioning &amp; Fraud</b></span>
+    <span class="spacer"></span>
+    <span class="accent-chip"></span>
+  </div>
+</div>
+
+<div class="doc-main">
+<div class="doc-cover">
+  <div class="eyebrow">Reference Document</div>
   <h1>Claims Decisioning &amp; Fraud</h1>
-  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — STP Eligibility, Low-Touch Path &amp; SIU Routing</p>
-  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+  <p class="lede">Life &amp; DI Claims Platform — STP Eligibility, Low-Touch Path &amp; SIU Routing</p>
+  <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
 </div>
 
 <div class="note">
   <strong>Two scores, one gate.</strong> Every claim gets two scores: an <strong>STP score</strong> (how clean and safe to automate?) and a <strong>fraud score</strong> (how suspicious?). The auto-ticket path opens only when the STP score is high <em>and</em> the fraud score is low. Fraud is a hard gate — a suspicious claim never auto-pays, no matter how clean it otherwise looks.
 </div>
 
-<h1>1. STP Score — Can We Auto-Ticket It?</h1>
+<h1><span class="n">1</span> STP Score — Can We Auto-Ticket It?</h1>
 <h2>Decides whether a claim can run straight through with no human (auto-ticketed) or needs a person to look at it. "STP" = straight-through processing.</h2>
 
 <div class="formula">
@@ -71,10 +78,10 @@ STP = (policy_in_force × 0.25)<br>
 
 <!-- FRAUD -->
 <div class="page-break"></div>
-<h1>2. Fraud Risk Score</h1>
+<h1><span class="n">2</span> Fraud Risk Score</h1>
 <h2>A separate weighted score, owned by the Fraud &amp; SIU context, computed by the Flink processor over windowed history.</h2>
 
-<div class="formula" style="color:#e63946;">
+<div class="formula" style="color:#e11d48;">
 Fraud = (velocity × 0.25)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; + (contestability_proximity × 0.20)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; + (beneficiary_anomaly × 0.20)<br>
@@ -100,7 +107,7 @@ Fraud = (velocity × 0.25)<br>
   <tr><td>≥ 85</td><td><span class="tier t-cx">CRITICAL</span></td><td>Immediate SIU + compliance notification; payment hard-held pending <code>SiuCleared</code></td></tr>
 </table>
 
-<h1>3. Rules First, ML Later</h1>
+<h1><span class="n">3</span> Rules First, ML Later</h1>
 <table>
   <tr><th>Phase</th><th>Decisioning</th><th>Fraud</th><th>Why</th></tr>
   <tr><td>At launch</td><td>Deterministic weighted rules (the formulas above), tuned with adjudicators</td><td>Rule-based signals + external data hits</td><td>Explainable from day one; regulators and adjudicators can audit every decision. No training data yet.</td></tr>
@@ -113,7 +120,7 @@ Fraud = (velocity × 0.25)<br>
 
 <!-- PAYLOADS -->
 <div class="page-break"></div>
-<h1>4. Sample Decision Event</h1>
+<h1><span class="n">4</span> Sample Decision Event</h1>
 <p>An auto-approved Life claim. The decision event carries the score breakdown so the rationale is auditable forever in the event log.</p>
 <pre>{
   <span class="k">"type"</span>: <span class="s">"claims.decision.ClaimAutoApproved"</span>,
@@ -135,7 +142,7 @@ Fraud = (velocity × 0.25)<br>
   }
 }</pre>
 
-<h1>5. Suppression &amp; Guardrail Rules</h1>
+<h1><span class="n">5</span> Suppression &amp; Guardrail Rules</h1>
 <table>
   <tr><th>Rule</th><th>Effect</th></tr>
   <tr><td>Contestability window (Life, ≤ 2 yr)</td><td>Suppress AUTO/ASSISTED; force CONTESTABILITY_REVIEW</td></tr>
@@ -146,7 +153,7 @@ Fraud = (velocity × 0.25)<br>
   <tr><td>DI recertification overdue</td><td>Suppress next benefit disbursement until received</td></tr>
 </table>
 
-<h1>6. What Good Looks Like</h1>
+<h1><span class="n">6</span> What Good Looks Like</h1>
 <table>
   <tr><th>Metric</th><th>Target</th><th>Meaning</th></tr>
   <tr><td>STP rate (auto + assisted)</td><td>40–55% of eligible claims as the low-touch path matures</td><td>Share of clean claims handled with little/no manual adjudication</td></tr>
@@ -155,7 +162,13 @@ Fraud = (velocity × 0.25)<br>
   <tr><td>SIU hit rate on referrals</td><td>Track &amp; tune</td><td>If too low, the fraud threshold is over-referring and burning investigator time</td></tr>
 </table>
 
-<br><br><hr>
-<p style="text-align:center;color:#999;font-size:11px;">Claims Decisioning &amp; Fraud — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</div>
+
+<footer>
+  <p>Claims Decisioning &amp; Fraud — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
+</footer>
+
+<script src="app.js" defer></script>
 </body>
 </html>

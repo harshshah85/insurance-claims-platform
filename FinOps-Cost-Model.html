@@ -2,42 +2,48 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FinOps &amp; Cost Architecture — Life &amp; DI Claims Platform</title>
-<style>
-  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
-  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #d4a017; padding-bottom: 8px; margin-top: 40px; }
-  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
-  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
-  .page-break { page-break-before: always; }
-  .cover { text-align: center; padding: 60px 0 40px 0; }
-  .cover h1 { border: none; font-size: 28px; }
-  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
-  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
-  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
-  tr:nth-child(even) td { background: #f7f9fc; }
-  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
-  .cost-box { background: #1a1a2e; color: white; border-radius: 10px; padding: 20px 24px; margin: 16px 0; }
-  .cost-box h3 { color: #d4a017; margin: 0 0 10px 0; }
-  .cost-row { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 6px 0; font-size: 12px; }
-  .cost-total { display: flex; justify-content: space-between; padding: 8px 0 0 0; font-weight: bold; font-size: 14px; color: #d4a017; }
-  .phase-header { background: #f0f4f8; padding: 10px 16px; border-radius: 6px; font-weight: bold; margin: 20px 0 8px 0; color: #1a1a2e; font-size: 13px; }
-  .lever { background: #eef8f5; border-left: 4px solid #2a9d8f; padding: 10px 14px; margin: 8px 0; font-size: 12px; }
-  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
-</style>
+<link rel="stylesheet" href="styles.css">
+<!--meta:injected-->
+<meta name="description" content="Life &amp; DI Claims Platform — Cost Drivers, Levers &amp; ROI">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:title" content="FinOps &amp; Cost Architecture">
+<meta property="og:description" content="Life &amp; DI Claims Platform — Cost Drivers, Levers &amp; ROI">
+<meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/FinOps-Cost-Model.html">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FinOps &amp; Cost Architecture">
+<meta name="twitter:description" content="Life &amp; DI Claims Platform — Cost Drivers, Levers &amp; ROI">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
-<body>
+<body class="doc" style="--accent:#d97706">
 
-<div class="cover">
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home" href="index.html">← Claims Platform</a>
+    <span class="crumb">/ <b>FinOps &amp; Cost Architecture</b></span>
+    <span class="spacer"></span>
+    <span class="accent-chip"></span>
+  </div>
+</div>
+
+<div class="doc-main">
+<div class="doc-cover">
+  <div class="eyebrow">Reference Document</div>
   <h1>FinOps &amp; Cost Architecture</h1>
-  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — Cost Drivers, Levers &amp; ROI</p>
-  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+  <p class="lede">Life &amp; DI Claims Platform — Cost Drivers, Levers &amp; ROI</p>
+  <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
 </div>
 
 <div class="note">
   <strong>Note on estimates:</strong> these are order-of-magnitude ranges for a vendor-neutral reference architecture, based on typical streaming-platform and cloud pricing and typical enterprise staffing. They are planning inputs, not a quote, and should be validated against actual volumes and contracts.
 </div>
 
-<h1>1. Cost Components</h1>
+<h1><span class="n">1</span> Cost Components</h1>
 
 <h3>Event Streaming Platform (the backbone)</h3>
 <table>
@@ -59,13 +65,13 @@
   <tr><td>Object storage (document refs/hashes)</td><td>References, not binaries</td><td>&lt; $100</td><td>Lifecycle to cold storage for closed claims</td></tr>
   <tr><td>Observability tooling</td><td>Metrics, logs, traces</td><td>$1,500 – $3,000</td><td>90-day log retention; sample traces; no PII in logs</td></tr>
   <tr><td>Security services (key mgmt, secrets, firewall)</td><td>Encryption, secrets, edge</td><td>$300 – $600</td><td>Security is non-negotiable — don't over-optimize</td></tr>
-  <tr><td>LLM inference <span style="color:#6d3fa0;">(assist layer — Stage D)</span></td><td>Per-token / per-request; only on routed claims</td><td>$500 – $3,000</td><td>Gate by tier; triage with a smaller model; cap context; cache policy/coverage lookups</td></tr>
+  <tr><td>LLM inference <span style="color:#7c3aed;">(assist layer — Stage D)</span></td><td>Per-token / per-request; only on routed claims</td><td>$500 – $3,000</td><td>Gate by tier; triage with a smaller model; cap context; cache policy/coverage lookups</td></tr>
   <tr><td><strong>Infrastructure Total (est.)</strong></td><td></td><td><strong>$7,100 – $16,000/month</strong> <span style="color:#888;font-weight:normal;">(incl. LLM assist when enabled)</span></td><td></td></tr>
 </table>
 
 <!-- COST SHAPE -->
 <div class="page-break"></div>
-<h1>2. Cost Shape — Thin Slice vs Full Platform</h1>
+<h1><span class="n">2</span> Cost Shape — Thin Slice vs Full Platform</h1>
 <h2>What drives cost, and how it grows from a walking skeleton to the full platform. Relative, not a budget — real numbers depend on volume and contracts.</h2>
 
 <table>
@@ -80,7 +86,7 @@
 
 <div class="note"><strong>The honest headline:</strong> at this scale <em>infrastructure isn't the expensive part — the build is</em>. The Kafka and cloud run-rate is real but modest next to the engineering effort. So cost control is mostly scope discipline and not over-building ahead of need; the infra levers in §4 trim the run-rate at the margins. (For reference, the supporting-infrastructure run-rate in §1 lands in the order of a few thousand to low-five-figures per month at the volumes assumed.)</div>
 
-<h1>3. Where the Money Comes From</h1>
+<h1><span class="n">3</span> Where the Money Comes From</h1>
 <h2>The levers that pay the platform back. Sized as illustrative unit economics, not a forecast.</h2>
 <table>
   <tr><th>Lever</th><th>How it pays back</th><th>Illustrative sizing</th></tr>
@@ -96,8 +102,8 @@
 
 <!-- LEVERS -->
 <div class="page-break"></div>
-<h1>4. FinOps Optimization Levers</h1>
-<div class="lever"><strong>1 · Topic retention &amp; compaction</strong> — Compact the event-sourced log (<code>claims.lifecycle</code>, <code>policy.snapshot</code>) and time-bound high-volume delete topics (<code>claims.fnol</code> 7d). Archive closed-claim history to cheap object storage for the statutory retention period.</div>
+<h1><span class="n">4</span> FinOps Optimization Levers</h1>
+<div class="lever"><strong>1 · Topic retention &amp; tiered storage</strong> — Keep the event-sourced log (<code>claims.lifecycle</code>) on long retention with tiered storage so its full history stays replayable (never compacted); compact only the latest-state topics (<code>policy.snapshot</code>, <code>party.identity</code>); and time-bound high-volume delete topics (<code>claims.fnol</code> 7d). Archive closed-claim history to cheap object storage for the statutory retention period.</div>
 <div class="lever"><strong>2 · Kafka tiered storage</strong> — Move older segments off broker disk to object storage; large reduction on long-retention cost without losing replay.</div>
 <div class="lever"><strong>3 · Right-size stream parallelism</strong> — Decisioning and fraud are the compute-heavy processors; low-volume projectors don't need the same parallelism. Tune per processor, review quarterly.</div>
 <div class="lever"><strong>4 · API-gateway caching</strong> — Cache GET /claims/{id} with a short TTL aligned to projection lag; cuts read-model query load for repeat status checks (clients refresh the same claim repeatedly).</div>
@@ -106,7 +112,7 @@
 <div class="lever"><strong>7 · Defer ML until the data earns it</strong> — ML compute and a feature store are real cost. Rule-based decisioning/fraud carries the early stages with no training-data spend and full explainability; ML earns its cost only once there's enough labeled history to train on.</div>
 <div class="lever"><strong>8 · Spend LLM inference only where it pays</strong> — The agent assist layer is genuine per-token cost. Gate it to the tiers where a human is in the loop (skip the deterministic auto-ticket lane), triage with a smaller/cheaper model and escalate to a larger one only when needed, cap the context window, and cache deterministic lookups (policy/coverage) instead of re-prompting. Inference scales with claim volume, so right-sizing the per-claim token budget is the lever.</div>
 
-<h1>5. Cost Governance</h1>
+<h1><span class="n">5</span> Cost Governance</h1>
 <table>
   <tr><th>Practice</th><th>Cadence</th><th>Owner</th></tr>
   <tr><td>Kafka usage review — partitions, retention, connectors</td><td>Monthly</td><td>Platform Eng + FinOps</td></tr>
@@ -116,7 +122,13 @@
   <tr><td>ROI report — STP rate, cycle time, fraud savings vs. spend</td><td>Quarterly</td><td>Product + Architecture → CIO/CFO</td></tr>
 </table>
 
-<br><br><hr>
-<p style="text-align:center;color:#999;font-size:11px;">FinOps &amp; Cost Architecture — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+</div>
+
+<footer>
+  <p>FinOps &amp; Cost Architecture — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
+</footer>
+
+<script src="app.js" defer></script>
 </body>
 </html>

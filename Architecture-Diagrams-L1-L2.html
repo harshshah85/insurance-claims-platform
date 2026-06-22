@@ -2,43 +2,52 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Architecture Diagrams L1 &amp; L2 — Life &amp; DI Claims Platform</title>
-<style>
-  body { font-family: Arial, sans-serif; font-size: 13px; margin: 40px; color: #222; background: #fff; }
-  h1 { color: #1a1a2e; font-size: 22px; border-bottom: 3px solid #e63946; padding-bottom: 8px; margin-top: 40px; }
-  h2 { color: #457b9d; font-size: 15px; margin: 6px 0 20px 0; }
-  h3 { color: #1a1a2e; font-size: 13px; margin: 18px 0 8px 0; font-weight: bold; }
-  .page-break { page-break-before: always; }
-  .cover { text-align: center; padding: 60px 0 40px 0; }
-  .cover h1 { border: none; font-size: 28px; }
-  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
-  th { background: #1a1a2e; color: white; padding: 8px 12px; text-align: left; }
-  td { border: 1px solid #ddd; padding: 7px 12px; vertical-align: top; }
-  tr:nth-child(even) td { background: #f7f9fc; }
-  .note { background: #fffbe6; border-left: 4px solid #f4c542; padding: 10px 14px; margin: 16px 0; font-size: 12px; }
-  code { background: #eef2f7; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono','Courier New',monospace; font-size: 11px; color: #0f3460; }
-  .diagram { font-family: 'SF Mono','Courier New',monospace; font-size: 11px; background: #0d1117; color: #c9d1d9; border-radius: 8px; padding: 20px 22px; overflow-x: auto; line-height: 1.7; margin: 14px 0; white-space: pre; }
-  .diagram .g { color: #2a9d8f; } .diagram .r { color: #e63946; } .diagram .y { color: #d4a017; } .diagram .b { color: #7ab8d8; } .diagram .p { color: #b88ee8; } .diagram .m { color: #6e7681; }
-  .roadmap-phase { background: #f0f4f8; border-left: 5px solid #457b9d; padding: 12px 16px; margin: 10px 0; border-radius: 0 8px 8px 0; }
-  .roadmap-phase h3 { margin: 0 0 6px 0; color: #1a1a2e; }
-</style>
+<link rel="stylesheet" href="styles.css">
+<!--meta:injected-->
+<meta name="description" content="System context, container diagrams &amp; a phased rollout — the platform from the outside in, then opened up into its runtime pieces.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:title" content="Architecture Diagrams L1 &amp; L2">
+<meta property="og:description" content="System context, container diagrams &amp; a phased rollout — the platform from the outside in, then opened up into its runtime pieces.">
+<meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Architecture-Diagrams-L1-L2.html">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Architecture Diagrams L1 &amp; L2">
+<meta name="twitter:description" content="System context, container diagrams &amp; a phased rollout — the platform from the outside in, then opened up into its runtime pieces.">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
-<body>
+<body class="doc" style="--accent:#e11d48">
 
-<div class="cover">
-  <h1>Architecture Diagrams — L1 &amp; L2</h1>
-  <p style="font-size:16px;color:#457b9d;">Life &amp; DI Claims Platform — System Context, Containers &amp; Phased Strategy</p>
-  <p style="color:#999;font-size:11px;">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</p>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home" href="index.html">← Claims Platform</a>
+    <span class="crumb">/ <b>L1 &amp; L2 Architecture Diagrams</b></span>
+    <span class="spacer"></span>
+    <span class="accent-chip"></span>
+  </div>
 </div>
 
-<div class="note">
-  <strong>C4 model, two levels.</strong> L1 (System Context) shows the platform as one box surrounded by the people and external systems it talks to. L2 (Container) opens the box into its runtime pieces — the Kafka backbone, the 9 bounded-context services, the <strong>agent workers</strong>, the read models, and the serving APIs. Lower levels (component / code) are intentionally out of scope for a reference architecture. This platform is <strong>agent-assisted and human-in-the-loop by design</strong>: LLM agent workers are first-class containers that read facts and draft recommendations, and a person (or the deterministic auto-ticket lane) holds decision authority. The split is deliberate — agents do the reasoning, people own the decision — not a bolt-on.
-</div>
+<div class="doc-main">
 
-<h1>1. L1 — System Context</h1>
-<h2>Who and what the platform interacts with. People on the left, systems of record and external services on the right.</h2>
+  <div class="doc-cover">
+    <div class="eyebrow">Reference Document</div>
+    <h1>L1 &amp; L2 Architecture Diagrams</h1>
+    <p class="lede">System context, container diagrams &amp; a phased rollout — the platform from the outside in, then opened up into its runtime pieces.</p>
+    <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
+  </div>
 
-<div class="diagram"><span class="m">                          ┌───────────────────────────────────────────────┐</span>
+  <div class="note accent">
+    <strong>C4 model, two levels.</strong> L1 (System Context) shows the platform as one box surrounded by the people and external systems it talks to. L2 (Container) opens the box into its runtime pieces — the Kafka backbone, the 9 bounded-context services, the <strong>agent workers</strong>, the read models, and the serving APIs. Lower levels (component / code) are intentionally out of scope for a reference architecture. This platform is <strong>agent-assisted and human-in-the-loop by design</strong>: LLM agent workers are first-class containers that read facts and draft recommendations, and a person (or the deterministic auto-ticket lane) holds decision authority. The split is deliberate — agents do the reasoning, people own the decision — not a bolt-on.
+  </div>
+
+  <h1><span class="n">1</span> L1 — System Context</h1>
+  <h2>Who and what the platform interacts with. People on the left, systems of record and external services on the right.</h2>
+
+  <div class="diagram"><span class="m">                          ┌───────────────────────────────────────────────┐</span>
 <span class="b">  Client</span>          ──FNOL──►   │                                               │   ◄──CDC──  <span class="y">Policy Admin System</span>
 <span class="b">  Advisor</span>         ──────►   │        <span class="g">LIFE &amp; DI CLAIMS PLATFORM</span>            │   ◄──────►  <span class="y">Document / ECM Store</span>
 <span class="b">  Service Rep</span>     ──────►   │     event-driven · agent-assisted · HITL      │   ──cmd──►  <span class="y">Treasury / Disbursement</span>
@@ -51,27 +60,26 @@
                                   calls <span class="p">LLM inference</span> ◄──►  <span class="y">LLM / Model-Serving Platform</span>
 </div>
 
-<table>
-  <tr><th>External Actor / System</th><th>Relationship</th></tr>
-  <tr><td><strong>Client</strong></td><td>Files FNOL across channels; tracks status; receives correspondence &amp; payment</td></tr>
-  <tr><td><strong>Advisor</strong></td><td>Files/assists on behalf of clients; sees their book's claims; nudges requirements</td></tr>
-  <tr><td><strong>Service Rep</strong></td><td>Works the human-touch queue; handles inbound calls; resolves NIGO items; one-click confirms or corrects agent-drafted packets on assisted claims</td></tr>
-  <tr><td><strong>Adjudicator / SIU</strong></td><td><strong>Reviews and approves (or overrides) agent-drafted recommendations and holds decision authority</strong>; decisions standard/complex claims; investigates referred fraud cases</td></tr>
-  <tr><td><strong>Policy Admin System</strong></td><td>Golden record for policy in-force, coverage, contestability, beneficiaries — consumed via Kafka Connect CDC</td></tr>
-  <tr><td><strong>Treasury / Disbursement</strong></td><td>Executes the actual debit/credit on the bank rail; the cash ledger of record</td></tr>
-  <tr><td><strong>Document / ECM Store</strong></td><td>Stores death certificates, APS, medical records; events carry references + hashes</td></tr>
-  <tr><td><strong>Fraud / External Data</strong></td><td>MIB, Death Master File (DMF), watchlists, known-fraud networks</td></tr>
-  <tr><td><strong>Identity / KYC Provider</strong></td><td>Verifies claimant &amp; payee identity (IDV/KYC)</td></tr>
-  <tr><td><strong>Enterprise Data Lake / BI</strong></td><td>Subscribes to the same domain events for analytics &amp; ML training — no separate ETL</td></tr>
-  <tr><td><strong>LLM / Model-Serving Platform</strong></td><td>Hosts the language models the agent workers call to read documents, reconcile facts, and draft recommendations — a swappable, vendor-neutral inference dependency; sees tokenized data only</td></tr>
-</table>
+  <table>
+    <tr><th>External Actor / System</th><th>Relationship</th></tr>
+    <tr><td><strong>Client</strong></td><td>Files FNOL across channels; tracks status; receives correspondence &amp; payment</td></tr>
+    <tr><td><strong>Advisor</strong></td><td>Files/assists on behalf of clients; sees their book's claims; nudges requirements</td></tr>
+    <tr><td><strong>Service Rep</strong></td><td>Works the human-touch queue; handles inbound calls; resolves NIGO items; one-click confirms or corrects agent-drafted packets on assisted claims</td></tr>
+    <tr><td><strong>Adjudicator / SIU</strong></td><td><strong>Reviews and approves (or overrides) agent-drafted recommendations and holds decision authority</strong>; decisions standard/complex claims; investigates referred fraud cases</td></tr>
+    <tr><td><strong>Policy Admin System</strong></td><td>Golden record for policy in-force, coverage, contestability, beneficiaries — consumed via Kafka Connect CDC</td></tr>
+    <tr><td><strong>Treasury / Disbursement</strong></td><td>Executes the actual debit/credit on the bank rail; the cash ledger of record</td></tr>
+    <tr><td><strong>Document / ECM Store</strong></td><td>Stores death certificates, APS, medical records; events carry references + hashes</td></tr>
+    <tr><td><strong>Fraud / External Data</strong></td><td>MIB, Death Master File (DMF), watchlists, known-fraud networks</td></tr>
+    <tr><td><strong>Identity / KYC Provider</strong></td><td>Verifies claimant &amp; payee identity (IDV/KYC)</td></tr>
+    <tr><td><strong>Enterprise Data Lake / BI</strong></td><td>Subscribes to the same domain events for analytics &amp; ML training — no separate ETL</td></tr>
+    <tr><td><strong>LLM / Model-Serving Platform</strong></td><td>Hosts the language models the agent workers call to read documents, reconcile facts, and draft recommendations — a swappable, vendor-neutral inference dependency; sees tokenized data only</td></tr>
+  </table>
 
-<!-- L2 -->
-<div class="page-break"></div>
-<h1>2. L2 — Container Diagram</h1>
-<h2>Inside the box: the Kafka backbone, context services as producers/consumers, the agent workers, the CQRS read models, and the serving layer.</h2>
+  <div class="page-break"></div>
+  <h1><span class="n">2</span> L2 — Container Diagram</h1>
+  <h2>Inside the box: the Kafka backbone, context services as producers/consumers, the agent workers, the CQRS read models, and the serving layer.</h2>
 
-<div class="diagram"><span class="m">  CHANNELS                 INGRESS              EVENT BACKBONE (Apache Kafka)            STREAM PROCESSORS</span>
+  <div class="diagram"><span class="m">  CHANNELS                 INGRESS              EVENT BACKBONE (Apache Kafka)            STREAM PROCESSORS</span>
   <span class="b">Client Portal</span>   ─┐
   <span class="b">Advisor Desktop</span> ─┼─► <span class="g">Intake API</span> ──► <span class="r">claims.fnol.v1 / claims.lifecycle.v1</span> ──┬─► <span class="p">STP Decisioning</span> (Streams)
   <span class="b">Service Desktop</span> ─┤        (outbox)        <span class="r">policy.snapshot.v1</span> (CDC)              ├─► <span class="p">Fraud Scoring</span> (Flink)
@@ -90,51 +98,56 @@
   <span class="m">AI review loop:</span>  <span class="p">Agent Workers</span> ─► <span class="r">claims.ai.v1</span> ─► <span class="p">Projectors</span> enrich <span class="g">claim_summary</span> + <span class="g">advisor_worklist</span> ─► <span class="b">Adjudicator / Service desktop</span> reviews &amp; decides ─► <span class="r">claims.decision.v1</span>   <span class="m">[agents reason, people decide]</span>
 </div>
 
-<table>
-  <tr><th>Container</th><th>Tech</th><th>Responsibility</th></tr>
-  <tr><td>Intake API</td><td>Stateless service + transactional outbox</td><td>Accept FNOL from any channel; emit <code>claims.fnol.v1</code> reliably</td></tr>
-  <tr><td>Kafka backbone</td><td>Apache Kafka + a schema registry</td><td>14 core topics (the event-sourced system of record) + the derived <code>claims.ai.v1</code> advisory stream</td></tr>
-  <tr><td>Kafka Connect</td><td>CDC + outbox connectors</td><td>Stream Policy Admin changes into <code>policy.snapshot.v1</code>; drain outboxes</td></tr>
-  <tr><td>Stream processors</td><td>Kafka Streams + Flink</td><td>Decisioning, fraud, DI timers, projections, correspondence triggers</td></tr>
-  <tr><td>Read models</td><td>Relational DB / search index / key-value store</td><td>CQRS projections rebuilt from the log; <code>claim_summary</code> &amp; <code>advisor_worklist</code> also surface the agent's recommendation from <code>claims.ai.v1</code> for the reviewer</td></tr>
-  <tr><td>Claims Domain APIs</td><td>REST/GraphQL behind an API gateway</td><td>Versioned read access for all channels — never the raw log</td></tr>
-  <tr><td>Correspondence Engine</td><td>Templating + delivery service</td><td>Omnichannel outbound honoring preference &amp; consent</td></tr>
-  <tr><td>Payment Saga</td><td>Saga orchestrator + idempotent commands</td><td>Controlled money movement to treasury</td></tr>
-  <tr><td>Agent Workers</td><td>Per-claim agent orchestrator + LLM, skills &amp; tools</td><td>First-class processors that read documents and committed facts, reconcile them, and draft a decision packet with cited rationale + confidence on <code>claims.ai.v1</code> for human review. <strong>Advisory by design</strong> — the agents reason, a person (or the auto-ticket rules) decides; they never move money</td></tr>
-</table>
+  <table>
+    <tr><th>Container</th><th>Tech</th><th>Responsibility</th></tr>
+    <tr><td>Intake API</td><td>Stateless service + transactional outbox</td><td>Accept FNOL from any channel; emit <code>claims.fnol.v1</code> reliably</td></tr>
+    <tr><td>Kafka backbone</td><td>Apache Kafka + a schema registry</td><td>14 core topics (the event-sourced system of record) + the derived <code>claims.ai.v1</code> advisory stream</td></tr>
+    <tr><td>Kafka Connect</td><td>CDC + outbox connectors</td><td>Stream Policy Admin changes into <code>policy.snapshot.v1</code>; drain outboxes</td></tr>
+    <tr><td>Stream processors</td><td>Kafka Streams + Flink</td><td>Decisioning, fraud, DI timers, projections, correspondence triggers</td></tr>
+    <tr><td>Read models</td><td>Relational DB / search index / key-value store</td><td>CQRS projections rebuilt from the log; <code>claim_summary</code> &amp; <code>advisor_worklist</code> also surface the agent's recommendation from <code>claims.ai.v1</code> for the reviewer</td></tr>
+    <tr><td>Claims Domain APIs</td><td>REST/GraphQL behind an API gateway</td><td>Versioned read access for all channels — never the raw log</td></tr>
+    <tr><td>Correspondence Engine</td><td>Templating + delivery service</td><td>Omnichannel outbound honoring preference &amp; consent</td></tr>
+    <tr><td>Payment Saga</td><td>Saga orchestrator + idempotent commands</td><td>Controlled money movement to treasury</td></tr>
+    <tr><td>Agent Workers</td><td>Per-claim agent orchestrator + LLM, skills &amp; tools</td><td>First-class processors that read documents and committed facts, reconcile them, and draft a decision packet with cited rationale + confidence on <code>claims.ai.v1</code> for human review. <strong>Advisory by design</strong> — the agents reason, a person (or the auto-ticket rules) decides; they never move money</td></tr>
+  </table>
 
-<!-- ROLLOUT -->
-<div class="page-break"></div>
-<h1>3. Rollout — A Thin Slice First</h1>
-<h2>Sequenced by what unlocks what, not by the calendar. How long each step takes depends on the organization; the order is what matters.</h2>
+  <div class="page-break"></div>
+  <h1><span class="n">3</span> Rollout — A Thin Slice First</h1>
+  <h2>Sequenced by what unlocks what, not by the calendar. How long each step takes depends on the organization; the order is what matters.</h2>
 
-<div class="roadmap-phase">
-  <h3>Stage A — Walking skeleton</h3>
-  <p>One claim type — the <strong>Life death claim</strong> — happy path, end to end: FNOL intake → the event-sourced claim → a rule-based decision → payment, with client/advisor status read models. Thin but complete. This is the step that proves the backbone is real and de-risks everything after it.</p>
-</div>
-<div class="roadmap-phase" style="border-color:#2a9d8f;">
-  <h3>Stage B — Breadth</h3>
-  <p>Add <strong>DI claims</strong> (recurring benefit, recertification, offsets), the rest of the 9 contexts, the full <strong>money-movement saga</strong>, and <strong>omnichannel correspondence</strong> with preference/consent. Now the platform covers both lines and the regulated, hard parts.</p>
-</div>
-<div class="roadmap-phase" style="border-color:#d4a017;">
-  <h3>Stage C — Automation depth</h3>
-  <p>Push the <strong>auto-ticket rate</strong> up by widening the low-touch path, add <strong>rule-based fraud scoring + SIU routing</strong>, and harden operations. The value here is fewer manual touches and less leakage — all still with explainable rules.</p>
-</div>
-<div class="roadmap-phase" style="border-color:#6d3fa0;">
-  <h3>Stage D — Intelligence (when earned)</h3>
-  <p>Add <strong>ML</strong> for fraud and STP soft-factors <em>once there is enough labeled claims history to train on</em> — typically a stretch of real operations, not a date on a plan. The same stage introduces the <strong>LLM / agent assist layer</strong>: models read documents, reconcile facts, and draft a recommended decision with cited detail for a human to approve — and only graduate to deciding clean claims once proven against human reviewers. Hard guardrails (contestability, OFAC, limits) stay as rules, and a human stays the decision-maker until the model has earned more. This stage is optional and gated on data and proof, never on a calendar. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)</p>
+  <div class="roadmap-phase">
+    <h3>Stage A — Walking skeleton</h3>
+    <p>One claim type — the <strong>Life death claim</strong> — happy path, end to end: FNOL intake → the event-sourced claim → a rule-based decision → payment, with client/advisor status read models. Thin but complete. This is the step that proves the backbone is real and de-risks everything after it.</p>
+  </div>
+  <div class="roadmap-phase" style="border-left-color:#0d9488;">
+    <h3>Stage B — Breadth</h3>
+    <p>Add <strong>DI claims</strong> (recurring benefit, recertification, offsets), the rest of the 9 contexts, the full <strong>money-movement saga</strong>, and <strong>omnichannel correspondence</strong> with preference/consent. Now the platform covers both lines and the regulated, hard parts.</p>
+  </div>
+  <div class="roadmap-phase" style="border-left-color:#d97706;">
+    <h3>Stage C — Automation depth</h3>
+    <p>Push the <strong>auto-ticket rate</strong> up by widening the low-touch path, add <strong>rule-based fraud scoring + SIU routing</strong>, and harden operations. The value here is fewer manual touches and less leakage — all still with explainable rules.</p>
+  </div>
+  <div class="roadmap-phase" style="border-left-color:#7c3aed;">
+    <h3>Stage D — Intelligence (when earned)</h3>
+    <p>Add <strong>ML</strong> for fraud and STP soft-factors <em>once there is enough labeled claims history to train on</em> — typically a stretch of real operations, not a date on a plan. The same stage introduces the <strong>LLM / agent assist layer</strong>: models read documents, reconcile facts, and draft a recommended decision with cited detail for a human to approve — and only graduate to deciding clean claims once proven against human reviewers. Hard guardrails (contestability, OFAC, limits) stay as rules, and a human stays the decision-maker until the model has earned more. This stage is optional and gated on data and proof, never on a calendar. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)</p>
+  </div>
+
+  <h3>Why this order</h3>
+  <table>
+    <tr><th>Principle</th><th>Rationale</th></tr>
+    <tr><td>Backbone before features</td><td>Every later capability is just another consumer of the event log — the backbone is the leverage point</td></tr>
+    <tr><td>Life before DI</td><td>The death claim pays once and is simpler; it proves the platform before DI's long-running complexity (recertification, offsets) is added</td></tr>
+    <tr><td>Rules before ML</td><td>Explainable from day one for regulators; ML needs labeled history that doesn't exist at launch</td></tr>
+    <tr><td>A thin slice before breadth</td><td>One claim type all the way through finds the real integration problems early, while the blast radius is still small</td></tr>
+  </table>
+
 </div>
 
-<h3>Why this order</h3>
-<table>
-  <tr><th>Principle</th><th>Rationale</th></tr>
-  <tr><td>Backbone before features</td><td>Every later capability is just another consumer of the event log — the backbone is the leverage point</td></tr>
-  <tr><td>Life before DI</td><td>The death claim pays once and is simpler; it proves the platform before DI's long-running complexity (recertification, offsets) is added</td></tr>
-  <tr><td>Rules before ML</td><td>Explainable from day one for regulators; ML needs labeled history that doesn't exist at launch</td></tr>
-  <tr><td>A thin slice before breadth</td><td>One claim type all the way through finds the real integration problems early, while the blast radius is still small</td></tr>
-</table>
+<footer>
+  <p>L1 &amp; L2 Architecture Diagrams + Rollout — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
+</footer>
 
-<br><br><hr>
-<p style="text-align:center;color:#999;font-size:11px;">Architecture Diagrams L1 &amp; L2 + Rollout — Life &amp; DI Claims Platform &nbsp;|&nbsp; Harsh Shah &nbsp;|&nbsp; June 2026</p>
+<script src="app.js" defer></script>
 </body>
 </html>
