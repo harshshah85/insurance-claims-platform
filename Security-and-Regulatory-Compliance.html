@@ -40,7 +40,7 @@
 </div>
 
 <div class="note">
-  <strong>Two halves, one obligation.</strong> A Life &amp; DI claims platform moves money to grieving beneficiaries and disabled claimants using their most sensitive data. Part 1 is the technical security stack (edge to data). Part 2 is the regulatory map specific to life &amp; disability claims. The event-sourced log is a security asset here — it is the immutable audit trail regulators ask for.
+  <strong>Two halves, one obligation.</strong> A Life &amp; Disability claims platform moves money to grieving beneficiaries and disabled claimants using their most sensitive data. Part 1 is the technical security stack (edge to data). Part 2 is the regulatory map specific to life &amp; disability claims. The event-sourced log is a security asset here — it is the immutable audit trail regulators ask for.
 </div>
 
 <h1><span class="n">1</span> Seven-Layer Security Design</h1>
@@ -77,7 +77,7 @@
   <tr><td><strong>Tool abuse</strong></td><td>An agent tool is used beyond its intent — to write state or move money</td><td>Least-privilege, sandboxed tools; money-moving / state-changing tools are human-gated; agents read freely but cannot act on the world on their own</td></tr>
 </table>
 
-<h1><span class="n">3</span> Regulatory Map — Life &amp; DI Claims</h1>
+<h1><span class="n">3</span> Regulatory Map — Life &amp; Disability Claims</h1>
 <h2>Each obligation mapped to where the platform enforces it. Vendor-neutral; not legal advice.</h2>
 
 <table>
@@ -85,7 +85,7 @@
   <tr><td><strong>UCSPA</strong> (Unfair Claims Settlement Practices Acts)</td><td>Prompt acknowledgement, timely investigation &amp; decision, fair settlement; many states require <strong>interest</strong> on delayed death proceeds</td><td>Regulatory SLA timers on <code>FnolCaptured</code>/decision/payment; interest computed on overdue disbursement</td></tr>
   <tr><td><strong>Contestability</strong> (state policy law)</td><td>Within ~2 years of issue, insurer may investigate material misrepresentation before paying</td><td>Hard guardrail: contestable Life claims never auto-approve; forced <code>CONTESTABILITY_REVIEW</code></td></tr>
   <tr><td><strong>Death Master File + NAIC Unclaimed Benefits / Escheatment</strong></td><td>Cross-check Death Master File; locate beneficiaries; escheat unclaimed proceeds to the state</td><td>Death Master File as a fraud/external signal; dormancy timers; escheatment workflow in Compliance context</td></tr>
-  <tr><td><strong>ERISA</strong> (employer group Life/DI)</td><td>Claims &amp; appeals procedures, decision timeframes, full-and-fair review for group plans</td><td>Group-claim variant of the lifecycle with ERISA timeframes &amp; appeal-rights correspondence</td></tr>
+  <tr><td><strong>ERISA</strong> (employer group Life &amp; Disability)</td><td>Claims &amp; appeals procedures, decision timeframes, full-and-fair review for group plans</td><td>Group-claim variant of the lifecycle with ERISA timeframes &amp; appeal-rights correspondence</td></tr>
   <tr><td><strong>HIPAA</strong></td><td>Protect PHI in DI medical records / APS; minimum necessary access</td><td>Tokenized PHI; layer-5/6 controls; access logging on medical fields</td></tr>
   <tr><td><strong>GLBA</strong> + state privacy (CCPA et al.)</td><td>Safeguard nonpublic personal info; privacy notices; consumer rights</td><td>Field encryption; consent model in correspondence; data-subject request tooling</td></tr>
   <tr><td><strong>OFAC / AML</strong></td><td>Screen payees against sanctions lists; block prohibited payments; report suspicious activity</td><td>OFAC screen in the payment saga; <code>PaymentHeld</code> on hit; fraud unit/compliance referral</td></tr>

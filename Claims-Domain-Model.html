@@ -51,7 +51,7 @@
 
 <div class="ctx-box"><h3>1 · Intake &amp; Claim Filing</h3><p>Captures First Notice of Loss from every channel (client portal, advisor desktop, service-rep phone, secure message, mail/upload, IVR). Owns the channel-agnostic intake contract and the initial claim creation.</p></div>
 <div class="ctx-box"><h3>2 · Policy &amp; Coverage</h3><p>Resolves the claim to a policy via Policy Admin CDC. Confirms in-force status, coverage type, face amount / benefit amount, and contestability window. Quarantines unresolved policy numbers.</p></div>
-<div class="ctx-box"><h3>3 · Party &amp; Identity</h3><p>Models claimant, insured (decedent for Life), beneficiary, advisor, and servicing rep. Owns identity verification (identity verification) and beneficiary designation resolution.</p></div>
+<div class="ctx-box"><h3>3 · Party &amp; Identity</h3><p>Models claimant, insured (decedent for Life), beneficiary, advisor, and servicing rep. Owns identity verification and beneficiary designation resolution.</p></div>
 <div class="ctx-box"><h3>4 · Requirements</h3><p>Tracks outstanding requirements (death certificate, proof of loss, attending-physician statement, claimant statement, beneficiary forms). Raises, satisfies, waives, and ages requirements.</p></div>
 <div class="ctx-box"><h3>5 · Adjudication &amp; Decisioning</h3><p>Computes the STP eligibility score, routes to the low-touch or manual path, and records the approve / deny / pend decision with rationale and the responsible authority.</p></div>
 <div class="ctx-box"><h3>6 · Fraud &amp; Investigations</h3><p>Scores fraud risk, refers high-risk claims to the Special Investigations Unit, and tracks investigation outcome (cleared / substantiated). Blocks the low-touch path on referral.</p></div>
@@ -84,7 +84,7 @@
   <tr><td><strong>BeneficiaryDesignation</strong></td><td>Party</td><td>policy_id</td><td>Share allocations across beneficiaries must sum to 100%</td></tr>
   <tr><td><strong>RequirementSet</strong></td><td>Requirements</td><td>claim_id</td><td>A waived requirement records the waiving authority and reason</td></tr>
   <tr><td><strong>Decision</strong></td><td>Adjudication</td><td>claim_id</td><td>A denial must carry a reason code and cite the policy provision</td></tr>
-  <tr><td><strong>FraudCase</strong></td><td>Fraud / fraud unit</td><td>claim_id</td><td>Only fraud unit may set SiuCleared / SiuSubstantiated; decisioning cannot</td></tr>
+  <tr><td><strong>FraudCase</strong></td><td>Fraud &amp; Investigations</td><td>claim_id</td><td>Only the fraud unit may set SiuCleared / SiuSubstantiated; decisioning cannot</td></tr>
   <tr><td><strong>BenefitPeriod</strong></td><td>Disability Mgmt</td><td>claim_id + period_no</td><td>Periods are contiguous; a new period cannot open before the prior one ends or recertifies</td></tr>
   <tr><td><strong>Payment</strong></td><td>Payments</td><td>payment_id</td><td>Idempotent — a payment_id settles at most once; reversals are new events</td></tr>
   <tr><td><strong>Correspondence</strong></td><td>Correspondence</td><td>correspondence_id</td><td>Outbound to a client respects channel preference &amp; consent on record</td></tr>
@@ -153,7 +153,7 @@
   <tr><td>Advisor</td><td><code>claim_summary</code> + <code>advisor_worklist</code></td><td>Their clients' claims, what is blocking, and where they can help (e.g. nudge a requirement)</td></tr>
   <tr><td>Service Rep</td><td><code>advisor_worklist</code></td><td>Queue of claims needing human touch, sorted by SLA-timer urgency</td></tr>
   <tr><td>Adjudicator</td><td><code>claim_summary</code> + decision context</td><td>STP score breakdown, requirements, policy/coverage facts, fraud signal</td></tr>
-  <tr><td>fraud unit Investigator</td><td><code>fraud_case_view</code></td><td>Fraud score drivers, linked claims, investigation tasks and findings</td></tr>
+  <tr><td>Fraud Investigator</td><td><code>fraud_case_view</code></td><td>Fraud score drivers, linked claims, investigation tasks and findings</td></tr>
   <tr><td>Treasury / Finance</td><td><code>payment_ledger</code> + <code>di_benefit_ledger</code></td><td>Scheduled vs. settled disbursements, 1099-R basis, reconciliation status</td></tr>
 </table>
 

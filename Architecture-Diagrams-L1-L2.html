@@ -47,14 +47,14 @@
   <h1><span class="n">1</span> L1 — System Context</h1>
   <h2>Who and what the platform interacts with. People on the left, systems of record and external services on the right.</h2>
 
-  <div class="diagram"><span class="m">                          ┌───────────────────────────────────────────────┐</span>
-<span class="b">  Client</span>          ──FNOL──►   │                                               │   ◄──CDC──  <span class="y">Policy Admin System</span>
-<span class="b">  Advisor</span>         ──────►   │        <span class="g">LIFE &amp; DI CLAIMS PLATFORM</span>            │   ◄──────►  <span class="y">Document / ECM Store</span>
-<span class="b">  Service Rep</span>     ──────►   │     event-driven · agent-assisted · HITL      │   ──cmd──►  <span class="y">Treasury / Disbursement</span>
+  <div class="diagram"><span class="m">                            ┌───────────────────────────────────────────────┐</span>
+<span class="b">  Client</span>          ──FNOL──► │                                               │   ◄──CDC──  <span class="y">Policy Admin System</span>
+<span class="b">  Advisor</span>         ──────►   │   <span class="g">EVENT-DRIVEN, AI-ASSISTED CLAIMS PLATFORM</span>   │   ◄──────►  <span class="y">Document / ECM Store</span>
+<span class="b">  Service Rep</span>     ──────►   │   demonstrated on Life &amp; Disability claims    │   ──cmd──►  <span class="y">Treasury / Disbursement</span>
 <span class="b">  Adjudicator</span>     ──────►   │                                               │   ◄──────►  <span class="r">Fraud / External Data (MIB, DMF)</span>
-<span class="b">  SIU Investigator</span> ──────►   │                                               │   ◄──────►  <span class="y">Identity / KYC Provider</span>
+<span class="b">  SIU Investigator</span> ──────►  │                                               │   ◄──────►  <span class="y">Identity / KYC Provider</span>
 <span class="b">  Treasury Ops</span>    ──────►   │                                               │   ──notify─►  <span class="r">Regulators / Auditors</span>
-<span class="m">                          └───────────────────────────────────────────────┘</span>
+<span class="m">                            └───────────────────────────────────────────────┘</span>
                                           │
                                   emits <span class="g">domain events</span> ──►  <span class="y">Enterprise Data Lake / BI</span>
                                   calls <span class="p">LLM inference</span> ◄──►  <span class="y">LLM / Model-Serving Platform</span>
@@ -65,12 +65,12 @@
     <tr><td><strong>Client</strong></td><td>Files first notice of loss across channels; tracks status; receives correspondence &amp; payment</td></tr>
     <tr><td><strong>Advisor</strong></td><td>Files/assists on behalf of clients; sees their book's claims; nudges requirements</td></tr>
     <tr><td><strong>Service Rep</strong></td><td>Works the human-touch queue; handles inbound calls; resolves not-in-good-order items; one-click confirms or corrects agent-drafted packets on assisted claims</td></tr>
-    <tr><td><strong>Adjudicator / fraud unit</strong></td><td><strong>Reviews and approves (or overrides) agent-drafted recommendations and holds decision authority</strong>; decisions standard/complex claims; investigates referred fraud cases</td></tr>
+    <tr><td><strong>Adjudicator / Investigator</strong></td><td><strong>Reviews and approves (or overrides) agent-drafted recommendations and holds decision authority</strong>; decisions standard/complex claims; investigates referred fraud cases</td></tr>
     <tr><td><strong>Policy Admin System</strong></td><td>Golden record for policy in-force, coverage, contestability, beneficiaries — consumed via Kafka Connect CDC</td></tr>
     <tr><td><strong>Treasury / Disbursement</strong></td><td>Executes the actual debit/credit on the bank rail; the cash ledger of record</td></tr>
     <tr><td><strong>Document / ECM Store</strong></td><td>Stores death certificates, APS, medical records; events carry references + hashes</td></tr>
     <tr><td><strong>Fraud / External Data</strong></td><td>MIB, Death Master File, watchlists, known-fraud networks</td></tr>
-    <tr><td><strong>Identity / identity verification Provider</strong></td><td>Verifies claimant &amp; payee identity (identity verification)</td></tr>
+    <tr><td><strong>Identity Verification Provider</strong></td><td>Verifies claimant &amp; payee identity</td></tr>
     <tr><td><strong>Enterprise Data Lake / BI</strong></td><td>Subscribes to the same domain events for analytics &amp; ML training — no separate ETL</td></tr>
     <tr><td><strong>LLM / Model-Serving Platform</strong></td><td>Hosts the language models the agent workers call to read documents, reconcile facts, and draft recommendations — a swappable, vendor-neutral inference dependency; sees tokenized data only</td></tr>
   </table>
@@ -125,7 +125,7 @@
   </div>
   <div class="roadmap-phase" style="border-left-color:#d97706;">
     <h3>Stage C — Automation depth</h3>
-    <p>Push the <strong>auto-ticket rate</strong> up by widening the low-touch path, add <strong>rule-based fraud scoring + fraud unit routing</strong>, and harden operations. The value here is fewer manual touches and less leakage — all still with explainable rules.</p>
+    <p>Push the <strong>auto-ticket rate</strong> up by widening the low-touch path, add <strong>rule-based fraud scoring + investigations routing</strong>, and harden operations. The value here is fewer manual touches and less leakage — all still with explainable rules.</p>
   </div>
   <div class="roadmap-phase" style="border-left-color:#7c3aed;">
     <h3>Stage D — Intelligence (when earned)</h3>

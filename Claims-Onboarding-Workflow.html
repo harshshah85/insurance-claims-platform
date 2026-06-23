@@ -44,7 +44,7 @@
 </div>
 
 <h1><span class="n">1</span> Scenario A — New Product / Plan Onboarding</h1>
-<h2>One-time. Performed by product + platform teams when a new Life/DI product becomes claimable.</h2>
+<h2>One-time. Performed by product + platform teams when a new Life &amp; Disability product becomes claimable.</h2>
 
 <div class="step"><strong>Step 1 — Map coverage to claim rules</strong> <span class="auto">[semi-auto]</span><br>Define which loss events the product covers, exclusions, elimination period (DI), face/benefit structure, and contestability terms. Encode as decisioning rules consumed by STP scoring.</div>
 <div class="step"><strong>Step 2 — Register / extend event schemas</strong> <span class="manual">[manual + CI gate]</span><br>If the product needs new fields, evolve the relevant Avro schemas (additive only) and pass the Schema Registry compatibility check in CI. New product variants almost always fit existing <code>v1</code> schemas.</div>

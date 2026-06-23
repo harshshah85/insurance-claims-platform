@@ -70,11 +70,11 @@
 <div class="flow">
 <span class="b">FNOL + uploaded documents</span>  ─►  <span class="ai">Orchestrator</span> <span class="m">(one run per claim)</span>
         │
-        ├─► <span class="ai">Intake &amp; Triage agent</span>     ─► classify Life/DI, identify filer, build fact-sheet, list missing items
+        ├─► <span class="ai">Intake &amp; Triage agent</span>     ─► classify Life &amp; Disability, identify filer, build fact-sheet, list missing items
         ├─► <span class="ai">Document Intelligence agent</span> ─► extract + reconcile dates/amounts across docs  <span class="m">(feeds documentation_inconsistency)</span>
         ├─► <span class="ai">Policy &amp; Coverage agent</span>    ─► in-force, coverage match, exclusions, contestability proximity
         ├─► <span class="ai">Decisioning agent</span>          ─► <span class="y">DecisionProposed</span>  <span class="m">(recommendation + cited rationale + confidence)</span>
-        ├─► <span class="ai">Fraud / SIU copilot</span>        ─► investigator-ready narrative  <span class="m">(assists; never refers or clears on its own)</span>
+        ├─► <span class="ai">Fraud copilot</span>              ─► investigator-ready narrative  <span class="m">(assists; never refers or clears on its own)</span>
         └─► <span class="ai">Correspondence agent</span>       ─► letter drafts  <span class="m">(claimant / beneficiary / advisor)</span>
         │
         ▼
@@ -122,7 +122,7 @@
   <tr><td><span class="tier t-auto">AUTO &nbsp;≥ 85</span></td><td>Prepares the full packet; rules + scores make the auto-ticket call inside the guardrails</td><td><strong>No per-claim human.</strong> But: a confidence floor is required, the AI can never deny, and a <strong>sampled share is pulled for human QA</strong> to catch drift</td></tr>
   <tr><td><span class="tier t-assist">ASSISTED &nbsp;65–84</span></td><td>Delivers a complete decision packet — recommendation, evidence, citations, confidence</td><td><strong>One-click confirm or correct.</strong> This is the core "review the AI's findings, then approve" loop</td></tr>
   <tr><td><span class="tier t-std">STANDARD &nbsp;40–64</span></td><td>Copilot — extracts, summarizes, surfaces the facts and the score breakdown</td><td>Human adjudicates fully; the AI is assist-only</td></tr>
-  <tr><td><span class="tier t-cx">COMPLEX / fraud unit &nbsp;&lt; 40</span></td><td>Assembles the narrative and the evidence pack</td><td>Senior adjudicator / fraud unit decide; the AI never automates any part</td></tr>
+  <tr><td><span class="tier t-cx">COMPLEX / fraud unit &nbsp;&lt; 40</span></td><td>Assembles the narrative and the evidence pack</td><td>Senior adjudicator / investigator decide; the AI never automates any part</td></tr>
   <tr><td colspan="3" style="background:#fff5f5;"><strong>Any denial</strong> — the AI may draft the coded reason and rationale, but a <span class="manual">human with authority</span> always makes the call. ML can <em>raise</em> a claim out of the low-touch path; it can never be the sole basis of a denial. &nbsp; <strong>Money movement</strong> — the AI proposes; a human approves above threshold and the disbursement saga is unchanged (dual control stays).</td></tr>
 </table>
 
