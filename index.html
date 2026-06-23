@@ -3,30 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Life &amp; DI Claims Platform — Event-Driven Architecture Reference</title>
+<title>Event-Driven, AI-Assisted Claims Platform — Reference Architecture</title>
 <link rel="stylesheet" href="styles.css">
 <!--meta:injected-->
 <meta name="description" content="A vendor-neutral reference architecture for handling life &amp; disability income claims as events on Kafka — auto-ticket STP, fraud checks, correspondence, money movement, and an agent-assisted, human-in-the-loop decisioning layer.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Life & DI Claims Platform">
-<meta property="og:title" content="Life &amp; DI Claims Platform">
+<meta property="og:site_name" content="Event-Driven, AI-Assisted Claims Platform">
+<meta property="og:title" content="Event-Driven, AI-Assisted Claims Platform">
 <meta property="og:description" content="A vendor-neutral reference architecture for handling life &amp; disability income claims as events on Kafka — auto-ticket STP, fraud checks, correspondence, money movement, and an agent-assisted, human-in-the-loop decisioning layer.">
 <meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/index.html">
-<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Life &amp; DI Claims Platform">
+<meta name="twitter:title" content="Event-Driven, AI-Assisted Claims Platform">
 <meta name="twitter:description" content="A vendor-neutral reference architecture for handling life &amp; disability income claims as events on Kafka — auto-ticket STP, fraud checks, correspondence, money movement, and an agent-assisted, human-in-the-loop decisioning layer.">
-<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
 <body>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-tag">Architecture Reference</div>
-  <h1>Life &amp; Disability Income<br><span>Claims Platform</span></h1>
-  <p>A reference design for handling life and disability income claims as a stream of events on Kafka — from a claim being filed, through review and fraud checks, to letters and payment — with a low-touch "auto-ticket" path for the clean, simple ones. LLM agent workers read documents, reconcile facts, and draft a recommended decision for a person to approve — agent-assisted by design, with people holding decision authority. Life (death) claims are filed by a beneficiary; DI claims by the policyholder. The platform handles both.</p>
+  <div class="hero-tag">Reference Architecture</div>
+  <h1>Event-Driven, AI-Assisted<br><span>Claims Platform</span></h1>
+  <p>A reference architecture for processing insurance claims as a stream of events on Kafka — event sourcing through review, fraud checks, correspondence, and payment, with a low-touch "auto-ticket" path for the clean, simple ones. On top sits an agentic, human-in-the-loop decisioning layer: language-model agents read documents, reconcile facts, and draft a recommended decision for a person to approve — agents reason, people decide. Demonstrated end-to-end on Life &amp; Disability claims (a death claim is filed by a beneficiary; a disability-income claim by the policyholder).</p>
   <div class="hero-meta">
     <span><span class="dot" style="background:#0d9488"></span> Apache Kafka</span>
     <span><span class="dot" style="background:#2563eb"></span> Event sourcing</span>
@@ -52,7 +52,7 @@
         </div>
       </div>
       <div class="card-body">
-        C4 model diagrams showing all external actors (client, advisor, service rep, SIU, treasury), the 9 bounded contexts as containers, policy-admin CDC integration, the event-sourced backbone, and a thin-slice-first rollout.
+        C4 model diagrams showing all external actors (client, advisor, service rep, fraud unit, treasury), the 9 bounded contexts as containers, policy-admin CDC integration, the event-sourced backbone, and a thin-slice-first rollout.
       </div>
       <div class="card-tags">
         <span class="tag tag-arch">C4 Model</span>
@@ -72,7 +72,7 @@
         </div>
       </div>
       <div class="card-body">
-        The Kafka backbone — 14 core topics, the 36-event domain catalog, Schema Registry + Avro evolution rules, event sourcing &amp; CQRS read models, exactly-once processing, the transactional outbox, DLQ/retry, and Kafka Streams / Flink topology.
+        The Kafka backbone — 14 core topics, the 36-event domain catalog, Schema Registry + Avro evolution rules, event sourcing &amp; CQRS read models, exactly-once processing, the transactional outbox, dead-letter queue/retry, and Kafka Streams / Flink topology.
       </div>
       <div class="card-tags">
         <span class="tag tag-stream">14 Topics</span>
@@ -108,17 +108,17 @@
         <div class="card-icon">🎯</div>
         <div>
           <div class="card-title">Claims Decisioning &amp; Fraud</div>
-          <div class="card-subtitle">STP Eligibility, Low-Touch Path &amp; SIU Routing</div>
+          <div class="card-subtitle">STP Eligibility, Low-Touch Path &amp; Fraud Routing</div>
         </div>
       </div>
       <div class="card-body">
-        The STP eligibility score and fraud risk score formulas, the low-touch / auto-ticketing path, decision tiers, the rules-then-ML strategy, SIU referral triggers, suppression rules, and sample decision event payloads.
+        The STP eligibility score and fraud risk score formulas, the low-touch / auto-ticketing path, decision tiers, the rules-then-ML strategy, fraud unit referral triggers, suppression rules, and sample decision event payloads.
       </div>
       <div class="card-tags">
         <span class="tag tag-data">STP Scoring</span>
         <span class="tag tag-ml">Fraud Risk</span>
         <span class="tag tag-data">Low-Touch Path</span>
-        <span class="tag tag-stream">SIU Referral</span>
+        <span class="tag tag-stream">Fraud Referral</span>
       </div>
     </a>
 
@@ -152,7 +152,7 @@
         </div>
       </div>
       <div class="card-body">
-        mTLS + Kafka SASL/SSL, field-level encryption of PII/PHI, OAuth 2.0 by consumer, STRIDE threat model, and the regulatory map — UCSPA prompt-pay, contestability, DMF/escheatment, ERISA, HIPAA/GLBA, OFAC/AML, SOX over money movement, and immutable audit.
+        mTLS + Kafka SASL/SSL, field-level encryption of PII/PHI, OAuth 2.0 by consumer, STRIDE threat model, and the regulatory map — UCSPA prompt-pay, contestability, Death Master File/escheatment, ERISA, HIPAA/GLBA, OFAC/AML, SOX over money movement, and immutable audit.
       </div>
       <div class="card-tags">
         <span class="tag tag-arch">mTLS · OAuth 2.0</span>
@@ -192,13 +192,33 @@
         </div>
       </div>
       <div class="card-body">
-        Event-freshness and decisioning SLOs, consumer-lag and DLQ alerting, money-movement watch metrics, STP-rate and cycle-time business SLOs, P1–P4 alert routing, dashboards per team role, and the blameless incident process.
+        Event-freshness and decisioning SLOs, consumer-lag and dead-letter queue alerting, money-movement watch metrics, STP-rate and cycle-time business SLOs, P1–P4 alert routing, dashboards per team role, and the blameless incident process.
       </div>
       <div class="card-tags">
         <span class="tag tag-api">SLOs · SLAs</span>
         <span class="tag tag-stream">Consumer Lag</span>
         <span class="tag tag-data">STP Quality</span>
         <span class="tag tag-arch">Incident Mgmt</span>
+      </div>
+    </a>
+
+    <!-- Resilience & DR -->
+    <a href="Resilience-and-Disaster-Recovery.html" class="card" style="--cat:#4f46e5">
+      <div class="card-header">
+        <div class="card-icon">🛡️</div>
+        <div>
+          <div class="card-title">Resilience &amp; Disaster Recovery</div>
+          <div class="card-subtitle">Failure Domains, RTO/RPO &amp; Saga Recovery</div>
+        </div>
+      </div>
+      <div class="card-body">
+        Failure domains and recovery targets, Kafka multi-zone/region durability, and how an event-sourced platform recovers in-flight work — replay-based rebuilds and a disbursement saga caught mid-flight by a regional failover, made safe by idempotent commands.
+      </div>
+      <div class="card-tags">
+        <span class="tag tag-api">RTO / RPO</span>
+        <span class="tag tag-stream">Multi-Region Kafka</span>
+        <span class="tag tag-arch">Saga Recovery</span>
+        <span class="tag tag-ml">Replay Rebuild</span>
       </div>
     </a>
 
@@ -231,13 +251,13 @@
         </div>
       </div>
       <div class="card-body">
-        Two onboarding scenarios (new product/plan vs. new claim intake), step-by-step workflows, automated vs. manual step breakdown, quarantine recovery for unresolved policy numbers, and a later self-service FNOL vision.
+        Two onboarding scenarios (new product/plan vs. new claim intake), step-by-step workflows, automated vs. manual step breakdown, quarantine recovery for unresolved policy numbers, and a later self-service first notice of loss vision.
       </div>
       <div class="card-tags">
         <span class="tag tag-stream">Policy CDC</span>
         <span class="tag tag-api">Schema Registry</span>
-        <span class="tag tag-arch">IDV Intake</span>
-        <span class="tag tag-ml">Self-Service FNOL</span>
+        <span class="tag tag-arch">identity verification Intake</span>
+        <span class="tag tag-ml">Self-Service Intake</span>
       </div>
     </a>
 
@@ -270,7 +290,7 @@
         </div>
       </div>
       <div class="card-body">
-        Plain-language definitions of the insurance, event-driven, and AI shorthand used across these documents — FNOL, STP, DI, SIU, event sourcing, CQRS, saga, outbox, CDC, EOS, HITL, and more.
+        Plain-language definitions of the insurance, event-driven, and AI shorthand used across these documents — first notice of loss, STP, DI, fraud unit, event sourcing, CQRS, saga, outbox, CDC, EOS, human-in-the-loop, and more.
       </div>
       <div class="card-tags">
         <span class="tag tag-stream">Insurance</span>
@@ -287,7 +307,7 @@
   <div class="panel">
     <h2>Platform Architecture Overview</h2>
     <div class="flow">
-<span class="comment">// Event Flow — Life &amp; DI Claims Platform</span>
+<span class="comment">// Event Flow — Event-Driven, AI-Assisted Claims Platform</span>
 
 <span class="hl">Client / Advisor / Service Rep</span>  ──(FNOL, omnichannel)──►  <span class="hl4">Intake API</span>  ──►  <span class="hl2">claims.fnol.v1</span>  ──►  <span class="hl">Claim Aggregate (event-sourced)</span>
 <span class="hl">Policy Admin System</span>  ──(Kafka Connect CDC)──►  <span class="hl3">policy.snapshot.v1</span>  ──────────────────────────────────────►↑
@@ -336,7 +356,7 @@
     <div class="decision-item">
       <div class="decision-num">Decision 05</div>
       <h3>STP &amp; Fraud Scoring Formulas</h3>
-      <p>STP = (policy_in_force × 0.25) + (coverage_clear × 0.20) + (doc_completeness × 0.20) + (identity_verified × 0.15) + (fraud_inverse × 0.10) + (amount_in_band × 0.10). Fraud risk is a separate weighted score; ≥ 60 forces SIU referral and blocks the low-touch path.</p>
+      <p>STP = (policy_in_force × 0.25) + (coverage_clear × 0.20) + (doc_completeness × 0.20) + (identity_verified × 0.15) + (fraud_inverse × 0.10) + (amount_in_band × 0.10). Fraud risk is a separate weighted score; ≥ 60 forces fraud unit referral and blocks the low-touch path.</p>
     </div>
     <div class="decision-item">
       <div class="decision-num">Decision 06</div>
@@ -353,7 +373,7 @@
 
 <!-- FOOTER -->
 <footer>
-  <p>Life &amp; DI Claims Platform — Event-Driven Architecture Reference <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Event-Driven, AI-Assisted Claims Platform — Event-Driven Architecture Reference <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="https://github.com/harshshah85/insurance-claims-platform">github.com/harshshah85/insurance-claims-platform</a></p>
 </footer>
 

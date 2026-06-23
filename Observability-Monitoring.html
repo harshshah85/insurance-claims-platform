@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Observability &amp; Monitoring — Life &amp; DI Claims Platform</title>
+<title>Observability &amp; Monitoring — Event-Driven, AI-Assisted Claims Platform</title>
 <link rel="stylesheet" href="styles.css">
 <!--meta:injected-->
-<meta name="description" content="Life &amp; DI Claims Platform — SLOs, Consumer Lag &amp; Alert Routing">
+<meta name="description" content="Event-Driven, AI-Assisted Claims Platform — SLOs, Consumer Lag &amp; Alert Routing">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:site_name" content="Event-Driven, AI-Assisted Claims Platform">
 <meta property="og:title" content="Observability &amp; Monitoring">
-<meta property="og:description" content="Life &amp; DI Claims Platform — SLOs, Consumer Lag &amp; Alert Routing">
+<meta property="og:description" content="Event-Driven, AI-Assisted Claims Platform — SLOs, Consumer Lag &amp; Alert Routing">
 <meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Observability-Monitoring.html">
-<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Observability &amp; Monitoring">
-<meta name="twitter:description" content="Life &amp; DI Claims Platform — SLOs, Consumer Lag &amp; Alert Routing">
-<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:description" content="Event-Driven, AI-Assisted Claims Platform — SLOs, Consumer Lag &amp; Alert Routing">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
 <body class="doc" style="--accent:#0d9488">
@@ -35,7 +35,7 @@
 <div class="doc-cover">
   <div class="eyebrow">Reference Document</div>
   <h1>Observability &amp; Monitoring</h1>
-  <p class="lede">Life &amp; DI Claims Platform — SLOs, Consumer Lag &amp; Alert Routing</p>
+  <p class="lede">Event-Driven, AI-Assisted Claims Platform — SLOs, Consumer Lag &amp; Alert Routing</p>
   <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
 </div>
 
@@ -43,7 +43,7 @@
 
 <div class="pillar"><h3>Metrics — what is happening right now?</h3><p>Throughput per topic, consumer lag, processor latency, API latency/error rate, STP rate, payment success rate. Collected every 60s. Used for SLO burn-rate alerting and capacity planning.</p></div>
 <div class="pillar" style="border-left-color:#0d9488;"><h3>Logs — why did it happen?</h3><p>Structured JSON logs from intake, processors, APIs, correspondence, payment saga. Centralized; 90-day retention; <strong>no raw PII/PHI</strong> in logs (tokens only). Searched for root cause.</p></div>
-<div class="pillar" style="border-left-color:#7c3aed;"><h3>Traces — where did the request go?</h3><p>Distributed tracing with <code>correlationid</code> propagated FNOL → API → processor → read model. Identifies latency hotspots across service and topic boundaries.</p></div>
+<div class="pillar" style="border-left-color:#7c3aed;"><h3>Traces — where did the request go?</h3><p>Distributed tracing with <code>correlationid</code> propagated first notice of loss → API → processor → read model. Identifies latency hotspots across service and topic boundaries.</p></div>
 <div class="pillar" style="border-left-color:#d97706;"><h3>Event lineage — the fourth pillar</h3><p>Unique to event sourcing: the <code>correlationid</code>/<code>causationid</code> chain lets you replay exactly how any decision or payment came to be. This is both an ops tool and the regulatory audit answer.</p></div>
 
 <h1><span class="n">2</span> SLOs — Service Level Objectives</h1>
@@ -53,11 +53,11 @@
   <h3>Streaming SLOs — Event Freshness &amp; Health</h3>
   <table>
     <tr><th>Path</th><th>SLO Target</th><th>Alert Threshold</th></tr>
-    <tr><td>FNOL → committed to Kafka</td><td>99.9% within 2 seconds</td><td>Intake outbox lag &gt; 30s or publish error rate &gt; 0.1%</td></tr>
+    <tr><td>first notice of loss → committed to Kafka</td><td>99.9% within 2 seconds</td><td>Intake outbox lag &gt; 30s or publish error rate &gt; 0.1%</td></tr>
     <tr><td>Consumer lag (decisioning, fraud, projectors)</td><td>Steady-state lag &lt; 1,000 events per partition</td><td>Lag &gt; 5,000 OR rising for 10 min on any critical consumer</td></tr>
     <tr><td>Policy CDC freshness</td><td>99% of Policy Admin changes in <code>policy.snapshot.v1</code> within 5 min</td><td>CDC connector last_event &gt; 15 min old</td></tr>
     <tr><td>Read-model lag (claim_summary)</td><td>p95 projection lag &lt; 10 seconds</td><td>Read model &gt; 60s behind the log</td></tr>
-    <tr><td>DLQ rate</td><td>&lt; 0.05% of events reach <code>claims.dlq.v1</code></td><td>Any sustained DLQ inflow, or single PHI/payment event in DLQ</td></tr>
+    <tr><td>dead-letter queue rate</td><td>&lt; 0.05% of events reach <code>claims.dlq.v1</code></td><td>Any sustained dead-letter queue inflow, or single PHI/payment event in dead-letter queue</td></tr>
   </table>
 </div>
 
@@ -67,7 +67,7 @@
     <tr><th>Endpoint / Flow</th><th>Availability</th><th>Latency</th></tr>
     <tr><td>Claims Domain API — GET /claims/{id}</td><td>99.9%</td><td>p50 &lt; 120ms, p95 &lt; 400ms</td></tr>
     <tr><td>Intake API — POST /fnol</td><td>99.95%</td><td>p95 &lt; 600ms (ack), async thereafter</td></tr>
-    <tr><td>STP auto-decision (FNOL → decision)</td><td>99.5%</td><td>p95 &lt; 5 seconds end-to-end</td></tr>
+    <tr><td>STP auto-decision (first notice of loss → decision)</td><td>99.5%</td><td>p95 &lt; 5 seconds end-to-end</td></tr>
     <tr><td>Payment saga (approval → disbursement initiated)</td><td>99.5%</td><td>Well inside prompt-payment statute</td></tr>
   </table>
 </div>
@@ -77,7 +77,7 @@
   <table>
     <tr><th>Metric</th><th>Target</th><th>Cadence</th></tr>
     <tr><td>STP rate (auto + assisted)</td><td>40–55% of eligible claims (as automation matures)</td><td>Weekly dashboard</td></tr>
-    <tr><td>Average claim cycle time (FNOL → decision)</td><td>Trending down quarter over quarter</td><td>Monthly cohort</td></tr>
+    <tr><td>Average claim cycle time (first notice of loss → decision)</td><td>Trending down quarter over quarter</td><td>Monthly cohort</td></tr>
     <tr><td>False-auto rate</td><td>&lt; 0.5%</td><td>Weekly — auto-approved later flagged for review</td></tr>
     <tr><td>Prompt-payment compliance</td><td>100% within statute</td><td>Daily automated check on regulatory timers</td></tr>
     <tr><td>Treasury reconciliation breaks</td><td>0 unresolved end-of-day</td><td>Daily</td></tr>
@@ -91,7 +91,7 @@
     <tr><td>Grounding rate (findings with a valid source citation)</td><td>~100%</td><td>An ungrounded assertion is a hallucination risk — it should never reach an adjudicator</td></tr>
     <tr><td>Packet acceptance rate (ASSISTED, confirmed with no correction)</td><td>High &amp; rising</td><td>The core trust signal; a falling rate means the model is drifting from human judgment</td></tr>
     <tr><td>Abstention precision (escalations a human agrees needed a person)</td><td>Track &amp; tune</td><td>Too low → the model over-escalates and saves no time; too high may mask under-escalation</td></tr>
-    <tr><td>Agent run latency (FNOL → packet on <code>claims.ai.v1</code>)</td><td>p95 &lt; 30s</td><td>Assist must be ready before the human picks up the claim</td></tr>
+    <tr><td>Agent run latency (first notice of loss → packet on <code>claims.ai.v1</code>)</td><td>p95 &lt; 30s</td><td>Assist must be ready before the human picks up the claim</td></tr>
     <tr><td>False-auto rate (shared with Business SLOs)</td><td>&lt; 0.5%</td><td>The number the AI layer must never let creep — sampled QA on the auto-ticket lane</td></tr>
   </table>
 </div>
@@ -102,7 +102,7 @@
 <table>
   <tr><th>Alert</th><th>Severity</th><th>Route To</th><th>Response</th></tr>
   <tr><td>Payment saga failure / stuck disbursement</td><td><span class="badge b-p1">P1</span></td><td>Platform + Treasury on-call — immediate page</td><td>15 min</td></tr>
-  <tr><td>PII/PHI or payment event in DLQ</td><td><span class="badge b-p1">P1</span></td><td>Platform Eng + Security — immediate</td><td>15 min</td></tr>
+  <tr><td>PII/PHI or payment event in dead-letter queue</td><td><span class="badge b-p1">P1</span></td><td>Platform Eng + Security — immediate</td><td>15 min</td></tr>
   <tr><td>STP decisioning consumer down / lag &gt; 5,000</td><td><span class="badge b-p1">P1</span></td><td>Platform Engineering on-call</td><td>15 min</td></tr>
   <tr><td>Claims Domain API error rate &gt; 1% for 5 min</td><td><span class="badge b-p1">P1</span></td><td>Platform Engineering on-call</td><td>15 min</td></tr>
   <tr><td>Prompt-payment SLA timer at risk for any claim</td><td><span class="badge b-p2">P2</span></td><td>Claims Ops + Platform</td><td>30 min</td></tr>
@@ -125,7 +125,7 @@
   <tr><td>Consumer Lag Heatmap</td><td>Lag per consumer group × partition; red on threshold breach</td></tr>
   <tr><td>EOS / Transaction Health</td><td>Transaction commit rate, aborted-transaction rate on stream processors</td></tr>
   <tr><td>API Health</td><td>Claims Domain API p50/p95/p99, error rate, request volume</td></tr>
-  <tr><td>DLQ &amp; Retry</td><td>Inflow to retry tiers and <code>claims.dlq.v1</code>; oldest un-drained message</td></tr>
+  <tr><td>dead-letter queue &amp; Retry</td><td>Inflow to retry tiers and <code>claims.dlq.v1</code>; oldest un-drained message</td></tr>
 </table>
 
 <h3>Claims Ops (flow &amp; SLA)</h3>
@@ -133,7 +133,7 @@
   <tr><th>Panel</th><th>Metric</th></tr>
   <tr><td>Regulatory Timer Board</td><td>Claims approaching acknowledge/decide/pay statutory deadlines</td></tr>
   <tr><td>Worklist Depth</td><td>Standard/complex queue depth and aging by tier</td></tr>
-  <tr><td>STP Funnel</td><td>FNOL → scored → auto / assisted / standard / SIU</td></tr>
+  <tr><td>STP Funnel</td><td>first notice of loss → scored → auto / assisted / standard / fraud unit</td></tr>
 </table>
 
 <h3>Treasury / Finance (money movement)</h3>
@@ -168,7 +168,7 @@
 </div>
 
 <footer>
-  <p>Observability &amp; Monitoring — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Observability &amp; Monitoring — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

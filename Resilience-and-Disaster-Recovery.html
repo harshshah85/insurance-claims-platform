@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resilience &amp; Disaster Recovery — Event-Driven, AI-Assisted Claims Platform</title>
+<link rel="stylesheet" href="styles.css">
+<!--meta:injected-->
+<meta name="description" content="Failure domains and RTO/RPO targets, Kafka multi-AZ/region resilience, and how an event-sourced platform recovers in-flight work — including a disbursement saga caught mid-flight by a failover.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Event-Driven, AI-Assisted Claims Platform">
+<meta property="og:title" content="Resilience & Disaster Recovery">
+<meta property="og:description" content="Failure domains and RTO/RPO targets, Kafka multi-AZ/region resilience, and how an event-sourced platform recovers in-flight work — including a disbursement saga caught mid-flight by a failover.">
+<meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Resilience-and-Disaster-Recovery.html">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Resilience & Disaster Recovery">
+<meta name="twitter:description" content="Failure domains and RTO/RPO targets, Kafka multi-AZ/region resilience, and how an event-sourced platform recovers in-flight work.">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
+<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+</head>
+<body class="doc" style="--accent:#4f46e5">
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="home" href="index.html">← Claims Platform</a>
+    <span class="crumb">/ <b>Resilience &amp; Disaster Recovery</b></span>
+    <span class="spacer"></span>
+    <span class="accent-chip"></span>
+  </div>
+</div>
+
+<div class="doc-main">
+
+  <div class="doc-cover">
+    <div class="eyebrow">Reference Document</div>
+    <h1>Resilience &amp; Disaster Recovery</h1>
+    <p class="lede">Failure domains, recovery targets, and how an event-sourced platform that moves money survives the loss of a broker, a processor, or a whole region.</p>
+    <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
+  </div>
+
+  <div class="note accent">
+    <strong>The payoff of event sourcing shows up here.</strong> Because the log <em>is</em> the system of record and everything else is a projection of it, most recovery is "replay from a durable log," not "restore a fragile database to a precise point and hope." This document sets the recovery targets, the Kafka durability posture, and — the part that matters most — how in-flight work, including a half-finished payment, comes back cleanly.
+  </div>
+
+  <h1><span class="n">1</span> Failure Domains &amp; Recovery Targets</h1>
+  <h2>Recovery Time Objective (RTO) = how fast service is restored; Recovery Point Objective (RPO) = how much data, in time, can be lost. Set per failure domain, tightest where money and the record live.</h2>
+
+  <table>
+    <tr><th>Failure</th><th>Blast radius</th><th>RTO</th><th>RPO</th><th>How it's met</th></tr>
+    <tr><td>Single broker / one availability zone</td><td>None visible</td><td>~0</td><td>0</td><td>Replication factor 3 across 3 zones, <code>min.insync.replicas=2</code>; producers use <code>acks=all</code>. A lost broker is a non-event.</td></tr>
+    <tr><td>Stream processor crash</td><td>One processor lags briefly</td><td>Seconds</td><td>0</td><td>Restart restores state from its compacted changelog and resumes from its committed offset. Exactly-once means no double effects.</td></tr>
+    <tr><td>Read-model store loss</td><td>That query view is stale/unavailable</td><td>Rebuild time</td><td>0</td><td>Read models are projections — drop and rebuild by replaying the log. No data is lost because none was the source of truth.</td></tr>
+    <tr><td>Poison event / bad deploy</td><td>One consumer group stalls</td><td>Minutes</td><td>0</td><td>Tiered retry → dead-letter queue isolates the bad message; roll back the deploy and replay. The log is untouched.</td></tr>
+    <tr><td>Whole-region loss</td><td>Platform failover</td><td>Minutes–hours</td><td>Near-0</td><td>Standby region fed by asynchronous cluster replication; failover promotes it. RPO equals the replication lag at the moment of loss.</td></tr>
+  </table>
+
+  <div class="note">Targets are tiered on purpose: the money-movement and audit paths get the tightest numbers; a stale dashboard can wait. Spending the same RTO budget everywhere would be over-engineering.</div>
+
+  <h1><span class="n">2</span> Kafka Durability Posture</h1>
+  <table>
+    <tr><th>Control</th><th>Setting</th><th>Why</th></tr>
+    <tr><td>Replication factor</td><td>3, across 3 availability zones</td><td>Survive a broker or a full zone with no data loss.</td></tr>
+    <tr><td>In-sync replicas</td><td><code>min.insync.replicas=2</code> + <code>acks=all</code></td><td>A write is acknowledged only once durably on two zones — no silent loss on a failover.</td></tr>
+    <tr><td>The event log</td><td>Long retention on tiered storage; never compacted</td><td>The full history stays replayable for rebuild and audit (see Event Streaming Architecture).</td></tr>
+    <tr><td>Cross-region</td><td>Asynchronous cluster replication to a standby region</td><td>A regional disaster fails over to a warm copy; async keeps the hot path fast, accepting a small RPO.</td></tr>
+    <tr><td>Backups</td><td>Tiered-storage segments in durable object storage</td><td>The log's older segments already live in cheap, durable storage — that <em>is</em> the backup, and it's replayable.</td></tr>
+  </table>
+
+  <div class="page-break"></div>
+  <h1><span class="n">3</span> Recovering In-Flight Work — Including a Payment</h1>
+  <h2>The hard case: a region fails over while a disbursement is half-done. Because the saga's state is itself a stream of events, recovery is deterministic — and idempotency makes a replay safe.</h2>
+
+  <p>Money movement runs as a saga whose every step is an event on <code>payment.disbursement.v1</code> (<code>scheduled → held → settled / failed</code>). The saga has no hidden in-memory state to lose: on recovery the orchestrator <strong>rehydrates each in-flight payment by replaying its events</strong> and continues from exactly where it stopped — completing the next step or running the compensation. Commands carry <strong>idempotency keys</strong> (<code>cmd.disburse</code>), so even if a step is retried after failover, the downstream treasury/bank rail executes it <em>once</em>. A payment can never go out twice.</p>
+
+  <div class="flow"><span class="m"># A disbursement caught mid-flight by a regional failover</span>
+before:  <span class="y">PaymentScheduled</span> ─► <span class="y">PaymentHeld</span> (OFAC clear, dual-control approved) ─► … <span class="r">REGION LOST</span>
+            │
+            ▼  failover promotes standby region
+recover: orchestrator replays <span class="g">payment.disbursement.v1</span> for this payment_id
+            │   last durable state = <span class="y">PaymentHeld</span>
+            ▼
+         resume: issue <span class="b">cmd.disburse</span> (idempotency_key) ─► treasury executes ONCE ─► <span class="y">PaymentSettled</span>
+            │   (had a debit already happened pre-failover, the key makes the retry a no-op)
+</div>
+
+  <div class="note accent"><strong>Why this is clean and not luck:</strong> the saga state lives in the log, not in a process; recovery is replay, not reconstruction; and idempotency keys make "did that step already happen?" a safe question to get wrong. The same three properties that make the platform auditable make it recoverable.</div>
+
+  <h1><span class="n">4</span> Backups, Replay &amp; Rebuild</h1>
+  <ul>
+    <li><strong>The log is the backup.</strong> Long-retention topics on tiered storage mean a point-in-time rebuild is "replay from offset/timestamp," not a restore-and-pray.</li>
+    <li><strong>Read models are disposable.</strong> Any projection can be dropped and rebuilt from the log; a corrupted view is fixed by redeploying the corrected projector and replaying, never by patching production rows.</li>
+    <li><strong>Snapshots bound the cost.</strong> Aggregate snapshots (compacted changelogs) keep a full rebuild from taking forever — restore the snapshot, replay only events since.</li>
+    <li><strong>Documents &amp; cash live elsewhere.</strong> Large documents sit in the object/ECM store and the actual debit/credit in treasury; their own backup/DR posture is referenced, and Kafka carries only references and settled facts.</li>
+  </ul>
+
+  <h1><span class="n">5</span> Proving It — Drills &amp; Runbooks</h1>
+  <table>
+    <tr><th>Practice</th><th>What it checks</th><th>Cadence</th></tr>
+    <tr><td>Region failover drill</td><td>Standby promotion, RTO/RPO actually met, money-saga resumes correctly</td><td>Quarterly</td></tr>
+    <tr><td>Read-model rebuild drill</td><td>Full replay-and-rebuild completes within its window</td><td>Quarterly</td></tr>
+    <tr><td>Broker / zone chaos test</td><td>No data loss or client-visible impact on a forced broker kill</td><td>Monthly</td></tr>
+    <tr><td>Restore-from-tiered-storage test</td><td>Older log segments are genuinely replayable</td><td>Quarterly</td></tr>
+    <tr><td>Runbooks + game days</td><td>The on-call can actually execute failover/rebuild under pressure</td><td>Ongoing</td></tr>
+  </table>
+
+  <div class="note">A recovery target you have never exercised is a guess. The drills turn the RTO/RPO numbers in §1 from aspirations into measured facts — and surface the runbook gaps before a real incident does. (Ties into the incident process in Observability &amp; Monitoring.)</div>
+
+</div>
+
+<footer>
+  <p>Resilience &amp; Disaster Recovery — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
+</footer>
+
+<script src="app.js" defer></script>
+</body>
+</html>

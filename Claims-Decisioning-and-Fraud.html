@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Claims Decisioning &amp; Fraud — Life &amp; DI Claims Platform</title>
+<title>Claims Decisioning &amp; Fraud — Event-Driven, AI-Assisted Claims Platform</title>
 <link rel="stylesheet" href="styles.css">
 <!--meta:injected-->
-<meta name="description" content="Life &amp; DI Claims Platform — STP Eligibility, Low-Touch Path &amp; SIU Routing">
+<meta name="description" content="Event-Driven, AI-Assisted Claims Platform — STP Eligibility, Low-Touch Path &amp; Fraud Routing">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:site_name" content="Event-Driven, AI-Assisted Claims Platform">
 <meta property="og:title" content="Claims Decisioning &amp; Fraud">
-<meta property="og:description" content="Life &amp; DI Claims Platform — STP Eligibility, Low-Touch Path &amp; SIU Routing">
+<meta property="og:description" content="Event-Driven, AI-Assisted Claims Platform — STP Eligibility, Low-Touch Path &amp; Fraud Routing">
 <meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Claims-Decisioning-and-Fraud.html">
-<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Claims Decisioning &amp; Fraud">
-<meta name="twitter:description" content="Life &amp; DI Claims Platform — STP Eligibility, Low-Touch Path &amp; SIU Routing">
-<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:description" content="Event-Driven, AI-Assisted Claims Platform — STP Eligibility, Low-Touch Path &amp; Fraud Routing">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
 <body class="doc" style="--accent:#d97706">
@@ -35,7 +35,7 @@
 <div class="doc-cover">
   <div class="eyebrow">Reference Document</div>
   <h1>Claims Decisioning &amp; Fraud</h1>
-  <p class="lede">Life &amp; DI Claims Platform — STP Eligibility, Low-Touch Path &amp; SIU Routing</p>
+  <p class="lede">Event-Driven, AI-Assisted Claims Platform — STP Eligibility, Low-Touch Path &amp; Fraud Routing</p>
   <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
 </div>
 
@@ -60,7 +60,7 @@ STP = (policy_in_force × 0.25)<br>
   <tr><td><strong>policy_in_force</strong></td><td>0.25</td><td>0 if lapsed / unresolved; 100 if confirmed in-force on date of loss with premiums current</td></tr>
   <tr><td><strong>coverage_clear</strong></td><td>0.20</td><td>Coverage type clearly covers the claimed event; no riders/exclusions in dispute; not in contestability window</td></tr>
   <tr><td><strong>doc_completeness</strong></td><td>0.20</td><td>% of required documents received and validated (death certificate, proof, beneficiary forms / APS for DI)</td></tr>
-  <tr><td><strong>identity_verified</strong></td><td>0.15</td><td>Claimant &amp; payee IDV/KYC pass; beneficiary designation unambiguous (shares sum to 100%)</td></tr>
+  <tr><td><strong>identity_verified</strong></td><td>0.15</td><td>Claimant &amp; payee identity verification pass; beneficiary designation unambiguous (shares sum to 100%)</td></tr>
   <tr><td><strong>fraud_inverse</strong></td><td>0.10</td><td>100 − fraud risk score (couples the two models so a clean-looking but risky claim can't auto-pass)</td></tr>
   <tr><td><strong>amount_in_band</strong></td><td>0.10</td><td>100 if face/benefit ≤ the auto-approval limit; decays above it (large amounts always get a human)</td></tr>
 </table>
@@ -71,7 +71,7 @@ STP = (policy_in_force × 0.25)<br>
   <tr><td>≥ 85</td><td><span class="tier t-auto">AUTO</span></td><td><strong>Low-touch / auto-ticket.</strong> System adjudicates, emits <code>ClaimAutoApproved</code>, schedules payment, and triggers correspondence — no queue, no human.</td></tr>
   <tr><td>65 – 84</td><td><span class="tier t-assist">ASSISTED</span></td><td>Auto-prepared decision packet routed to a service rep for a one-click confirm; system did the work, human signs off.</td></tr>
   <tr><td>40 – 64</td><td><span class="tier t-std">STANDARD</span></td><td>Full manual adjudication in the worklist; system supplies score breakdown and facts but makes no decision.</td></tr>
-  <tr><td>&lt; 40</td><td><span class="tier t-cx">COMPLEX / SIU</span></td><td>Complex claim — large amount, contestability, or fraud signal. Senior adjudicator and/or SIU. Never automated.</td></tr>
+  <tr><td>&lt; 40</td><td><span class="tier t-cx">COMPLEX / fraud unit</span></td><td>Complex claim — large amount, contestability, or fraud signal. Senior adjudicator and/or fraud unit. Never automated.</td></tr>
 </table>
 
 <div class="note"><strong>Hard overrides (bypass the score):</strong> a claim is forced out of the AUTO/ASSISTED path — regardless of STP score — when any of these is true: within the 2-year <strong>contestability</strong> window (Life), <strong>fraud risk ≥ 60</strong>, face/benefit above the <strong>auto-approval limit</strong>, beneficiary in dispute, or an <strong>OFAC</strong> hit on any party. These are policy, not ML — they are non-negotiable guardrails.</div>
@@ -79,7 +79,7 @@ STP = (policy_in_force × 0.25)<br>
 <!-- FRAUD -->
 <div class="page-break"></div>
 <h1><span class="n">2</span> Fraud Risk Score</h1>
-<h2>A separate weighted score, owned by the Fraud &amp; SIU context, computed by the Flink processor over windowed history.</h2>
+<h2>A separate weighted score, owned by the Fraud &amp; Investigations context, computed by the Flink processor over windowed history.</h2>
 
 <div class="formula" style="color:#e11d48;">
 Fraud = (velocity × 0.25)<br>
@@ -95,7 +95,7 @@ Fraud = (velocity × 0.25)<br>
   <tr><td><strong>contestability_proximity</strong></td><td>0.20</td><td>Claim filed close to policy issue or just inside the contestability window (early-claim risk)</td></tr>
   <tr><td><strong>beneficiary_anomaly</strong></td><td>0.20</td><td>Recent beneficiary change before loss; payee mismatch; bank account shared across unrelated claims</td></tr>
   <tr><td><strong>documentation_inconsistency</strong></td><td>0.20</td><td>Dates / amounts / provider details that don't reconcile across documents; altered-document signals</td></tr>
-  <tr><td><strong>external_signal</strong></td><td>0.15</td><td>Industry data hit (e.g. MIB), watchlist, DMF mismatch on date of death, or known-fraud network link</td></tr>
+  <tr><td><strong>external_signal</strong></td><td>0.15</td><td>Industry data hit (e.g. MIB), watchlist, Death Master File mismatch on date of death, or known-fraud network link</td></tr>
 </table>
 
 <h3>Fraud tiers &amp; actions</h3>
@@ -103,15 +103,15 @@ Fraud = (velocity × 0.25)<br>
   <tr><th>Fraud Score</th><th>Tier</th><th>Action</th></tr>
   <tr><td>&lt; 30</td><td><span class="tier t-auto">LOW</span></td><td>No action; <code>fraud_inverse</code> feeds STP normally</td></tr>
   <tr><td>30 – 59</td><td><span class="tier t-std">ELEVATED</span></td><td>Flag for adjudicator attention; suppresses AUTO tier but allows ASSISTED with review</td></tr>
-  <tr><td>60 – 84</td><td><span class="tier t-cx">HIGH</span></td><td><strong>SIU referral</strong> (<code>SiuReferred</code>); claim blocked from any automated path; payment hold applied</td></tr>
-  <tr><td>≥ 85</td><td><span class="tier t-cx">CRITICAL</span></td><td>Immediate SIU + compliance notification; payment hard-held pending <code>SiuCleared</code></td></tr>
+  <tr><td>60 – 84</td><td><span class="tier t-cx">HIGH</span></td><td><strong>fraud unit referral</strong> (<code>SiuReferred</code>); claim blocked from any automated path; payment hold applied</td></tr>
+  <tr><td>≥ 85</td><td><span class="tier t-cx">CRITICAL</span></td><td>Immediate fraud unit + compliance notification; payment hard-held pending <code>SiuCleared</code></td></tr>
 </table>
 
 <h1><span class="n">3</span> Rules First, ML Later</h1>
 <table>
   <tr><th>Phase</th><th>Decisioning</th><th>Fraud</th><th>Why</th></tr>
   <tr><td>At launch</td><td>Deterministic weighted rules (the formulas above), tuned with adjudicators</td><td>Rule-based signals + external data hits</td><td>Explainable from day one; regulators and adjudicators can audit every decision. No training data yet.</td></tr>
-  <tr><td>Once labeled history exists</td><td>ML propensity replaces the soft factors; hard guardrails stay as rules</td><td>Supervised fraud model trained on a meaningful stretch of labeled SIU outcomes</td><td>Enough labeled history to train without noise. Guardrails never move to ML — they must stay auditable.</td></tr>
+  <tr><td>Once labeled history exists</td><td>ML propensity replaces the soft factors; hard guardrails stay as rules</td><td>Supervised fraud model trained on a meaningful stretch of labeled fraud unit outcomes</td><td>Enough labeled history to train without noise. Guardrails never move to ML — they must stay auditable.</td></tr>
 </table>
 
 <div class="note"><strong>Design principle — never let ML decide a denial alone.</strong> ML can <em>raise</em> a claim out of the low-touch path (more scrutiny) but cannot be the sole basis of a denial. A denial always cites a coded reason mapped to a policy provision, decided by a human with authority. This keeps the platform defensible under UCSPA and state market-conduct exams.</div>
@@ -146,7 +146,7 @@ Fraud = (velocity × 0.25)<br>
 <table>
   <tr><th>Rule</th><th>Effect</th></tr>
   <tr><td>Contestability window (Life, ≤ 2 yr)</td><td>Suppress AUTO/ASSISTED; force CONTESTABILITY_REVIEW</td></tr>
-  <tr><td>Fraud risk ≥ 60</td><td>Suppress all automation; SIU referral + payment hold</td></tr>
+  <tr><td>Fraud risk ≥ 60</td><td>Suppress all automation; fraud unit referral + payment hold</td></tr>
   <tr><td>Amount &gt; auto-approval limit</td><td>Suppress AUTO; route to senior adjudicator</td></tr>
   <tr><td>OFAC / sanctions hit on any party</td><td>Suppress everything; compliance hold</td></tr>
   <tr><td>Beneficiary designation in dispute</td><td>Suppress payment; route to legal/benefits review</td></tr>
@@ -157,15 +157,15 @@ Fraud = (velocity × 0.25)<br>
 <table>
   <tr><th>Metric</th><th>Target</th><th>Meaning</th></tr>
   <tr><td>STP rate (auto + assisted)</td><td>40–55% of eligible claims as the low-touch path matures</td><td>Share of clean claims handled with little/no manual adjudication</td></tr>
-  <tr><td>Auto-decision latency (p95)</td><td>&lt; 5 seconds end-to-end</td><td>FNOL → decision for low-touch claims</td></tr>
+  <tr><td>Auto-decision latency (p95)</td><td>&lt; 5 seconds end-to-end</td><td>first notice of loss → decision for low-touch claims</td></tr>
   <tr><td>False-auto rate</td><td>&lt; 0.5%</td><td>Auto-approved claims later found to need review (the number to never let creep)</td></tr>
-  <tr><td>SIU hit rate on referrals</td><td>Track &amp; tune</td><td>If too low, the fraud threshold is over-referring and burning investigator time</td></tr>
+  <tr><td>fraud unit hit rate on referrals</td><td>Track &amp; tune</td><td>If too low, the fraud threshold is over-referring and burning investigator time</td></tr>
 </table>
 
 </div>
 
 <footer>
-  <p>Claims Decisioning &amp; Fraud — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Claims Decisioning &amp; Fraud — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

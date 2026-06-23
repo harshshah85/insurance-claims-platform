@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Event Streaming Architecture — Life &amp; DI Claims Platform</title>
+<title>Event Streaming Architecture — Event-Driven, AI-Assisted Claims Platform</title>
 <link rel="stylesheet" href="styles.css">
 <!--meta:injected-->
 <meta name="description" content="Topic design, event contracts &amp; stream topology — the Kafka backbone that carries every claim from filing to payment.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:site_name" content="Event-Driven, AI-Assisted Claims Platform">
 <meta property="og:title" content="Event Streaming Architecture">
 <meta property="og:description" content="Topic design, event contracts &amp; stream topology — the Kafka backbone that carries every claim from filing to payment.">
 <meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Event-Streaming-Architecture.html">
-<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Event Streaming Architecture">
 <meta name="twitter:description" content="Topic design, event contracts &amp; stream topology — the Kafka backbone that carries every claim from filing to payment.">
-<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
 <body class="doc" style="--accent:#0d9488">
@@ -52,12 +52,12 @@
 
   <table>
     <tr><th>Bounded Context</th><th>Domain Events (past-tense facts)</th></tr>
-    <tr><td><strong>Intake &amp; FNOL</strong></td><td><code>ClaimNotified</code>, <code>FnolCaptured</code>, <code>IntakeValidated</code> <span class="m">(channel is captured as a field on <code>FnolCaptured</code>)</span></td></tr>
+    <tr><td><strong>Intake &amp; Claim Filing</strong></td><td><code>ClaimNotified</code>, <code>FnolCaptured</code>, <code>IntakeValidated</code> <span class="m">(channel is captured as a field on <code>FnolCaptured</code>)</span></td></tr>
     <tr><td><strong>Policy &amp; Coverage</strong></td><td><code>PolicyResolved</code>, <code>PolicyUnresolved</code> (quarantine), <code>CoverageConfirmed</code>, <code>ContestabilityFlagged</code></td></tr>
     <tr><td><strong>Party &amp; Identity</strong></td><td><code>ClaimantRegistered</code>, <code>BeneficiaryIdentified</code>, <code>IdentityVerified</code>, <code>IdentityChallenged</code></td></tr>
     <tr><td><strong>Requirements</strong></td><td><code>RequirementRaised</code>, <code>RequirementSatisfied</code>, <code>RequirementOverdue</code> <span class="m">(a waiver is a <code>RequirementSatisfied</code> with reason)</span></td></tr>
     <tr><td><strong>Adjudication &amp; Decisioning</strong></td><td><code>StpEligibilityScored</code>, <code>ClaimAutoApproved</code>, <code>ClaimApproved</code>, <code>ClaimDenied</code>, <code>ClaimPended</code>, <code>DecisionReversed</code></td></tr>
-    <tr><td><strong>Fraud &amp; SIU</strong></td><td><code>FraudScored</code>, <code>SiuReferred</code>, <code>SiuCleared</code>, <code>SiuSubstantiated</code></td></tr>
+    <tr><td><strong>Fraud &amp; Investigations</strong></td><td><code>FraudScored</code>, <code>SiuReferred</code>, <code>SiuCleared</code>, <code>SiuSubstantiated</code></td></tr>
     <tr><td><strong>Disability Management</strong></td><td><code>BenefitPeriodOpened</code>, <code>RecertificationDue</code>, <code>RecertificationReceived</code>, <code>ReturnToWorkRecorded</code>, <code>BenefitOffsetApplied</code>, <code>BenefitEnded</code></td></tr>
     <tr><td><strong>Payments &amp; Money Movement</strong></td><td><code>PaymentScheduled</code>, <code>PaymentHeld</code>, <code>PaymentSettled</code>, <code>PaymentFailed</code></td></tr>
     <tr><td><strong>Correspondence</strong></td><td><code>CorrespondenceRequested</code>, <code>CorrespondenceDelivered</code> <span class="m">(inbound variants share the topic)</span></td></tr>
@@ -76,15 +76,15 @@
     <tr><td><code>claims.lifecycle.v1</code></td><td>Event</td><td>claim_id</td><td>24</td><td>∞ retain · tiered</td><td>Claim aggregate state transitions (the event-sourced log — full history, never compacted)</td></tr>
     <tr><td><code>claims.requirements.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>30d delete</td><td>Outstanding requirement raised / satisfied (docs, forms, proof)</td></tr>
     <tr><td><code>claims.decision.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>7y retain · tiered</td><td>Adjudication outcomes: approved / denied / pended / reversed / STP auto-decision</td></tr>
-    <tr><td><code>claims.fraud.scored.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>90d delete</td><td>Fraud risk scores and SIU referral signals</td></tr>
+    <tr><td><code>claims.fraud.scored.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>90d delete</td><td>Fraud risk scores and fraud unit referral signals</td></tr>
     <tr><td><code>policy.snapshot.v1</code></td><td>Event (CDC)</td><td>policy_id</td><td>24</td><td>compact</td><td>Policy Admin CDC: in-force, coverage, contestability, beneficiaries</td></tr>
-    <tr><td><code>party.identity.v1</code></td><td>Event</td><td>party_id</td><td>12</td><td>compact</td><td>Claimant / beneficiary identity &amp; verification (IDV/KYC) results</td></tr>
-    <tr><td><code>di.benefit.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>7y retain · tiered</td><td>DI recurring benefit periods, recertification, RTW, offsets</td></tr>
+    <tr><td><code>party.identity.v1</code></td><td>Event</td><td>party_id</td><td>12</td><td>compact</td><td>Claimant / beneficiary identity &amp; verification (identity verification) results</td></tr>
+    <tr><td><code>di.benefit.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>7y retain · tiered</td><td>DI recurring benefit periods, recertification, return-to-work, offsets</td></tr>
     <tr><td><code>correspondence.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>90d delete</td><td>Inbound &amp; outbound correspondence facts across all channels</td></tr>
     <tr><td><code>payment.disbursement.v1</code></td><td>Event</td><td>payment_id</td><td>12</td><td>7y retain · tiered</td><td>Money-movement saga events: scheduled → held → settled / failed</td></tr>
     <tr><td><code>cmd.adjudicate.v1</code></td><td>Command</td><td>claim_id</td><td>12</td><td>3d delete</td><td>Requests to (re)run adjudication for a claim</td></tr>
     <tr><td><code>cmd.disburse.v1</code></td><td>Command</td><td>payment_id</td><td>6</td><td>3d delete</td><td>Idempotent disbursement commands into the payment saga</td></tr>
-    <tr><td><code>claims.dlq.v1</code></td><td>Infra (DLQ)</td><td>original_key</td><td>6</td><td>14d delete</td><td>Poison / unprocessable events, with failure metadata headers</td></tr>
+    <tr><td><code>claims.dlq.v1</code></td><td>Infra (dead-letter queue)</td><td>original_key</td><td>6</td><td>14d delete</td><td>Poison / unprocessable events, with failure metadata headers</td></tr>
     <tr><td><code>claims.retry.5m.v1</code></td><td>Infra (retry)</td><td>original_key</td><td>6</td><td>1d delete</td><td>Tiered retry topic (5m); siblings at 1m / 30m by convention</td></tr>
   </table>
 
@@ -105,7 +105,7 @@
   <h2>An event is a contract: a shared envelope wrapping a versioned Avro payload, governed by a Schema Registry. Getting the contract right is what lets dozens of independent consumers read the same stream for years without breaking.</h2>
 
   <h3>Canonical event envelope</h3>
-  <p>Every event shares a CloudEvents-style envelope so consumers, the DLQ, and the audit store can treat all 36 event types uniformly. The domain payload is nested under <code>data</code>.</p>
+  <p>Every event shares a CloudEvents-style envelope so consumers, the dead-letter queue, and the audit store can treat all 36 event types uniformly. The domain payload is nested under <code>data</code>.</p>
   <pre><span class="c">// envelope is identical across all 36 event types</span>
 {
   <span class="k">"id"</span>: <span class="s">"01HZX9...ULID"</span>,                <span class="c">// globally unique, sortable</span>
@@ -169,7 +169,7 @@
     <tr><td><code>claim_summary</code></td><td>Relational DB</td><td>claims.lifecycle, decision, payment</td><td>Client portal + advisor desktop claim view</td></tr>
     <tr><td><code>advisor_worklist</code></td><td>Search index</td><td>claims.lifecycle, requirements</td><td>Service-rep / advisor task queues, search</td></tr>
     <tr><td><code>di_benefit_ledger</code></td><td>Relational DB</td><td>di.benefit.v1</td><td>Recurring DI benefit schedule &amp; history</td></tr>
-    <tr><td><code>fraud_case_view</code></td><td>Key-value store</td><td>claims.fraud.scored, lifecycle</td><td>SIU case management UI</td></tr>
+    <tr><td><code>fraud_case_view</code></td><td>Key-value store</td><td>claims.fraud.scored, lifecycle</td><td>fraud unit case management UI</td></tr>
     <tr><td><code>payment_ledger</code></td><td>Relational DB</td><td>payment.disbursement.v1</td><td>Treasury reconciliation &amp; 1099-R reporting</td></tr>
   </table>
 
@@ -197,7 +197,7 @@ Intake Service  ─►  BEGIN TX
   </div>
 
   <h3>Poison-message handling</h3>
-  <p>A consumer that cannot process an event retries with backoff via the tiered retry topics (<code>claims.retry.1m/5m/30m</code>). After the final tier it lands in <code>claims.dlq.v1</code> with failure headers (<code>x-exception</code>, <code>x-original-topic</code>, <code>x-retry-count</code>). The DLQ is monitored (see Observability) and drained by an operator tool, never auto-replayed blindly.</p>
+  <p>A consumer that cannot process an event retries with backoff via the tiered retry topics (<code>claims.retry.1m/5m/30m</code>). After the final tier it lands in <code>claims.dlq.v1</code> with failure headers (<code>x-exception</code>, <code>x-original-topic</code>, <code>x-retry-count</code>). The dead-letter queue is monitored (see Observability) and drained by an operator tool, never auto-replayed blindly.</p>
 
   <!-- 6. TOPOLOGY -->
   <div class="page-break"></div>
@@ -229,7 +229,7 @@ Intake Service  ─►  BEGIN TX
 </div>
 
 <footer>
-  <p>Event Streaming Architecture — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Event Streaming Architecture — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

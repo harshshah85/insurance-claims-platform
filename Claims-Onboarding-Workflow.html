@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Claims Onboarding Workflow — Life &amp; DI Claims Platform</title>
+<title>Claims Onboarding Workflow — Event-Driven, AI-Assisted Claims Platform</title>
 <link rel="stylesheet" href="styles.css">
 <!--meta:injected-->
-<meta name="description" content="Life &amp; DI Claims Platform — New Product &amp; New Claim Intake Onboarding">
+<meta name="description" content="Event-Driven, AI-Assisted Claims Platform — New Product &amp; New Claim Intake Onboarding">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:site_name" content="Event-Driven, AI-Assisted Claims Platform">
 <meta property="og:title" content="Claims Onboarding Workflow">
-<meta property="og:description" content="Life &amp; DI Claims Platform — New Product &amp; New Claim Intake Onboarding">
+<meta property="og:description" content="Event-Driven, AI-Assisted Claims Platform — New Product &amp; New Claim Intake Onboarding">
 <meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Claims-Onboarding-Workflow.html">
-<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Claims Onboarding Workflow">
-<meta name="twitter:description" content="Life &amp; DI Claims Platform — New Product &amp; New Claim Intake Onboarding">
-<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:description" content="Event-Driven, AI-Assisted Claims Platform — New Product &amp; New Claim Intake Onboarding">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
 <body class="doc" style="--accent:#7c3aed">
@@ -35,12 +35,12 @@
 <div class="doc-cover">
   <div class="eyebrow">Reference Document</div>
   <h1>Claims Onboarding Workflow</h1>
-  <p class="lede">Life &amp; DI Claims Platform — New Product &amp; New Claim Intake Onboarding</p>
+  <p class="lede">Event-Driven, AI-Assisted Claims Platform — New Product &amp; New Claim Intake Onboarding</p>
   <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
 </div>
 
 <div class="note">
-  <strong>Two kinds of onboarding.</strong> <em>Scenario A</em> — onboarding a <strong>new product / plan</strong> (a new Life or DI product that can now be claimed against): a one-time engineering/config exercise. <em>Scenario B</em> — onboarding a <strong>new claim</strong> at intake (FNOL): the high-volume, per-claim runtime flow. They share the platform but differ entirely in cadence and who does the work.
+  <strong>Two kinds of onboarding.</strong> <em>Scenario A</em> — onboarding a <strong>new product / plan</strong> (a new Life or DI product that can now be claimed against): a one-time engineering/config exercise. <em>Scenario B</em> — onboarding a <strong>new claim</strong> at intake (first notice of loss): the high-volume, per-claim runtime flow. They share the platform but differ entirely in cadence and who does the work.
 </div>
 
 <h1><span class="n">1</span> Scenario A — New Product / Plan Onboarding</h1>
@@ -58,7 +58,7 @@
 
 <!-- SCENARIO B -->
 <div class="page-break"></div>
-<h1><span class="n">2</span> Scenario B — New Claim Intake (FNOL)</h1>
+<h1><span class="n">2</span> Scenario B — New Claim Intake</h1>
 <h2>Per-claim, high-volume, mostly automated. This is the runtime onboarding of a claim into the platform.</h2>
 
 <div class="flow">
@@ -82,18 +82,18 @@
 <h3>Automated vs. manual at intake</h3>
 <table>
   <tr><th>Step</th><th>Mode</th><th>Human touch when…</th></tr>
-  <tr><td>FNOL capture</td><td><span class="auto">Automated</span></td><td>IVR/phone intake transcribed by a service rep</td></tr>
+  <tr><td>first notice of loss capture</td><td><span class="auto">Automated</span></td><td>IVR/phone intake transcribed by a service rep</td></tr>
   <tr><td>Policy resolution</td><td><span class="auto">Automated</span></td><td>Policy number unresolved → quarantine recovery</td></tr>
-  <tr><td>Identity verification</td><td><span class="auto">Automated</span></td><td>IDV challenge / document mismatch</td></tr>
+  <tr><td>Identity verification</td><td><span class="auto">Automated</span></td><td>identity verification challenge / document mismatch</td></tr>
   <tr><td>Requirement raising</td><td><span class="auto">Automated</span></td><td>Non-standard requirement judgment</td></tr>
   <tr><td>STP &amp; fraud scoring</td><td><span class="auto">Automated</span></td><td>Never manual — but low scores route to humans</td></tr>
-  <tr><td>Decision</td><td><span class="auto">Auto if STP ≥ 85</span></td><td>Assisted / standard / complex / SIU otherwise</td></tr>
+  <tr><td>Decision</td><td><span class="auto">Auto if STP ≥ 85</span></td><td>Assisted / standard / complex / fraud unit otherwise</td></tr>
 </table>
 
 <div class="note"><strong>Agent assist at intake.</strong> Several of the "automated" steps are now <strong>agent-assisted</strong>: document auto-classification &amp; extraction (the Document Intelligence agent) and requirement prediction — asking only for what a claim actually needs — draft onto <code>claims.ai.v1</code> for confirmation. The agents speed intake; a human still confirms anything they surface, and decision authority is unchanged. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)</div>
 
 <h1><span class="n">3</span> Quarantine Recovery (Unresolved Policy)</h1>
-<p>An FNOL whose policy number can't be resolved against <code>policy.snapshot.v1</code> is <strong>quarantined, never dropped</strong> — the claimant has already been told their claim is received, so losing it is unacceptable.</p>
+<p>An first notice of loss whose policy number can't be resolved against <code>policy.snapshot.v1</code> is <strong>quarantined, never dropped</strong> — the claimant has already been told their claim is received, so losing it is unacceptable.</p>
 <div class="flow">
 <span class="r">PolicyUnresolved</span> ─► quarantine read model (claim is live, status "in research")
    ├─ <span class="g">[auto]</span> re-attempt match on each <span class="y">policy.snapshot.v1</span> update (late CDC, fuzzy match on name/DOB)
@@ -102,10 +102,10 @@
 </div>
 <div class="note"><strong>Why this matters:</strong> in Life claims the most common quarantine cause is a beneficiary who has the policy number slightly wrong or only knows the insured's name. The recovery flow keeps the regulatory acknowledgement clock honest while research happens in the background — the claim is never silently stuck.</div>
 
-<h1><span class="n">4</span> Self-Service FNOL — the Later Vision</h1>
+<h1><span class="n">4</span> Self-Service Intake — the Later Vision</h1>
 <table>
   <tr><th>Capability</th><th>Now</th><th>Later (with ML)</th></tr>
-  <tr><td>Intake</td><td>Guided forms per channel</td><td>Conversational / assisted FNOL; document auto-classification &amp; extraction</td></tr>
+  <tr><td>Intake</td><td>Guided forms per channel</td><td>Conversational / assisted first notice of loss; document auto-classification &amp; extraction</td></tr>
   <tr><td>Requirements</td><td>Templated per product</td><td>Predicted per claim — only ask for what's actually needed</td></tr>
   <tr><td>Status</td><td>Read-model status view</td><td>Proactive, plain-language nudges to client &amp; advisor</td></tr>
   <tr><td>Quarantine</td><td>Auto-retry + rep escalation</td><td>ML entity-resolution to auto-match more unresolved policies</td></tr>
@@ -116,7 +116,7 @@
 </div>
 
 <footer>
-  <p>Claims Onboarding Workflow — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Claims Onboarding Workflow — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI-Assisted &amp; Agentic Decisioning — Life &amp; DI Claims Platform</title>
+<title>AI-Assisted &amp; Agentic Decisioning — Event-Driven, AI-Assisted Claims Platform</title>
 <link rel="stylesheet" href="styles.css">
 <!--meta:injected-->
-<meta name="description" content="Life &amp; DI Claims Platform — Where AI Helps, Where a Person Decides, and Where It Hands Off">
+<meta name="description" content="Event-Driven, AI-Assisted Claims Platform — Where AI Helps, Where a Person Decides, and Where It Hands Off">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:site_name" content="Event-Driven, AI-Assisted Claims Platform">
 <meta property="og:title" content="AI-Assisted &amp; Agentic Decisioning">
-<meta property="og:description" content="Life &amp; DI Claims Platform — Where AI Helps, Where a Person Decides, and Where It Hands Off">
+<meta property="og:description" content="Event-Driven, AI-Assisted Claims Platform — Where AI Helps, Where a Person Decides, and Where It Hands Off">
 <meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/AI-Agentic-Decisioning.html">
-<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AI-Assisted &amp; Agentic Decisioning">
-<meta name="twitter:description" content="Life &amp; DI Claims Platform — Where AI Helps, Where a Person Decides, and Where It Hands Off">
-<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:description" content="Event-Driven, AI-Assisted Claims Platform — Where AI Helps, Where a Person Decides, and Where It Hands Off">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
 <body class="doc" style="--accent:#0ea5e9">
@@ -35,7 +35,7 @@
 <div class="doc-cover">
   <div class="eyebrow">Reference Document</div>
   <h1>AI-Assisted &amp; Agentic Decisioning</h1>
-  <p class="lede">Life &amp; DI Claims Platform — Where AI Helps, Where a Person Decides, and Where It Hands Off</p>
+  <p class="lede">Event-Driven, AI-Assisted Claims Platform — Where AI Helps, Where a Person Decides, and Where It Hands Off</p>
   <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
 </div>
 
@@ -84,11 +84,11 @@
 
 <table>
   <tr><th>Agent</th><th>Bounded context</th><th>Emits</th><th>Authority</th></tr>
-  <tr><td><strong>Intake &amp; Triage</strong></td><td>Intake / FNOL</td><td><code>ClaimFactsExtracted</code></td><td>Drafts facts only</td></tr>
+  <tr><td><strong>Intake &amp; Triage</strong></td><td>Intake / first notice of loss</td><td><code>ClaimFactsExtracted</code></td><td>Drafts facts only</td></tr>
   <tr><td><strong>Document Intelligence</strong></td><td>Requirements / Documents</td><td><code>DocFindings</code></td><td>Drafts findings only</td></tr>
   <tr><td><strong>Policy &amp; Coverage</strong></td><td>Policy / Coverage</td><td><code>CoverageFindings</code></td><td>Reads CDC model; asserts nothing it can't ground</td></tr>
   <tr><td><strong>Decisioning</strong></td><td>Decisioning</td><td><code>DecisionProposed</code></td><td>Proposes; never the final authority</td></tr>
-  <tr><td><strong>Fraud / SIU copilot</strong></td><td>Fraud &amp; SIU</td><td><code>FraudNarrativeDrafted</code></td><td>Assists the investigator</td></tr>
+  <tr><td><strong>Fraud copilot</strong></td><td>Fraud &amp; Investigations</td><td><code>FraudNarrativeDrafted</code></td><td>Assists the investigator</td></tr>
   <tr><td><strong>Correspondence</strong></td><td>Correspondence</td><td><code>LetterDrafted</code></td><td>Drafts; a human releases</td></tr>
 </table>
 
@@ -102,7 +102,7 @@
 <table>
   <tr><th>Capability</th><th>Type</th><th>Used by</th><th>Notes</th></tr>
   <tr><td>Policy-admin read-model lookup</td><td><span class="pill p-tool">tool</span></td><td>Policy, Decisioning</td><td>Reads the CDC projection; never writes</td></tr>
-  <tr><td>OFAC / watchlist / DMF / industry-data screening</td><td><span class="pill p-tool">tool</span></td><td>Fraud, Decisioning</td><td>Deterministic match; a hit is a hard guardrail</td></tr>
+  <tr><td>OFAC / watchlist / Death Master File / industry-data screening</td><td><span class="pill p-tool">tool</span></td><td>Fraud, Decisioning</td><td>Deterministic match; a hit is a hard guardrail</td></tr>
   <tr><td>Payment / disbursement saga initiation</td><td><span class="pill p-tool">tool</span></td><td>Decisioning</td><td><strong>Human-gated</strong> above the auto-approval limit</td></tr>
   <tr><td>Document extraction (OCR + structured pull)</td><td><span class="pill p-skill">skill</span></td><td>Document Intelligence</td><td>Every field carries a source citation</td></tr>
   <tr><td>Cross-document reconciliation</td><td><span class="pill p-skill">skill</span></td><td>Document Intelligence</td><td>Dates / amounts / providers must agree</td></tr>
@@ -122,7 +122,7 @@
   <tr><td><span class="tier t-auto">AUTO &nbsp;≥ 85</span></td><td>Prepares the full packet; rules + scores make the auto-ticket call inside the guardrails</td><td><strong>No per-claim human.</strong> But: a confidence floor is required, the AI can never deny, and a <strong>sampled share is pulled for human QA</strong> to catch drift</td></tr>
   <tr><td><span class="tier t-assist">ASSISTED &nbsp;65–84</span></td><td>Delivers a complete decision packet — recommendation, evidence, citations, confidence</td><td><strong>One-click confirm or correct.</strong> This is the core "review the AI's findings, then approve" loop</td></tr>
   <tr><td><span class="tier t-std">STANDARD &nbsp;40–64</span></td><td>Copilot — extracts, summarizes, surfaces the facts and the score breakdown</td><td>Human adjudicates fully; the AI is assist-only</td></tr>
-  <tr><td><span class="tier t-cx">COMPLEX / SIU &nbsp;&lt; 40</span></td><td>Assembles the narrative and the evidence pack</td><td>Senior adjudicator / SIU decide; the AI never automates any part</td></tr>
+  <tr><td><span class="tier t-cx">COMPLEX / fraud unit &nbsp;&lt; 40</span></td><td>Assembles the narrative and the evidence pack</td><td>Senior adjudicator / fraud unit decide; the AI never automates any part</td></tr>
   <tr><td colspan="3" style="background:#fff5f5;"><strong>Any denial</strong> — the AI may draft the coded reason and rationale, but a <span class="manual">human with authority</span> always makes the call. ML can <em>raise</em> a claim out of the low-touch path; it can never be the sole basis of a denial. &nbsp; <strong>Money movement</strong> — the AI proposes; a human approves above threshold and the disbursement saga is unchanged (dual control stays).</td></tr>
 </table>
 
@@ -156,7 +156,36 @@
   <tr><td><strong>Evaluation + sampled QA</strong></td><td>An offline evaluation harness plus a sampled human QA on the AUTO lane watches for drift; <code>false-auto rate</code> stays the number we never let creep.</td></tr>
 </table>
 
-<h1><span class="n">7</span> Sample AI Events</h1>
+<div class="page-break"></div>
+<h1><span class="n">7</span> Evaluation &amp; the Feedback Flywheel</h1>
+<h2>What makes the reasoning layer get better over time — and the governance that keeps "better" from quietly meaning "more autonomous."</h2>
+
+<p>Every human decision is also a label. When an adjudicator confirms or corrects an ASSISTED packet, or decides a STANDARD claim outright, that outcome lands on <code>claims.decision.v1</code> next to the agent's recommendation — a clean, growing set of <em>model-said / human-did</em> pairs. That set is the flywheel: it trains the next fraud and auto-ticket models and scores the next version of the agents.</p>
+
+<div class="flow"><span class="m"># The feedback flywheel</span>
+human decision (confirm · correct · decide)  ──►  <span class="g">claims.decision.v1</span>  (paired with the agent's <span class="b">claims.ai.v1</span> recommendation)
+        │
+        ▼  labeled model-said / human-did outcomes
+   training &amp; evaluation sets  ──►  candidate model / prompt version
+        │
+        ▼  <span class="y">offline eval on a golden set</span>  (accuracy vs human · grounding · abstention precision · false-auto rate)
+        │      must clear thresholds to ship
+        ▼
+   <span class="g">shadow</span> ──► <span class="g">canary</span> ──► <span class="g">full</span>   (online: grounding rate · packet acceptance · abstention precision · p95)
+        │
+        ▼
+   better recommendations next time  <span class="m">— NOT more autonomy (that is a separate, governed step)</span>
+</div>
+
+<h3>Offline evaluation — earn the right to ship</h3>
+<p>A curated <strong>golden set</strong> of historical claims with known-correct outcomes is the gate. Every candidate model or prompt version is scored against it before it can reach production — accuracy versus the human decision, grounding rate (every finding cited), abstention precision and recall (does it decline the right ones), and the <code>false-auto rate</code> that the AUTO lane never lets creep. Prompts and models are <strong>versioned artifacts</strong>, and the version is already stamped on every <code>claims.ai.v1</code> event, so any recommendation is reproducible.</p>
+
+<h3>Online — watch, roll out, roll back</h3>
+<p>A passing version rolls out <strong>shadow → canary → full</strong>, watched on the same metrics surfaced in Observability (grounding rate, packet-acceptance rate, abstention precision, agent p95). Any regression rolls back instantly — a config flip, because the model is a swappable dependency, not baked in.</p>
+
+<div class="key"><strong>The flywheel feeds quality, not authority.</strong> More labels make the recommendations sharper; they do <em>not</em> let the model start deciding on its own. Today a human is the decision-maker on every AI-touched claim. Moving a claim class from "recommend" to "decide" is a deliberate, governed, one-directional step — evidence from this very flywheel is what justifies it, but the promotion is a human sign-off, never an automatic consequence of a good evaluation. (See ADR-06 and the maturity path in §1.)</div>
+
+<h1><span class="n">8</span> Sample AI Events</h1>
 <p>The decisioning agent's proposed packet for an ASSISTED-tier Life claim. It carries the rationale, the per-factor citations, and a confidence, so the human review is just consuming and acting on it — and the reasoning is preserved in the log forever.</p>
 <pre>{
   <span class="k">"type"</span>: <span class="s">"claims.ai.DecisionProposed"</span>,
@@ -191,7 +220,7 @@
   }
 }</pre>
 
-<h1><span class="n">8</span> What Good Looks Like</h1>
+<h1><span class="n">9</span> What Good Looks Like</h1>
 <table>
   <tr><th>Metric</th><th>Target</th><th>Meaning</th></tr>
   <tr><td>Packet acceptance rate (ASSISTED)</td><td>High &amp; rising</td><td>Share of AI decision packets a human confirms with no correction — the trust signal</td></tr>
@@ -204,7 +233,7 @@
 </div>
 
 <footer>
-  <p>AI-Assisted &amp; Agentic Decisioning — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>AI-Assisted &amp; Agentic Decisioning — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

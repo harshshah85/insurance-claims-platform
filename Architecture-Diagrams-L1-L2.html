@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Architecture Diagrams L1 &amp; L2 — Life &amp; DI Claims Platform</title>
+<title>Architecture Diagrams L1 &amp; L2 — Event-Driven, AI-Assisted Claims Platform</title>
 <link rel="stylesheet" href="styles.css">
 <!--meta:injected-->
 <meta name="description" content="System context, container diagrams &amp; a phased rollout — the platform from the outside in, then opened up into its runtime pieces.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:site_name" content="Event-Driven, AI-Assisted Claims Platform">
 <meta property="og:title" content="Architecture Diagrams L1 &amp; L2">
 <meta property="og:description" content="System context, container diagrams &amp; a phased rollout — the platform from the outside in, then opened up into its runtime pieces.">
 <meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Architecture-Diagrams-L1-L2.html">
-<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Architecture Diagrams L1 &amp; L2">
 <meta name="twitter:description" content="System context, container diagrams &amp; a phased rollout — the platform from the outside in, then opened up into its runtime pieces.">
-<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
 <body class="doc" style="--accent:#e11d48">
@@ -62,15 +62,15 @@
 
   <table>
     <tr><th>External Actor / System</th><th>Relationship</th></tr>
-    <tr><td><strong>Client</strong></td><td>Files FNOL across channels; tracks status; receives correspondence &amp; payment</td></tr>
+    <tr><td><strong>Client</strong></td><td>Files first notice of loss across channels; tracks status; receives correspondence &amp; payment</td></tr>
     <tr><td><strong>Advisor</strong></td><td>Files/assists on behalf of clients; sees their book's claims; nudges requirements</td></tr>
-    <tr><td><strong>Service Rep</strong></td><td>Works the human-touch queue; handles inbound calls; resolves NIGO items; one-click confirms or corrects agent-drafted packets on assisted claims</td></tr>
-    <tr><td><strong>Adjudicator / SIU</strong></td><td><strong>Reviews and approves (or overrides) agent-drafted recommendations and holds decision authority</strong>; decisions standard/complex claims; investigates referred fraud cases</td></tr>
+    <tr><td><strong>Service Rep</strong></td><td>Works the human-touch queue; handles inbound calls; resolves not-in-good-order items; one-click confirms or corrects agent-drafted packets on assisted claims</td></tr>
+    <tr><td><strong>Adjudicator / fraud unit</strong></td><td><strong>Reviews and approves (or overrides) agent-drafted recommendations and holds decision authority</strong>; decisions standard/complex claims; investigates referred fraud cases</td></tr>
     <tr><td><strong>Policy Admin System</strong></td><td>Golden record for policy in-force, coverage, contestability, beneficiaries — consumed via Kafka Connect CDC</td></tr>
     <tr><td><strong>Treasury / Disbursement</strong></td><td>Executes the actual debit/credit on the bank rail; the cash ledger of record</td></tr>
     <tr><td><strong>Document / ECM Store</strong></td><td>Stores death certificates, APS, medical records; events carry references + hashes</td></tr>
-    <tr><td><strong>Fraud / External Data</strong></td><td>MIB, Death Master File (DMF), watchlists, known-fraud networks</td></tr>
-    <tr><td><strong>Identity / KYC Provider</strong></td><td>Verifies claimant &amp; payee identity (IDV/KYC)</td></tr>
+    <tr><td><strong>Fraud / External Data</strong></td><td>MIB, Death Master File, watchlists, known-fraud networks</td></tr>
+    <tr><td><strong>Identity / identity verification Provider</strong></td><td>Verifies claimant &amp; payee identity (identity verification)</td></tr>
     <tr><td><strong>Enterprise Data Lake / BI</strong></td><td>Subscribes to the same domain events for analytics &amp; ML training — no separate ETL</td></tr>
     <tr><td><strong>LLM / Model-Serving Platform</strong></td><td>Hosts the language models the agent workers call to read documents, reconcile facts, and draft recommendations — a swappable, vendor-neutral inference dependency; sees tokenized data only</td></tr>
   </table>
@@ -100,7 +100,7 @@
 
   <table>
     <tr><th>Container</th><th>Tech</th><th>Responsibility</th></tr>
-    <tr><td>Intake API</td><td>Stateless service + transactional outbox</td><td>Accept FNOL from any channel; emit <code>claims.fnol.v1</code> reliably</td></tr>
+    <tr><td>Intake API</td><td>Stateless service + transactional outbox</td><td>Accept first notice of loss from any channel; emit <code>claims.fnol.v1</code> reliably</td></tr>
     <tr><td>Kafka backbone</td><td>Apache Kafka + a schema registry</td><td>14 core topics (the event-sourced system of record) + the derived <code>claims.ai.v1</code> advisory stream</td></tr>
     <tr><td>Kafka Connect</td><td>CDC + outbox connectors</td><td>Stream Policy Admin changes into <code>policy.snapshot.v1</code>; drain outboxes</td></tr>
     <tr><td>Stream processors</td><td>Kafka Streams + Flink</td><td>Decisioning, fraud, DI timers, projections, correspondence triggers</td></tr>
@@ -117,7 +117,7 @@
 
   <div class="roadmap-phase">
     <h3>Stage A — Walking skeleton</h3>
-    <p>One claim type — the <strong>Life death claim</strong> — happy path, end to end: FNOL intake → the event-sourced claim → a rule-based decision → payment, with client/advisor status read models. Thin but complete. This is the step that proves the backbone is real and de-risks everything after it.</p>
+    <p>One claim type — the <strong>Life death claim</strong> — happy path, end to end: first notice of loss intake → the event-sourced claim → a rule-based decision → payment, with client/advisor status read models. Thin but complete. This is the step that proves the backbone is real and de-risks everything after it.</p>
   </div>
   <div class="roadmap-phase" style="border-left-color:#0d9488;">
     <h3>Stage B — Breadth</h3>
@@ -125,7 +125,7 @@
   </div>
   <div class="roadmap-phase" style="border-left-color:#d97706;">
     <h3>Stage C — Automation depth</h3>
-    <p>Push the <strong>auto-ticket rate</strong> up by widening the low-touch path, add <strong>rule-based fraud scoring + SIU routing</strong>, and harden operations. The value here is fewer manual touches and less leakage — all still with explainable rules.</p>
+    <p>Push the <strong>auto-ticket rate</strong> up by widening the low-touch path, add <strong>rule-based fraud scoring + fraud unit routing</strong>, and harden operations. The value here is fewer manual touches and less leakage — all still with explainable rules.</p>
   </div>
   <div class="roadmap-phase" style="border-left-color:#7c3aed;">
     <h3>Stage D — Intelligence (when earned)</h3>
@@ -144,7 +144,7 @@
 </div>
 
 <footer>
-  <p>L1 &amp; L2 Architecture Diagrams + Rollout — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>L1 &amp; L2 Architecture Diagrams + Rollout — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

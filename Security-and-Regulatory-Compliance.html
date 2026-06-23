@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Security &amp; Regulatory Compliance — Life &amp; DI Claims Platform</title>
+<title>Security &amp; Regulatory Compliance — Event-Driven, AI-Assisted Claims Platform</title>
 <link rel="stylesheet" href="styles.css">
 <!--meta:injected-->
-<meta name="description" content="Life &amp; DI Claims Platform — 7-Layer Security + Regulatory Map">
+<meta name="description" content="Event-Driven, AI-Assisted Claims Platform — 7-Layer Security + Regulatory Map">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:site_name" content="Event-Driven, AI-Assisted Claims Platform">
 <meta property="og:title" content="Security &amp; Regulatory Compliance">
-<meta property="og:description" content="Life &amp; DI Claims Platform — 7-Layer Security + Regulatory Map">
+<meta property="og:description" content="Event-Driven, AI-Assisted Claims Platform — 7-Layer Security + Regulatory Map">
 <meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Security-and-Regulatory-Compliance.html">
-<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Security &amp; Regulatory Compliance">
-<meta name="twitter:description" content="Life &amp; DI Claims Platform — 7-Layer Security + Regulatory Map">
-<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:description" content="Event-Driven, AI-Assisted Claims Platform — 7-Layer Security + Regulatory Map">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
 <body class="doc" style="--accent:#e11d48">
@@ -35,7 +35,7 @@
 <div class="doc-cover">
   <div class="eyebrow">Reference Document</div>
   <h1>Security &amp; Regulatory Compliance</h1>
-  <p class="lede">Life &amp; DI Claims Platform — 7-Layer Security + Regulatory Map</p>
+  <p class="lede">Event-Driven, AI-Assisted Claims Platform — 7-Layer Security + Regulatory Map</p>
   <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
 </div>
 
@@ -45,8 +45,8 @@
 
 <h1><span class="n">1</span> Seven-Layer Security Design</h1>
 
-<div class="layer"><h3>Layer 1 — Edge &amp; Network</h3><p>WAF on all public ingress (intake, portals, APIs); rate limiting and bot defense on FNOL endpoints; private networking between services; no broker exposed publicly. DDoS protection on channel endpoints.</p></div>
-<div class="layer" style="border-color:#e76f51;"><h3>Layer 2 — Transport</h3><p>TLS 1.2+ everywhere. <strong>Kafka SASL/SSL</strong> with mTLS between services and brokers; client certificates per service identity. No plaintext on the wire, internal or external.</p></div>
+<div class="layer"><h3>Layer 1 — Edge &amp; Network</h3><p>WAF on all public ingress (intake, portals, APIs); rate limiting and bot defense on first notice of loss endpoints; private networking between services; no broker exposed publicly. DDoS protection on channel endpoints.</p></div>
+<div class="layer" style="border-left-color:#ea7a45;"><h3>Layer 2 — Transport</h3><p>TLS 1.2+ everywhere. <strong>Kafka SASL/SSL</strong> with mTLS between services and brokers; client certificates per service identity. No plaintext on the wire, internal or external.</p></div>
 <div class="layer" style="border-left-color:#d97706;"><h3>Layer 3 — Identity &amp; Access</h3><p><strong>OAuth 2.0 / OIDC</strong> per consumer type: clients (portal, step-up auth for payment changes), advisors/reps (workforce SSO + MFA), service-to-service (client-credentials, short-lived tokens). RBAC + attribute-based rules; least privilege per topic and per read model.</p></div>
 <div class="layer" style="border-left-color:#0d9488;"><h3>Layer 4 — Application</h3><p>Input validation and schema enforcement at every boundary; signed commands; idempotency keys on money-movement commands; dual control on disbursement; segregation of duties between adjudication and payment approval.</p></div>
 <div class="layer" style="border-left-color:#2563eb;"><h3>Layer 5 — Data</h3><p><strong>Field-level encryption</strong> of PII/PHI; SSN and medical detail <strong>tokenized at the edge</strong> — events carry tokens, the access-controlled vault resolves them. Encryption at rest for topics, read models, and documents. Keys held and rotated in a managed key-management service.</p></div>
@@ -58,12 +58,12 @@
 <h1><span class="n">2</span> STRIDE Threat Model (selected)</h1>
 <table>
   <tr><th>Threat</th><th>Example</th><th>Mitigation</th></tr>
-  <tr><td><strong>S</strong>poofing</td><td>Fraudster files FNOL as a beneficiary</td><td>IDV/KYC before disbursement; step-up auth; identity-verified invariant on payee</td></tr>
+  <tr><td><strong>S</strong>poofing</td><td>Fraudster files first notice of loss as a beneficiary</td><td>identity verification before disbursement; step-up auth; identity-verified invariant on payee</td></tr>
   <tr><td><strong>T</strong>ampering</td><td>Altering a claim decision or payee bank detail</td><td>Immutable event log; signed commands; dual control + OFAC on payments</td></tr>
   <tr><td><strong>R</strong>epudiation</td><td>"I never approved that payment"</td><td>Causation/correlation chain in events; approver identities recorded on the decision</td></tr>
   <tr><td><strong>I</strong>nfo disclosure</td><td>SSN/medical leak via analytics or logs</td><td>Tokenization + field encryption; PHI masking in non-prod; no raw PII in logs</td></tr>
-  <tr><td><strong>D</strong>enial of service</td><td>FNOL endpoint flooded</td><td>WAF rate limiting; backpressure; Kafka buffering absorbs bursts</td></tr>
-  <tr><td><strong>E</strong>levation</td><td>Adjudicator self-approves a large payment</td><td>Segregation of duties; dual-control threshold; SIU/compliance can't be bypassed</td></tr>
+  <tr><td><strong>D</strong>enial of service</td><td>first notice of loss endpoint flooded</td><td>WAF rate limiting; backpressure; Kafka buffering absorbs bursts</td></tr>
+  <tr><td><strong>E</strong>levation</td><td>Adjudicator self-approves a large payment</td><td>Segregation of duties; dual-control threshold; fraud unit/compliance can't be bypassed</td></tr>
 </table>
 
 <h3>AI / agent-specific threats</h3>
@@ -84,11 +84,11 @@
   <tr><th>Regulation / Standard</th><th>What it requires (claims context)</th><th>Where enforced</th></tr>
   <tr><td><strong>UCSPA</strong> (Unfair Claims Settlement Practices Acts)</td><td>Prompt acknowledgement, timely investigation &amp; decision, fair settlement; many states require <strong>interest</strong> on delayed death proceeds</td><td>Regulatory SLA timers on <code>FnolCaptured</code>/decision/payment; interest computed on overdue disbursement</td></tr>
   <tr><td><strong>Contestability</strong> (state policy law)</td><td>Within ~2 years of issue, insurer may investigate material misrepresentation before paying</td><td>Hard guardrail: contestable Life claims never auto-approve; forced <code>CONTESTABILITY_REVIEW</code></td></tr>
-  <tr><td><strong>DMF + NAIC Unclaimed Benefits / Escheatment</strong></td><td>Cross-check Death Master File; locate beneficiaries; escheat unclaimed proceeds to the state</td><td>DMF as a fraud/external signal; dormancy timers; escheatment workflow in Compliance context</td></tr>
+  <tr><td><strong>Death Master File + NAIC Unclaimed Benefits / Escheatment</strong></td><td>Cross-check Death Master File; locate beneficiaries; escheat unclaimed proceeds to the state</td><td>Death Master File as a fraud/external signal; dormancy timers; escheatment workflow in Compliance context</td></tr>
   <tr><td><strong>ERISA</strong> (employer group Life/DI)</td><td>Claims &amp; appeals procedures, decision timeframes, full-and-fair review for group plans</td><td>Group-claim variant of the lifecycle with ERISA timeframes &amp; appeal-rights correspondence</td></tr>
   <tr><td><strong>HIPAA</strong></td><td>Protect PHI in DI medical records / APS; minimum necessary access</td><td>Tokenized PHI; layer-5/6 controls; access logging on medical fields</td></tr>
   <tr><td><strong>GLBA</strong> + state privacy (CCPA et al.)</td><td>Safeguard nonpublic personal info; privacy notices; consumer rights</td><td>Field encryption; consent model in correspondence; data-subject request tooling</td></tr>
-  <tr><td><strong>OFAC / AML</strong></td><td>Screen payees against sanctions lists; block prohibited payments; report suspicious activity</td><td>OFAC screen in the payment saga; <code>PaymentHeld</code> on hit; SIU/compliance referral</td></tr>
+  <tr><td><strong>OFAC / AML</strong></td><td>Screen payees against sanctions lists; block prohibited payments; report suspicious activity</td><td>OFAC screen in the payment saga; <code>PaymentHeld</code> on hit; fraud unit/compliance referral</td></tr>
   <tr><td><strong>IRS reporting</strong></td><td>1099-R for taxable DI benefits; correct withholding</td><td>Tax determination step before settlement; <code>payment_ledger</code> as 1099-R basis</td></tr>
   <tr><td><strong>SOX</strong> (financial controls)</td><td>Controls over disbursement; segregation of duties; auditability</td><td>Dual control, idempotent payments, immutable log, reconciliation</td></tr>
   <tr><td><strong>SOC 2</strong></td><td>Security/availability/confidentiality controls for the platform</td><td>The seven layers above + change management &amp; access reviews</td></tr>
@@ -108,10 +108,30 @@
   <tr><td>Public</td><td>This reference architecture</td><td>No real data; illustrative values only</td></tr>
 </table>
 
+<div class="page-break"></div>
+<h1><span class="n">5</span> Data Lifecycle &amp; the Right to Erasure</h1>
+<h2>The hardest problem in event sourcing on regulated personal data: the log is append-only and never deleted, yet privacy law says a person can ask to be erased. The two are reconciled with crypto-shredding.</h2>
+
+<div class="note accent"><strong>The tension, stated plainly.</strong> The event log is deliberately <em>immutable and tamper-evident</em> — that is what makes it a defensible audit record. But privacy regimes (and some state insurance rules) give a data subject a right to have their personal data erased. You cannot honour an erasure request by rewriting or deleting events without destroying the very audit guarantees regulators rely on. So you don't.</div>
+
+<h3>Crypto-shredding — erase the key, not the log</h3>
+<p>Personal data is never written into events in the clear. Building on the Layer-5 controls, each data subject's personal fields are encrypted with a <strong>per-subject data key</strong> held in the access-controlled vault; the event carries only the ciphertext (or a token that resolves to it). To honour an erasure request, the platform <strong>destroys that subject's key</strong>. The events stay exactly where they were — same offsets, same ordering, same hash chain and causation links — but the personal data inside them is now unrecoverable ciphertext. The audit record remains complete and tamper-evident; the person is, in any practical sense, erased.</p>
+
+<table>
+  <tr><th>Concern</th><th>How it's handled</th></tr>
+  <tr><td>What gets shredded</td><td>Only personal data (the per-subject encrypted fields / vault-resolved tokens). Non-personal facts — that a decision happened, when, the amount band, approver <em>role</em> — survive for audit.</td></tr>
+  <tr><td>What stays intact</td><td>Event offsets, ordering, hash chain, correlation/causation links. A market-conduct examiner can still see <em>that</em> the claim was handled correctly and by whom (by role), just not the erased person's identifying detail.</td></tr>
+  <tr><td>Retention vs. erasure</td><td>Statutory insurance retention (often ~7 years) sets the <em>earliest</em> an erasure may be honoured; a request is queued and executed when retention lapses. A legal hold suspends it entirely.</td></tr>
+  <tr><td>Read models &amp; backups</td><td>Read models are projections — drop and rebuild, and the shredded fields simply never re-materialise. Key destruction also renders the subject's data in older encrypted backups unreadable as those age out.</td></tr>
+  <tr><td>Scope of a key</td><td>Keys are per data subject (claimant, beneficiary, payee), not per claim — so erasing one party doesn't affect others on a shared claim.</td></tr>
+</table>
+
+<div class="note">Net: the platform satisfies an erasure request <em>and</em> keeps an immutable, tamper-evident audit log — the two stop being in conflict because erasure acts on the <strong>key</strong>, never on the <strong>log</strong>.</div>
+
 </div>
 
 <footer>
-  <p>Security &amp; Regulatory Compliance — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Security &amp; Regulatory Compliance — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Claims Domain Model — Life &amp; DI Claims Platform</title>
+<title>Claims Domain Model — Event-Driven, AI-Assisted Claims Platform</title>
 <link rel="stylesheet" href="styles.css">
 <!--meta:injected-->
-<meta name="description" content="Life &amp; DI Claims Platform — Bounded Contexts, Aggregates &amp; Lifecycle">
+<meta name="description" content="Event-Driven, AI-Assisted Claims Platform — Bounded Contexts, Aggregates &amp; Lifecycle">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Life & DI Claims Platform">
+<meta property="og:site_name" content="Event-Driven, AI-Assisted Claims Platform">
 <meta property="og:title" content="Claims Domain Model">
-<meta property="og:description" content="Life &amp; DI Claims Platform — Bounded Contexts, Aggregates &amp; Lifecycle">
+<meta property="og:description" content="Event-Driven, AI-Assisted Claims Platform — Bounded Contexts, Aggregates &amp; Lifecycle">
 <meta property="og:url" content="https://harshshah85.github.io/insurance-claims-platform/Claims-Domain-Model.html">
-<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta property="og:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Claims Domain Model">
-<meta name="twitter:description" content="Life &amp; DI Claims Platform — Bounded Contexts, Aggregates &amp; Lifecycle">
-<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.svg">
+<meta name="twitter:description" content="Event-Driven, AI-Assisted Claims Platform — Bounded Contexts, Aggregates &amp; Lifecycle">
+<meta name="twitter:image" content="https://harshshah85.github.io/insurance-claims-platform/og-image.png">
 <script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 </head>
 <body class="doc" style="--accent:#2563eb">
@@ -35,7 +35,7 @@
 <div class="doc-cover">
   <div class="eyebrow">Reference Document</div>
   <h1>Claims Domain Model</h1>
-  <p class="lede">Life &amp; DI Claims Platform — Bounded Contexts, Aggregates &amp; Lifecycle</p>
+  <p class="lede">Event-Driven, AI-Assisted Claims Platform — Bounded Contexts, Aggregates &amp; Lifecycle</p>
   <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
 </div>
 
@@ -49,12 +49,12 @@
 <h1><span class="n">1</span> Bounded Contexts</h1>
 <h2>Nine contexts, each owning its events, its aggregates, and its team. Contexts integrate only through published events — never shared tables.</h2>
 
-<div class="ctx-box"><h3>1 · Intake &amp; FNOL</h3><p>Captures First Notice of Loss from every channel (client portal, advisor desktop, service-rep phone, secure message, mail/upload, IVR). Owns the channel-agnostic intake contract and the initial claim creation.</p></div>
+<div class="ctx-box"><h3>1 · Intake &amp; Claim Filing</h3><p>Captures First Notice of Loss from every channel (client portal, advisor desktop, service-rep phone, secure message, mail/upload, IVR). Owns the channel-agnostic intake contract and the initial claim creation.</p></div>
 <div class="ctx-box"><h3>2 · Policy &amp; Coverage</h3><p>Resolves the claim to a policy via Policy Admin CDC. Confirms in-force status, coverage type, face amount / benefit amount, and contestability window. Quarantines unresolved policy numbers.</p></div>
-<div class="ctx-box"><h3>3 · Party &amp; Identity</h3><p>Models claimant, insured (decedent for Life), beneficiary, advisor, and servicing rep. Owns identity verification (IDV/KYC) and beneficiary designation resolution.</p></div>
+<div class="ctx-box"><h3>3 · Party &amp; Identity</h3><p>Models claimant, insured (decedent for Life), beneficiary, advisor, and servicing rep. Owns identity verification (identity verification) and beneficiary designation resolution.</p></div>
 <div class="ctx-box"><h3>4 · Requirements</h3><p>Tracks outstanding requirements (death certificate, proof of loss, attending-physician statement, claimant statement, beneficiary forms). Raises, satisfies, waives, and ages requirements.</p></div>
 <div class="ctx-box"><h3>5 · Adjudication &amp; Decisioning</h3><p>Computes the STP eligibility score, routes to the low-touch or manual path, and records the approve / deny / pend decision with rationale and the responsible authority.</p></div>
-<div class="ctx-box"><h3>6 · Fraud &amp; SIU</h3><p>Scores fraud risk, refers high-risk claims to the Special Investigations Unit, and tracks investigation outcome (cleared / substantiated). Blocks the low-touch path on referral.</p></div>
+<div class="ctx-box"><h3>6 · Fraud &amp; Investigations</h3><p>Scores fraud risk, refers high-risk claims to the Special Investigations Unit, and tracks investigation outcome (cleared / substantiated). Blocks the low-touch path on referral.</p></div>
 <div class="ctx-box"><h3>7 · Disability Management</h3><p>DI-only. Manages recurring benefit periods, periodic recertification, return-to-work, benefit offsets (e.g. Social Security, other coverage), and benefit termination.</p></div>
 <div class="ctx-box"><h3>8 · Payments &amp; Money Movement</h3><p>Owns the disbursement saga: schedule, hold, dual-control approval, OFAC, tax withholding, settlement, and reconciliation. (Detailed in Correspondence &amp; Money Movement.)</p></div>
 <div class="ctx-box"><h3>9 · Correspondence &amp; Compliance</h3><p>Drives inbound/outbound correspondence and enforces regulatory timers (acknowledge, decide, pay) and the immutable audit record. (Detailed in its own docs.)</p></div>
@@ -63,11 +63,11 @@
 <p>Agent-assisted by design — each agent worker is scoped to a context and drafts recommendations a human acts on. No agent forms a new context; they speed up the nine that already exist.</p>
 <table>
   <tr><th>Agent worker</th><th>Context it serves</th><th>Drafts (advisory)</th></tr>
-  <tr><td><strong>Intake &amp; Triage</strong></td><td>1 · Intake &amp; FNOL</td><td>Claim classification, structured fact-sheet, missing-item list</td></tr>
+  <tr><td><strong>Intake &amp; Triage</strong></td><td>1 · Intake &amp; Claim Filing</td><td>Claim classification, structured fact-sheet, missing-item list</td></tr>
   <tr><td><strong>Policy &amp; Coverage</strong></td><td>2 · Policy &amp; Coverage</td><td>In-force / coverage / contestability findings from the CDC read model</td></tr>
   <tr><td><strong>Document Intelligence</strong></td><td>4 · Requirements</td><td>Extraction + cross-document reconciliation (feeds <code>documentation_inconsistency</code>)</td></tr>
   <tr><td><strong>Decisioning</strong></td><td>5 · Adjudication &amp; Decisioning</td><td>Decision packet — recommendation + cited rationale + confidence</td></tr>
-  <tr><td><strong>Fraud / SIU copilot</strong></td><td>6 · Fraud &amp; SIU</td><td>Investigator-ready narrative; never refers or clears on its own</td></tr>
+  <tr><td><strong>Fraud copilot</strong></td><td>6 · Fraud &amp; Investigations</td><td>Investigator-ready narrative; never refers or clears on its own</td></tr>
   <tr><td><strong>Correspondence</strong></td><td>9 · Correspondence &amp; Compliance</td><td>Claimant / beneficiary / advisor letter drafts for human release</td></tr>
 </table>
 <div class="note">A human (or the deterministic auto-ticket lane) still owns every authoritative event — agents reason, people decide. The agents draft onto a derived <code>claims.ai.v1</code> stream; the canonical 9 contexts · 11 aggregates · 36 events are unchanged.</div>
@@ -78,13 +78,13 @@
 <table>
   <tr><th>Aggregate</th><th>Context</th><th>Key</th><th>Key Invariant Enforced</th></tr>
   <tr><td><strong>Claim</strong></td><td>Adjudication</td><td>claim_id</td><td>Cannot transition to APPROVED while any requirement is OUTSTANDING or fraud risk ≥ 60</td></tr>
-  <tr><td><strong>FnolNotice</strong></td><td>Intake</td><td>fnol_id</td><td>A claim is created from exactly one accepted FNOL; duplicates are linked, not re-created</td></tr>
+  <tr><td><strong>FnolNotice</strong></td><td>Intake</td><td>fnol_id</td><td>A claim is created from exactly one accepted first notice of loss; duplicates are linked, not re-created</td></tr>
   <tr><td><strong>PolicyLink</strong></td><td>Policy</td><td>claim_id</td><td>A claim is either resolved to one policy or quarantined — never partially linked</td></tr>
   <tr><td><strong>Party</strong></td><td>Party</td><td>party_id</td><td>A beneficiary cannot receive disbursement until IdentityVerified</td></tr>
   <tr><td><strong>BeneficiaryDesignation</strong></td><td>Party</td><td>policy_id</td><td>Share allocations across beneficiaries must sum to 100%</td></tr>
   <tr><td><strong>RequirementSet</strong></td><td>Requirements</td><td>claim_id</td><td>A waived requirement records the waiving authority and reason</td></tr>
   <tr><td><strong>Decision</strong></td><td>Adjudication</td><td>claim_id</td><td>A denial must carry a reason code and cite the policy provision</td></tr>
-  <tr><td><strong>FraudCase</strong></td><td>Fraud / SIU</td><td>claim_id</td><td>Only SIU may set SiuCleared / SiuSubstantiated; decisioning cannot</td></tr>
+  <tr><td><strong>FraudCase</strong></td><td>Fraud / fraud unit</td><td>claim_id</td><td>Only fraud unit may set SiuCleared / SiuSubstantiated; decisioning cannot</td></tr>
   <tr><td><strong>BenefitPeriod</strong></td><td>Disability Mgmt</td><td>claim_id + period_no</td><td>Periods are contiguous; a new period cannot open before the prior one ends or recertifies</td></tr>
   <tr><td><strong>Payment</strong></td><td>Payments</td><td>payment_id</td><td>Idempotent — a payment_id settles at most once; reversals are new events</td></tr>
   <tr><td><strong>Correspondence</strong></td><td>Correspondence</td><td>correspondence_id</td><td>Outbound to a client respects channel preference &amp; consent on record</td></tr>
@@ -153,7 +153,7 @@
   <tr><td>Advisor</td><td><code>claim_summary</code> + <code>advisor_worklist</code></td><td>Their clients' claims, what is blocking, and where they can help (e.g. nudge a requirement)</td></tr>
   <tr><td>Service Rep</td><td><code>advisor_worklist</code></td><td>Queue of claims needing human touch, sorted by SLA-timer urgency</td></tr>
   <tr><td>Adjudicator</td><td><code>claim_summary</code> + decision context</td><td>STP score breakdown, requirements, policy/coverage facts, fraud signal</td></tr>
-  <tr><td>SIU Investigator</td><td><code>fraud_case_view</code></td><td>Fraud score drivers, linked claims, investigation tasks and findings</td></tr>
+  <tr><td>fraud unit Investigator</td><td><code>fraud_case_view</code></td><td>Fraud score drivers, linked claims, investigation tasks and findings</td></tr>
   <tr><td>Treasury / Finance</td><td><code>payment_ledger</code> + <code>di_benefit_ledger</code></td><td>Scheduled vs. settled disbursements, 1099-R basis, reconciliation status</td></tr>
 </table>
 
@@ -171,7 +171,7 @@
 </div>
 
 <footer>
-  <p>Claims Domain Model — Life &amp; DI Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Claims Domain Model — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

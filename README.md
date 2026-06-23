@@ -1,6 +1,6 @@
-# Life &amp; DI Claims Platform — Event-Driven Reference Architecture
+# Event-Driven, AI-Assisted Claims Platform — Reference Architecture
 
-Reference documents for a **Kafka event-driven Life &amp; Disability Income (DI) claims platform** — a vendor-neutral design that takes a claim from the moment it's filed through review, fraud checks, letters, and payment, with a low-touch "auto-ticket" path for the clean ones. **Life (death) claims are filed by a beneficiary; DI claims by the policyholder** — the platform handles both, and that one difference shapes much of the design.
+Reference documents for an **event-driven, AI-assisted claims platform** — a vendor-neutral design built on Kafka event sourcing with an agentic, human-in-the-loop decisioning layer, **demonstrated end-to-end on Life &amp; Disability claims**. It takes a claim from the moment it's filed through review, fraud checks, letters, and payment, with a low-touch "auto-ticket" path for the clean ones. (A life claim is filed by a beneficiary after a death; a disability-income claim by the policyholder — the platform handles both, and that difference shapes much of the design.)
 
 The platform is **agent-assisted and human-in-the-loop by design**: every claim still runs the full deterministic check pipeline, and LLM agent workers — first-class processors alongside decisioning and fraud — read documents, reconcile facts, and draft a recommended decision *with cited detail* for a person to act on. **Today a human is the decision-maker** on every AI-touched claim; as the model proves out, it can graduate to directly deciding the clean ones — a deliberate, governed step. The agents reason on a dedicated `claims.ai.*` stream (derived, the way CQRS read models are derived from the log) while people keep decision authority — agents reason, people decide.
 
@@ -18,6 +18,7 @@ The platform is **agent-assisted and human-in-the-loop by design**: every claim 
 | [Correspondence-and-Money-Movement.html](Correspondence-and-Money-Movement.html) | Event-driven inbound/outbound correspondence (client, advisor, service reps), the omnichannel preference center, and the money-movement saga — dual control, OFAC, payment holds, tax withholding, idempotent disbursement, treasury reconciliation. |
 | [Security-and-Regulatory-Compliance.html](Security-and-Regulatory-Compliance.html) | 7-layer security design plus the Life/DI regulatory map — UCSPA prompt-pay, contestability, DMF/escheatment, ERISA, HIPAA/GLBA, OFAC/AML, SOX over money movement, and the immutable audit model. |
 | [Observability-Monitoring.html](Observability-Monitoring.html) | Event-freshness and decisioning SLOs, consumer-lag and DLQ alerting, money-movement watch metrics, STP-rate / cycle-time business SLOs, P1–P4 alert routing, dashboards per role, and the blameless incident process. |
+| [Resilience-and-Disaster-Recovery.html](Resilience-and-Disaster-Recovery.html) | Failure domains and RTO/RPO targets, Kafka multi-zone/region durability, and how an event-sourced platform recovers in-flight work — replay-based read-model rebuilds and a disbursement saga caught mid-flight by a regional failover, kept safe by idempotent commands. |
 | [FinOps-Cost-Model.html](FinOps-Cost-Model.html) | Kafka and cloud-infrastructure cost drivers (incl. LLM inference for the assist layer), the cost shape (thin slice vs full platform), where the payback comes from, 8 optimization levers, and cost governance. |
 | [Claims-Onboarding-Workflow.html](Claims-Onboarding-Workflow.html) | New product/plan vs. new claim-intake onboarding workflows, automated vs. manual steps, quarantine recovery for unresolved policy numbers, and a later self-service FNOL vision. |
 | [Event-Driven-Decision-Records.html](Event-Driven-Decision-Records.html) | Short decision records — events vs. overwriting rows, services reacting vs. a central coordinator, a durable log vs. a managed streaming service, the message format, and small reversible steps vs. one big transaction for payments. |
@@ -25,7 +26,7 @@ The platform is **agent-assisted and human-in-the-loop by design**: every claim 
 
 ## Platform Architecture Overview
 
-**Life &amp; DI Claims Platform** — an event-driven platform that takes a claim from first filing through review, letters, and payment, with a fast automatic path for clean claims and a fraud-investigation path for risky ones. ("First filing" is the insurance term *First Notice of Loss / FNOL*.)
+**Event-Driven, AI-Assisted Claims Platform** — an event-driven platform that takes a claim from first filing through review, letters, and payment, with a fast automatic path for clean claims and a fraud-investigation path for risky ones. ("First filing" is the insurance term *First Notice of Loss / FNOL*.)
 
 ```
 Client / Advisor / Service Rep (FNOL) → Intake API → Kafka (event-sourced claim) → STP Decisioning → Decision

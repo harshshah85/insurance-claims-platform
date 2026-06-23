@@ -16,6 +16,7 @@
     ["Security-and-Regulatory-Compliance.html", "Security & Regulatory Compliance"],
     ["Correspondence-and-Money-Movement.html",  "Correspondence & Money Movement"],
     ["Observability-Monitoring.html",           "Observability & Monitoring"],
+    ["Resilience-and-Disaster-Recovery.html",   "Resilience & Disaster Recovery"],
     ["FinOps-Cost-Model.html",                  "FinOps & Cost Architecture"],
     ["Claims-Onboarding-Workflow.html",         "Claims Onboarding Workflow"],
     ["Event-Driven-Decision-Records.html",      "Event-Driven Decision Records"]
