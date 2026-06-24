@@ -57,7 +57,7 @@
     <tr><td>Consumer lag (decisioning, fraud, projectors)</td><td>Steady-state lag &lt; 1,000 events per partition</td><td>Lag &gt; 5,000 OR rising for 10 min on any critical consumer</td></tr>
     <tr><td>Policy CDC freshness</td><td>99% of Policy Admin changes in <code>policy.snapshot.v1</code> within 5 min</td><td>CDC connector last_event &gt; 15 min old</td></tr>
     <tr><td>Read-model lag (claim_summary)</td><td>p95 projection lag &lt; 10 seconds</td><td>Read model &gt; 60s behind the log</td></tr>
-    <tr><td>dead-letter queue rate</td><td>&lt; 0.05% of events reach <code>claims.dlq.v1</code></td><td>Any sustained dead-letter queue inflow, or single PHI/payment event in dead-letter queue</td></tr>
+    <tr><td>dead-letter queue rate</td><td>&lt; 0.05% of events reach <code>claims.dlq.v1</code></td><td>Any sustained inflow, or a single PHI/payment event landing there</td></tr>
   </table>
 </div>
 

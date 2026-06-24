@@ -93,7 +93,7 @@
 <div class="note"><strong>Agent assist at intake.</strong> Several of the "automated" steps are now <strong>agent-assisted</strong>: document auto-classification &amp; extraction (the Document Intelligence agent) and requirement prediction — asking only for what a claim actually needs — draft onto <code>claims.ai.v1</code> for confirmation. The agents speed intake; a human still confirms anything they surface, and decision authority is unchanged. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)</div>
 
 <h1><span class="n">3</span> Quarantine Recovery (Unresolved Policy)</h1>
-<p>An first notice of loss whose policy number can't be resolved against <code>policy.snapshot.v1</code> is <strong>quarantined, never dropped</strong> — the claimant has already been told their claim is received, so losing it is unacceptable.</p>
+<p>A first notice of loss whose policy number can't be resolved against <code>policy.snapshot.v1</code> is <strong>quarantined, never dropped</strong> — the claimant has already been told their claim is received, so losing it is unacceptable.</p>
 <div class="flow">
 <span class="r">PolicyUnresolved</span> ─► quarantine read model (claim is live, status "in research")
    ├─ <span class="g">[auto]</span> re-attempt match on each <span class="y">policy.snapshot.v1</span> update (late CDC, fuzzy match on name/DOB)

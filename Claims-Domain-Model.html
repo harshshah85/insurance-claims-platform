@@ -95,7 +95,7 @@
 <h1><span class="n">3</span> How Life and DI Claims Differ</h1>
 <h2>Same platform, two very different jobs. The biggest difference is who starts the claim — and that one fact drives nearly everything else.</h2>
 
-<p style="font-size:12px;line-height:1.7;">A <strong>life (death) claim is beneficiary-driven</strong>: the insured has died, so someone else — a spouse, a child, the estate — files it. That person usually isn't in our systems and may not even know the policy number. A <strong>DI claim is client-initiated</strong>: the living policyholder files their own claim because they can't work, and they're already a known, logged-in customer. Most of the differences below fall out of that one fact.</p>
+<p>A <strong>life (death) claim is beneficiary-driven</strong>: the insured has died, so someone else — a spouse, a child, the estate — files it. That person usually isn't in our systems and may not even know the policy number. A <strong>DI claim is client-initiated</strong>: the living policyholder files their own claim because they can't work, and they're already a known, logged-in customer. Most of the differences below fall out of that one fact.</p>
 
 <table>
   <tr><th>&nbsp;</th><th>Life — death claim (beneficiary-driven)</th><th>Disability Income — DI (client-initiated)</th></tr>
@@ -112,7 +112,7 @@
 <div class="note"><strong>One nuance:</strong> "life claim" here means the <em>death</em> claim — the common, beneficiary-driven case. Living/accelerated benefits on a life policy are filed by the insured themselves, so they behave more like the client-initiated side. We treat the death claim as the primary life flow.</div>
 
 <h3>The two lifecycles</h3>
-<p style="font-size:12px;">A life claim is mostly a straight line that ends in one payment. Contestability is the branch that can pull it out of the fast path.</p>
+<p>A life claim is mostly a straight line that ends in one payment. Contestability is the branch that can pull it out of the fast path.</p>
 
 <div class="sm">
 <span class="b">NOTIFIED</span>
@@ -128,7 +128,7 @@
    <span class="m">side states: WITHDRAWN, REOPENED (e.g. additional beneficiary), QUARANTINE</span>
 </div>
 
-<p style="font-size:12px;">A DI claim opens and then loops — paying and re-checking each period until the person returns to work or the benefit ends. That re-check loop (the <code>RecertificationDue</code> timer) is the heartbeat of an active DI claim.</p>
+<p>A DI claim opens and then loops — paying and re-checking each period until the person returns to work or the benefit ends. That re-check loop (the <code>RecertificationDue</code> timer) is the heartbeat of an active DI claim.</p>
 
 <div class="sm">
 <span class="b">NOTIFIED</span> ─► <span class="b">INTAKE</span> ─► <span class="b">ELIGIBILITY_REVIEW</span>  <span class="m">(elimination period, occupation definition, APS)</span>
