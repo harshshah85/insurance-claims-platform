@@ -40,10 +40,10 @@
 </div>
 
 <div class="note">
-  <strong>Modeling approach:</strong> Domain-Driven Design over an event-sourced core. The model is defined as <strong>9 bounded contexts</strong>, <strong>11 aggregates</strong>, and a <strong>36-event domain catalog</strong> (defined in the Event Streaming Architecture doc). Life (death/mortality) and DI (income replacement) share one platform but have distinct lifecycle state machines, modeled explicitly below.</div>
+  <strong>The model is Domain-Driven Design over an event-sourced core.</strong> It works out to <strong>9 bounded contexts</strong>, <strong>11 aggregates</strong>, and a <strong>36-event domain catalog</strong> (the catalog itself lives in the Event Streaming Architecture doc). Life (the death claim) and DI (income replacement) run on the same platform but follow different lifecycle state machines, both laid out below.</div>
 
 <div class="note">
-  <strong>How the agents map to the model:</strong> the platform is <strong>agent-assisted by design</strong>. Each agent worker is a first-class collaborator scoped to a context it serves, drafting recommendations a human acts on — so the agents <em>operate the existing nine contexts faster</em> rather than forming a tenth. Authority is unchanged: every authoritative decision still belongs to its aggregate (a denial on the Decision aggregate must carry a reason code and cite the provision), enforced against a human's decision. Agents reason, people decide. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)
+  <strong>How the agents map to the model:</strong> the platform is <strong>agent-assisted by design</strong>. Each agent worker is a first-class collaborator scoped to a context it serves, drafting recommendations a human acts on — so the agents <em>operate the existing nine contexts faster</em> rather than forming a tenth. Authority is unchanged: every authoritative decision still belongs to its aggregate (a denial on the Decision aggregate must carry a reason code and cite the provision), enforced against a human's decision. Agents reason, humans decide. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)
 </div>
 
 <h1><span class="n">1</span> Bounded Contexts</h1>
@@ -70,7 +70,7 @@
   <tr><td><strong>Fraud copilot</strong></td><td>6 · Fraud &amp; Investigations</td><td>Investigator-ready narrative; never refers or clears on its own</td></tr>
   <tr><td><strong>Correspondence</strong></td><td>9 · Correspondence &amp; Compliance</td><td>Claimant / beneficiary / advisor letter drafts for human release</td></tr>
 </table>
-<div class="note">A human (or the deterministic auto-ticket lane) still owns every authoritative event — agents reason, people decide. The agents draft onto a derived <code>claims.ai.v1</code> stream; the canonical 9 contexts · 11 aggregates · 36 events are unchanged.</div>
+<div class="note">A human (or the deterministic auto-ticket lane) still owns every authoritative event — agents reason, humans decide. The agents draft onto a derived <code>claims.ai.v1</code> stream; the canonical 9 contexts · 11 aggregates · 36 events are unchanged.</div>
 
 <h1><span class="n">2</span> Aggregates &amp; Their Invariants</h1>
 <h2>Eleven aggregates. Each is a consistency boundary — commands are validated against the rehydrated aggregate before new events are appended.</h2>
@@ -171,7 +171,7 @@
 </div>
 
 <footer>
-  <p>Claims Domain Model — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Claims Domain Model — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> <a href="https://harshshah85.github.io/about-me/" style="color:inherit">Harsh Shah</a> <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

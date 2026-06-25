@@ -40,11 +40,11 @@
 </div>
 
 <div class="note">
-  <strong>Two scores, one gate.</strong> Every claim gets two scores: an <strong>STP score</strong> (how clean and safe to automate?) and a <strong>fraud score</strong> (how suspicious?). The auto-ticket path opens only when the STP score is high <em>and</em> the fraud score is low. Fraud is a hard gate — a suspicious claim never auto-pays, no matter how clean it otherwise looks.
+  <strong>Every claim gets two scores.</strong> An <strong>STP score</strong> (how clean and safe is this to automate?) and a <strong>fraud score</strong> (how suspicious is it?). The auto-ticket path only opens when the first is high and the second is low. Fraud is a hard gate: a suspicious claim never auto-pays, however clean it looks otherwise.
 </div>
 
 <h1><span class="n">1</span> STP Score — Can We Auto-Ticket It?</h1>
-<h2>Decides whether a claim can run straight through with no human (auto-ticketed) or needs a person to look at it. "STP" = straight-through processing.</h2>
+<h2>Decides whether a claim can run straight through with no human (auto-ticketed) or needs a human to look at it. "STP" = straight-through processing.</h2>
 
 <div class="formula">
 STP = (policy_in_force × 0.25)<br>
@@ -116,7 +116,7 @@ Fraud = (velocity × 0.25)<br>
 
 <div class="note"><strong>Design principle — never let ML decide a denial alone.</strong> ML can <em>raise</em> a claim out of the low-touch path (more scrutiny) but cannot be the sole basis of a denial. A denial always cites a coded reason mapped to a policy provision, decided by a human with authority. This keeps the platform defensible under UCSPA and state market-conduct exams.</div>
 
-<div class="note"><strong>Agent-assisted by design.</strong> Around these scores work first-class LLM agent workers that read documents, reconcile facts, and draft a decision packet with a cited rationale and confidence. They are the third leg of the decisioning evolution — deterministic rules, then ML on the soft factors, then agents reasoning on top — and the discipline holds at each leg: <strong>agents reason, people decide</strong>. The auto-ticket lane stays rule-decided; humans review and approve on the assisted path; low-confidence or conflicting claims escalate to manual review. See <a href="AI-Agentic-Decisioning.html"><strong>AI-Assisted &amp; Agentic Decisioning</strong></a>.</div>
+<div class="note"><strong>Agent-assisted by design.</strong> Around these scores work first-class LLM agent workers that read documents, reconcile facts, and draft a decision packet with a cited rationale and confidence. They are the third leg of the decisioning evolution — deterministic rules, then ML on the soft factors, then agents reasoning on top — and the discipline holds at each leg: <strong>agents reason, humans decide</strong>. The auto-ticket lane stays rule-decided; humans review and approve on the assisted path; low-confidence or conflicting claims escalate to manual review. See <a href="AI-Agentic-Decisioning.html"><strong>AI-Assisted &amp; Agentic Decisioning</strong></a>.</div>
 
 <!-- PAYLOADS -->
 <div class="page-break"></div>
@@ -165,7 +165,7 @@ Fraud = (velocity × 0.25)<br>
 </div>
 
 <footer>
-  <p>Claims Decisioning &amp; Fraud — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Claims Decisioning &amp; Fraud — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> <a href="https://harshshah85.github.io/about-me/" style="color:inherit">Harsh Shah</a> <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

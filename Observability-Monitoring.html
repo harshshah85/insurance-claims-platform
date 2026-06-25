@@ -90,7 +90,7 @@
     <tr><th>Metric</th><th>Target</th><th>Why it's watched</th></tr>
     <tr><td>Grounding rate (findings with a valid source citation)</td><td>~100%</td><td>An ungrounded assertion is a hallucination risk — it should never reach an adjudicator</td></tr>
     <tr><td>Packet acceptance rate (ASSISTED, confirmed with no correction)</td><td>High &amp; rising</td><td>The core trust signal; a falling rate means the model is drifting from human judgment</td></tr>
-    <tr><td>Abstention precision (escalations a human agrees needed a person)</td><td>Track &amp; tune</td><td>Too low → the model over-escalates and saves no time; too high may mask under-escalation</td></tr>
+    <tr><td>Abstention precision (escalations a human agrees needed a human)</td><td>Track &amp; tune</td><td>Too low → the model over-escalates and saves no time; too high may mask under-escalation</td></tr>
     <tr><td>Agent run latency (first notice of loss → packet on <code>claims.ai.v1</code>)</td><td>p95 &lt; 30s</td><td>Assist must be ready before the human picks up the claim</td></tr>
     <tr><td>False-auto rate (shared with Business SLOs)</td><td>&lt; 0.5%</td><td>The number the AI layer must never let creep — sampled QA on the auto-ticket lane</td></tr>
   </table>
@@ -168,7 +168,7 @@
 </div>
 
 <footer>
-  <p>Observability &amp; Monitoring — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Observability &amp; Monitoring — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> <a href="https://harshshah85.github.io/about-me/" style="color:inherit">Harsh Shah</a> <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

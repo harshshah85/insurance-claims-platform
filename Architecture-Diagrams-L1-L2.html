@@ -41,7 +41,7 @@
   </div>
 
   <div class="note accent">
-    <strong>C4 model, two levels.</strong> L1 (System Context) shows the platform as one box surrounded by the people and external systems it talks to. L2 (Container) opens the box into its runtime pieces — the Kafka backbone, the 9 bounded-context services, the <strong>agent workers</strong>, the read models, and the serving APIs. Lower levels (component / code) are intentionally out of scope for a reference architecture. This platform is <strong>agent-assisted and human-in-the-loop by design</strong>: LLM agent workers are first-class containers that read facts and draft recommendations, and a person (or the deterministic auto-ticket lane) holds decision authority. The split is deliberate — agents do the reasoning, people own the decision — not a bolt-on.
+    <strong>Two levels of the C4 model.</strong> L1 (System Context) shows the platform as a single box, with the people and systems around it. L2 (Container) opens that box into its runtime pieces: the Kafka backbone, the 9 bounded-context services, the <strong>agent workers</strong>, the read models, and the serving APIs. The lower C4 levels (component, code) are out of scope on purpose — this is a reference architecture, not an implementation. One thing to read off both diagrams: the agent workers are first-class containers that read facts and draft recommendations, but a human (or the deterministic auto-ticket lane) holds the decision. Agents reason, humans decide, and that's built in rather than bolted on.
   </div>
 
   <h1><span class="n">1</span> L1 — System Context</h1>
@@ -95,7 +95,7 @@
   <span class="g">fraud_case_view</span> (key-val) ─┤      <span class="y">Correspondence Engine</span> ─► Email/SMS/Secure/Print
   <span class="g">payment_ledger</span> (rel.)     ─┘      <span class="y">Payment Saga</span> ─► Treasury / EFT / Check
 
-  <span class="m">AI review loop:</span>  <span class="p">Agent Workers</span> ─► <span class="r">claims.ai.v1</span> ─► <span class="p">Projectors</span> enrich <span class="g">claim_summary</span> + <span class="g">advisor_worklist</span> ─► <span class="b">Adjudicator / Service desktop</span> reviews &amp; decides ─► <span class="r">claims.decision.v1</span>   <span class="m">[agents reason, people decide]</span>
+  <span class="m">AI review loop:</span>  <span class="p">Agent Workers</span> ─► <span class="r">claims.ai.v1</span> ─► <span class="p">Projectors</span> enrich <span class="g">claim_summary</span> + <span class="g">advisor_worklist</span> ─► <span class="b">Adjudicator / Service desktop</span> reviews &amp; decides ─► <span class="r">claims.decision.v1</span>   <span class="m">[agents reason, humans decide]</span>
 </div>
 
   <table>
@@ -108,7 +108,7 @@
     <tr><td>Claims Domain APIs</td><td>REST/GraphQL behind an API gateway</td><td>Versioned read access for all channels — never the raw log</td></tr>
     <tr><td>Correspondence Engine</td><td>Templating + delivery service</td><td>Omnichannel outbound honoring preference &amp; consent</td></tr>
     <tr><td>Payment Saga</td><td>Saga orchestrator + idempotent commands</td><td>Controlled money movement to treasury</td></tr>
-    <tr><td>Agent Workers</td><td>Per-claim agent orchestrator + LLM, skills &amp; tools</td><td>First-class processors that read documents and committed facts, reconcile them, and draft a decision packet with cited rationale + confidence on <code>claims.ai.v1</code> for human review. <strong>Advisory by design</strong> — the agents reason, a person (or the auto-ticket rules) decides; they never move money</td></tr>
+    <tr><td>Agent Workers</td><td>Per-claim agent orchestrator + LLM, skills &amp; tools</td><td>First-class processors that read documents and committed facts, reconcile them, and draft a decision packet with cited rationale + confidence on <code>claims.ai.v1</code> for human review. <strong>Advisory by design</strong> — the agents reason, a human (or the auto-ticket rules) decides; they never move money</td></tr>
   </table>
 
   <div class="page-break"></div>
@@ -144,7 +144,7 @@
 </div>
 
 <footer>
-  <p>L1 &amp; L2 Architecture Diagrams + Rollout — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>L1 &amp; L2 Architecture Diagrams + Rollout — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> <a href="https://harshshah85.github.io/about-me/" style="color:inherit">Harsh Shah</a> <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

@@ -26,7 +26,7 @@
 <div class="hero">
   <div class="hero-tag">Reference Architecture</div>
   <h1>Event-Driven, AI-Assisted<br><span>Claims Platform</span></h1>
-  <p>A reference architecture for processing insurance claims as a stream of events on Kafka — event sourcing through review, fraud checks, correspondence, and payment, with a low-touch "auto-ticket" path for the clean, simple ones. On top sits an agentic, human-in-the-loop decisioning layer: language-model agents read documents, reconcile facts, and draft a recommended decision for a person to approve — agents reason, people decide. Demonstrated end-to-end on Life &amp; Disability claims (a death claim is filed by a beneficiary; a disability-income claim by the policyholder).</p>
+  <p>An insurance claims platform built the way I think they ought to be. Every claim is a stream of events on Kafka, from the moment it's filed through review, fraud checks, letters, and payment. The clean ones take a low-touch "auto-ticket" path and never reach a human. On top sits an AI layer: language-model agents that read the documents, reconcile the facts, and draft a decision for someone to approve. The agents reason; humans decide. I worked it end to end on Life &amp; Disability claims — a death claim comes from a beneficiary, a disability claim from the policyholder, and that one difference shapes most of the design.</p>
   <div class="hero-meta">
     <span><span class="dot" style="background:#0d9488"></span> Apache Kafka</span>
     <span><span class="dot" style="background:#2563eb"></span> Event sourcing</span>
@@ -365,16 +365,16 @@
     </div>
     <div class="decision-item">
       <div class="decision-num">Decision 07</div>
-      <h3>Agents reason, people decide</h3>
-      <p>LLM agent workers — first-class processors — read documents, reconcile facts, and draft a recommended decision with cited rationale and confidence. But a human is the decision-maker on every AI-touched claim, no denial is ever model-only, and autonomy on clean claims is an earned, governed step. The agents reason on a derived claims.ai.* stream; people keep decision authority.</p>
+      <h3>Agents reason, humans decide</h3>
+      <p>LLM agent workers — first-class processors — read documents, reconcile facts, and draft a recommended decision with cited rationale and confidence. But a human is the decision-maker on every AI-touched claim, no denial is ever model-only, and autonomy on clean claims is an earned, governed step. The agents reason on a derived claims.ai.* stream; humans keep decision authority.</p>
     </div>
   </div>
 </div>
 
 <!-- FOOTER -->
 <footer>
-  <p>Event-Driven, AI-Assisted Claims Platform — Reference Architecture <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
-  <p style="margin-top:6px;"><a href="https://github.com/harshshah85/insurance-claims-platform">github.com/harshshah85/insurance-claims-platform</a></p>
+  <p>Event-Driven, AI-Assisted Claims Platform — Reference Architecture <span class="sep">|</span> <a href="https://harshshah85.github.io/about-me/" style="color:inherit">Harsh Shah</a> <span class="sep">|</span> June 2026</p>
+  <p style="margin-top:6px;"><a href="https://harshshah85.github.io/about-me/">Portfolio ↗</a> <span class="sep">·</span> <a href="https://github.com/harshshah85/insurance-claims-platform">github.com/harshshah85/insurance-claims-platform</a></p>
 </footer>
 
 <script src="app.js" defer></script>

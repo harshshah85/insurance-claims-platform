@@ -41,7 +41,7 @@
   </div>
 
   <div class="note accent">
-    <strong>The payoff of event sourcing shows up here.</strong> Because the log <em>is</em> the system of record and everything else is a projection of it, most recovery is "replay from a durable log," not "restore a fragile database to a precise point and hope." This document sets the recovery targets, the Kafka durability posture, and — the part that matters most — how in-flight work, including a half-finished payment, comes back cleanly.
+    <strong>This is where event sourcing pays off.</strong> Because the log is the system of record and everything else is just a projection of it, most recovery is "replay from a durable log" rather than "restore a fragile database to an exact point and pray." This doc sets the recovery targets, the Kafka durability posture, and the part that actually matters: how in-flight work, including a half-finished payment, comes back without a mess.
   </div>
 
   <h1><span class="n">1</span> Failure Domains &amp; Recovery Targets</h1>
@@ -110,7 +110,7 @@ recover: orchestrator replays <span class="g">payment.disbursement.v1</span> for
 </div>
 
 <footer>
-  <p>Resilience &amp; Disaster Recovery — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Resilience &amp; Disaster Recovery — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> <a href="https://harshshah85.github.io/about-me/" style="color:inherit">Harsh Shah</a> <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

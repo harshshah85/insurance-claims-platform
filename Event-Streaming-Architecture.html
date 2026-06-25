@@ -43,8 +43,32 @@
   </div>
 
   <div class="note accent">
-    <strong>The idea in one line:</strong> Kafka isn't a side-channel here — it's the backbone. Each claim is stored as its ordered list of events, and that list is the official record. Everything else — auto-ticketing, fraud checks, letters, payments, reporting — simply reads from it. This document follows the events from the ground up: the facts themselves, the topics that carry them, the contract they share, how they form the record, and how they're processed reliably.
+    <strong>Kafka isn't a side-channel here. It's the backbone.</strong> Each claim is stored as the ordered list of events that happened to it, and that list is the official record. Everything else — auto-ticketing, fraud checks, letters, payments, reporting — just reads from it. This doc works through the events from the ground up: the facts, the topics that carry them, the contract they share, how they add up to the record, and how they get processed without anything slipping.
   </div>
+
+  <h2 style="margin-top:6px">The shape of it, in one picture: producers write events, Kafka keeps the record, and everything else just reads the log.</h2>
+  <div class="diagram">  ┌────────────────────────────────────────────────────────────────────────────┐
+  │  <span class="b">PRODUCERS</span>  —  write events (facts)                                        │
+  │  Channels: web · advisor · phone · mail   ──►  Intake API                  │
+  │  Policy Admin   ──►  Kafka Connect  (change-data-capture)                  │
+  └────────────────────────────────────────────────────────────────────────────┘
+                                         │
+                                         ▼   <span class="m">append</span>
+  ╔════════════════════════════════════════════════════════════════════════════╗
+  ║  <span class="g">KAFKA</span>  —  the append-only, ordered log,  <span class="g">the one source of truth</span>          ║
+  ║  claims.fnol · claims.lifecycle · claims.decision · party · …              ║
+  ╚════════════════════════════════════════════════════════════════════════════╝
+                                         │
+                                         ▼   <span class="m">every consumer reads the same log, independently</span>
+  ┌────────────────────────────────────────────────────────────────────────────┐
+  │  <span class="y">CONSUMERS</span>  —  read the log and react   (always derived, never the source) │
+  │  • STP Decisioning     ──►  auto-ticket  /  human queue                    │
+  │  • Fraud Scoring       ──►  SIU referral  +  payment hold                  │
+  │  • <span class="p">AI Agents</span>           ──►  drafted recommendation  (advisory)             │
+  │  • Projectors (CQRS)   ──►  read models  ──►  APIs  ──►  apps              │
+  │  • Outbound            ──►  letters · payments (saga)                      │
+  └────────────────────────────────────────────────────────────────────────────┘
+</div>
 
   <!-- 1. EVENT CATALOG -->
   <h1><span class="n">1</span> The Domain Event Catalog — 36 Events</h1>
@@ -63,7 +87,7 @@
     <tr><td><strong>Correspondence</strong></td><td><code>CorrespondenceRequested</code>, <code>CorrespondenceDelivered</code> <span class="m">(inbound variants share the topic)</span></td></tr>
   </table>
 
-  <div class="note"><strong>Agentic decisioning events are recommendations by design.</strong> The agent workers emit their own events on <code>claims.ai.v1</code> — e.g. <code>DecisionProposed</code>, <code>EscalatedToManualReview</code> — as <em>recommendations and hand-offs</em>, distinct from the 36-event catalog of authoritative facts. Those facts (<code>ClaimApproved</code>, <code>ClaimDenied</code>, <code>ClaimAutoApproved</code>) stay owned by the Adjudication context and are produced by a human decision or the deterministic auto-ticket lane — agents reason, people decide. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)</div>
+  <div class="note"><strong>Agentic decisioning events are recommendations by design.</strong> The agent workers emit their own events on <code>claims.ai.v1</code> — e.g. <code>DecisionProposed</code>, <code>EscalatedToManualReview</code> — as <em>recommendations and hand-offs</em>, distinct from the 36-event catalog of authoritative facts. Those facts (<code>ClaimApproved</code>, <code>ClaimDenied</code>, <code>ClaimAutoApproved</code>) stay owned by the Adjudication context and are produced by a human decision or the deterministic auto-ticket lane — agents reason, humans decide. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)</div>
 
   <!-- 2. TOPIC TAXONOMY -->
   <div class="page-break"></div>
@@ -229,7 +253,7 @@ Intake Service  ─►  BEGIN TX
 </div>
 
 <footer>
-  <p>Event Streaming Architecture — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Event Streaming Architecture — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> <a href="https://harshshah85.github.io/about-me/" style="color:inherit">Harsh Shah</a> <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

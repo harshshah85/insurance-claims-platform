@@ -40,7 +40,7 @@
 </div>
 
 <div class="key">
-  <strong>The principle in one line.</strong> Every claim still runs the <em>full</em> check pipeline — all the deterministic policy, coverage, identity, fraud and compliance checks, with the same complete event trail. AI doesn't skip any of that. It does the <strong>judgment-shaped work</strong> that today eats adjudicator time — reading documents, reconciling facts, drafting a decision with a cited rationale, writing letters — and it produces <strong>proposed findings, not authority</strong>. A person reviews the findings and approves on the assisted path; the clean auto-ticket path stays rule-decided; and anything the AI can't ground or is unsure about is handed to a human.
+  <strong>Here's the deal.</strong> Every claim still runs the <em>full</em> check pipeline — all the deterministic policy, coverage, identity, fraud, and compliance checks, with the same complete event trail. The AI skips none of it. What it does is the judgment-shaped work that eats an adjudicator's day: reading documents, reconciling facts, drafting a decision with a cited rationale, writing the letters. And what it hands back is a <strong>proposal, not a decision</strong>. A person reviews and approves on the assisted path, the clean auto-ticket path stays rule-decided, and anything the AI can't ground or isn't sure about goes to a human.
 </div>
 
 <h1><span class="n">1</span> A Third Decision Layer — Not a Replacement</h1>
@@ -92,7 +92,7 @@
   <tr><td><strong>Correspondence</strong></td><td>Correspondence</td><td><code>LetterDrafted</code></td><td>Drafts; a human releases</td></tr>
 </table>
 
-<div class="note"><strong>How this fits the event backbone.</strong> The agent workers are <em>first-class processors</em> that reason off the committed log and draft onto a dedicated <code>claims.ai.*</code> stream — derived the way CQRS read models are derived. By design they speed up the existing nine contexts rather than forming a tenth, and authority stays with people: the core decision, fraud, and money-movement events remain owned by their contexts and are produced by a human or the deterministic auto-ticket lane. Agents reason, people decide.</div>
+<div class="note"><strong>How this fits the event backbone.</strong> The agent workers are <em>first-class processors</em> that reason off the committed log and draft onto a dedicated <code>claims.ai.*</code> stream — derived the way CQRS read models are derived. By design they speed up the existing nine contexts rather than forming a tenth, and authority stays with humans: the core decision, fraud, and money-movement events remain owned by their contexts and are produced by a human or the deterministic auto-ticket lane. Agents reason, humans decide.</div>
 
 <!-- SKILLS & TOOLS -->
 <div class="page-break"></div>
@@ -133,7 +133,7 @@
 
 <table>
   <tr><th>Trigger</th><th>Why it escalates</th></tr>
-  <tr><td>Confidence below threshold on any extraction or decision factor</td><td>An unsure model output is worth less than an honest "send this to a person"</td></tr>
+  <tr><td>Confidence below threshold on any extraction or decision factor</td><td>An unsure model output is worth less than an honest "send this to a human"</td></tr>
   <tr><td>Evidence conflicts / reconciliation fails</td><td>Dates, amounts, or provider details don't agree across documents</td></tr>
   <tr><td>A hard guardrail trips</td><td>Contestability, fraud ≥ 60, OFAC, amount over limit, beneficiary dispute — policy, not model</td></tr>
   <tr><td>Document quality too poor to extract reliably</td><td>Better to ask the claimant again than to guess</td></tr>
@@ -142,7 +142,7 @@
   <tr><td>Decisioning and Fraud agents disagree</td><td>Conflict between agents is a signal for a human, not a tie to break automatically</td></tr>
 </table>
 
-<div class="key"><strong>Abstention is a first-class output.</strong> "I don't know — route this to a person" is an encouraged, well-rewarded agent result, not an error. The platform is tuned so that the cost of a wrong auto-decision is always higher than the cost of one more manual review.</div>
+<div class="key"><strong>Abstention is a first-class output.</strong> "I don't know — route this to a human" is an encouraged, well-rewarded agent result, not an error. The platform is tuned so that the cost of a wrong auto-decision is always higher than the cost of one more manual review.</div>
 
 <h1><span class="n">6</span> Governance &amp; Guardrails for the AI Itself</h1>
 <h2>The part a regulator or a market-conduct examiner will ask about. Each of these is a non-negotiable property of the reasoning layer.</h2>
@@ -225,7 +225,7 @@ human decision (confirm · correct · decide)  ──►  <span class="g">claims
   <tr><th>Metric</th><th>Target</th><th>Meaning</th></tr>
   <tr><td>Packet acceptance rate (ASSISTED)</td><td>High &amp; rising</td><td>Share of AI decision packets a human confirms with no correction — the trust signal</td></tr>
   <tr><td>Grounding rate</td><td>~100%</td><td>Findings that carry a valid source citation; ungrounded output should be near zero</td></tr>
-  <tr><td>Abstention precision</td><td>Track &amp; tune</td><td>When the AI escalates, how often a human agrees it truly needed a person</td></tr>
+  <tr><td>Abstention precision</td><td>Track &amp; tune</td><td>When the AI escalates, how often a human agrees it truly needed a human</td></tr>
   <tr><td>False-auto rate</td><td>&lt; 0.5%</td><td>Auto-ticketed claims later found to need review — the number to never let creep</td></tr>
   <tr><td>Adjudicator time saved</td><td>Trend up</td><td>Cycle-time delta on AI-assisted vs. unassisted claims of the same tier</td></tr>
 </table>
@@ -233,7 +233,7 @@ human decision (confirm · correct · decide)  ──►  <span class="g">claims
 </div>
 
 <footer>
-  <p>AI-Assisted &amp; Agentic Decisioning — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>AI-Assisted &amp; Agentic Decisioning — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> <a href="https://harshshah85.github.io/about-me/" style="color:inherit">Harsh Shah</a> <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

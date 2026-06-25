@@ -40,7 +40,7 @@
 </div>
 
 <div class="note">
-  <strong>Two integration surfaces, one principle.</strong> Both correspondence and money movement are <em>event-driven and idempotent</em>. Correspondence reacts to claim events and fans out across channels; money movement is a compensating saga that never uses a distributed transaction. Both are decoupled from the claim aggregate — they consume facts and report facts back, closing the loop.
+  <strong>Correspondence and money movement work the same way.</strong> Both are event-driven and idempotent. Correspondence reacts to claim events and fans out across channels; money movement runs as a compensating saga that never reaches for a distributed transaction. Neither is wired into the claim aggregate — they consume facts and report facts back, which closes the loop.
 </div>
 
 <h1><span class="n">1</span> Correspondence — Event-Driven &amp; Omnichannel</h1>
@@ -72,7 +72,7 @@
 
 <div class="chan"><strong>Advisor &amp; service-rep loop:</strong> advisors see their clients' claim correspondence in their desktop and can act (nudge a requirement, request a status). Service reps work from the same <code>advisor_worklist</code> read model. Both are first-class correspondence audiences, not afterthoughts — important for an advice-led distribution model.</div>
 
-<div class="note"><strong>Agent-assisted drafting.</strong> The Correspondence agent drafts outbound letter copy — acknowledgement, requirements, decision and payment notices — from the triggering event, so a person reviews ready text instead of writing from scratch. Regulated notices (a denial with its reason code and appeal rights) are always reviewed and released by a human before the Engine delivers them: the agent drafts, a person approves — agents reason, people decide. Drafts ride the advisory <code>claims.ai.v1</code> stream; the delivered communication remains a <code>correspondence.v1</code> fact. <strong>Money movement is never agent-initiated</strong> — the disbursement saga's dual control and OFAC gates below are unchanged.</div>
+<div class="note"><strong>Agent-assisted drafting.</strong> The Correspondence agent drafts outbound letter copy — acknowledgement, requirements, decision and payment notices — from the triggering event, so a human reviews ready text instead of writing from scratch. Regulated notices (a denial with its reason code and appeal rights) are always reviewed and released by a human before the Engine delivers them: the agent drafts, a human approves — agents reason, humans decide. Drafts ride the advisory <code>claims.ai.v1</code> stream; the delivered communication remains a <code>correspondence.v1</code> fact. <strong>Money movement is never agent-initiated</strong> — the disbursement saga's dual control and OFAC gates below are unchanged.</div>
 
 <!-- MONEY MOVEMENT -->
 <div class="page-break"></div>
@@ -150,7 +150,7 @@
 </div>
 
 <footer>
-  <p>Correspondence &amp; Money Movement — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Correspondence &amp; Money Movement — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> <a href="https://harshshah85.github.io/about-me/" style="color:inherit">Harsh Shah</a> <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

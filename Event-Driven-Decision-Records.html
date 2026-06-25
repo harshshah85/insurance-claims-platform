@@ -40,7 +40,7 @@
 </div>
 
 <div class="note">
-  <strong>Why ADRs, not a vendor bake-off.</strong> The defining choices on this platform are architectural patterns, not product logos. Each record below states the decision, the options weighed, the trade-off, and the consequence. Decisions are deliberately reversible where cheap and deliberately locked where a reversal would be catastrophic (money movement, audit).
+  <strong>Why ADRs, and not a vendor bake-off.</strong> The choices that define this platform are architectural patterns, not product logos. Each record below gives the decision, the options I weighed, the trade-off, and what it commits us to. Some are kept easy to reverse; others are locked down hard, because reversing them — money movement, audit — would be catastrophic.
 </div>
 
 <div class="adr">
@@ -118,7 +118,7 @@
 
 <div class="adr">
   <h3>ADR-07 — LLM/agent assist as advisory vs. autonomous AI decisioning <span class="status">ACCEPTED</span></h3>
-  <p class="ctx"><strong>Context:</strong> an LLM/agent layer can read documents, reconcile facts, and draft a decision far faster than a person. The question is how much authority it holds — does it decide claims, or recommend to a human who decides?</p>
+  <p class="ctx"><strong>Context:</strong> an LLM/agent layer can read documents, reconcile facts, and draft a decision far faster than a human. The question is how much authority it holds — does it decide claims, or recommend to a human who decides?</p>
   <table>
     <tr><th>Option</th><th>Pros</th><th>Cons</th></tr>
     <tr><td class="winner">Advisory now → governed graduation to deciding</td><td>Human stays accountable; every recommendation auditable; defensible under AI-governance rules; builds an evidence base (acceptance/accuracy) before any autonomy</td><td>Slower to full automation; humans still in the assisted loop</td></tr>
@@ -140,7 +140,7 @@
 </div>
 
 <footer>
-  <p>Event-Driven Decision Records — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> Harsh Shah <span class="sep">|</span> June 2026</p>
+  <p>Event-Driven Decision Records — Event-Driven, AI-Assisted Claims Platform <span class="sep">|</span> <a href="https://harshshah85.github.io/about-me/" style="color:inherit">Harsh Shah</a> <span class="sep">|</span> June 2026</p>
   <p style="margin-top:6px;"><a href="index.html">← Back to all reference documents</a></p>
 </footer>
 

@@ -3,21 +3,22 @@
 
 > **How to use this file**
 > - **Hero image:** upload `hero-image.png` (1200×627) as the LinkedIn article cover.
-> - **Article body:** paste everything below the line "ARTICLE" into LinkedIn's article editor.
-> - **Teaser post:** use the short "LINKEDIN POST" block to share the article.
+> - **Article body:** paste everything below the "ARTICLE" line into LinkedIn's article editor.
+> - **Teaser post:** use the short "LINKEDIN POST" block to share it.
 > - Live reference architecture: **https://harshshah85.github.io/insurance-claims-platform/**
+> - More of my work: **https://harshshah85.github.io/about-me/**
 
 ---
 
 ## LINKEDIN POST (the share that links the article)
 
-Most "AI in claims" stories bolt a model onto a system that overwrites its own history — then can't explain a denial six months later.
+A lot of "AI in claims" projects bolt a model onto a system that overwrites its own history. Then, six months later, nobody can explain a denial.
 
-I built a vendor-neutral **reference architecture** for a Life & Disability claims platform that does it the other way around: the **event log is the system of record**, and AI is a **first-class but advisory** layer. Agents reason; people decide.
+So I built the opposite. It's a vendor-neutral reference architecture for a Life & Disability claims platform where the event log is the system of record, and the AI is an advisory layer sitting on top. The agents do the reading and reasoning. Humans make the call.
 
-It's fully documented and live — 12 reference docs covering the event backbone, the agentic decisioning layer, security & regulation, money movement, resilience, and the cost model. The white paper below is the 10-minute version.
+It's fully written up and live — 12 docs covering the event backbone, the agentic decisioning layer, security and regulation, money movement, resilience, and the cost model. The white paper below is the short version.
 
-🔗 Live architecture + docs: https://harshshah85.github.io/insurance-claims-platform/
+🔗 https://harshshah85.github.io/insurance-claims-platform/
 
 #EventDriven #Kafka #SoftwareArchitecture #InsurTech #AI #EventSourcing
 
@@ -27,74 +28,72 @@ It's fully documented and live — 12 reference docs covering the event backbone
 
 ![Event-Driven, AI-Assisted Claims Platform](hero-image.png)
 
-## The problem nobody wants to own
+## A hard job with an unforgiving audience
 
-A claims platform has a hard job and an unforgiving audience. It moves money to people on the worst day of their lives, using their most sensitive data, under rules that vary by state and carry interest penalties for being late. And it has to do two genuinely different jobs at once:
+Claims is a deceptively hard domain. You're moving money to people on the worst day of their lives, using their most sensitive data, under rules that change by state and charge you interest for being late.
 
-- A **life (death) claim** is filed by a *beneficiary* — often a grieving stranger to your systems who may not even know the policy number. It pays once, and the hard part is the front door: proving who they are, who's entitled, that the death happened, and which policy it maps to.
-- A **disability-income claim** is filed by the *policyholder* — an existing, authenticated customer. It pays a recurring benefit, and the hard part is the long tail: recertification, return-to-work, income offsets, month after month.
+And you're really doing two different jobs at once.
 
-Most modernization efforts take a familiar shape: a CRUD system that overwrites rows, a bolted-on audit table that drifts from the truth, and — lately — an AI model wired on top that can produce an answer but not a defensible *reason*. That works in a demo and fails in a market-conduct exam.
+A **life (death) claim** comes from a beneficiary — often someone who isn't in your systems at all and may not know the policy number. It pays once. The hard part is the front door: proving who they are, working out who's entitled, confirming the death, and finding the right policy.
+
+A **disability-income claim** comes from the policyholder, who is already a known, logged-in customer. It pays a benefit every month. The hard part is the long tail: recertification, return-to-work, income offsets, on and on.
+
+Most modernization efforts follow the same script. A CRUD system that overwrites rows. An audit table bolted on the side that slowly drifts from the truth. And lately, an AI model wired on top that can produce an answer but not a reason you'd want to defend. That's fine in a demo. It falls apart in a market-conduct exam.
 
 This is a reference architecture for doing it the other way around.
 
-## The core idea: the event is the record
+## Make the event the record
 
-Store each claim as the **ordered list of events that happened to it** — notified, policy resolved, requirement satisfied, scored, decided, paid — and make that log the system of record. Everything else (screens, dashboards, search) is a **projection** built by replaying the log. This is event sourcing with CQRS, on Apache Kafka.
+The core decision is simple to state. Store each claim as the ordered list of events that happened to it — notified, policy resolved, requirement satisfied, scored, decided, paid — and treat that log as the source of truth. Everything you look at on a screen is a projection built by replaying it. That's event sourcing with CQRS, running on Apache Kafka.
 
-Two payoffs fall out immediately:
+Two things follow immediately.
 
-1. **A complete, tamper-evident history for free.** When an examiner asks "show me every action on this claim, in order, and who took it," the answer *is* the log — with approver identities and causation links, not a reconstruction from scattered tables.
-2. **Disposable read models.** A projection bug is fixed by redeploying the projector and replaying — never by patching production rows. A view can be dropped and rebuilt from offset zero.
+First, you get a complete, tamper-evident history for free. When a regulator asks to see every action on a claim, in order, with the person who took each one, the log *is* the answer. You're not stitching it back together from a dozen tables and some application logs.
 
-On top of the backbone sit the things that make it a *claims* platform: a **straight-through-processing (STP) score** that auto-tickets clean, low-risk claims with no human; a separate **fraud score** that acts as a hard gate (a suspicious claim never auto-pays, however clean it looks); and a **saga** for money movement — small, individually reversible steps with compensation, because a disbursement spans your platform, a treasury system, and a bank, and no single transaction can or should span all three.
+Second, your read models become disposable. A bug in a projection isn't a data-fix emergency. You redeploy the corrected projector, replay the log, and the view rebuilds itself. Nothing in production got patched by hand.
 
-## Adding AI without giving away the store
+On top of that backbone go the things that make it a claims platform. A straight-through-processing score (STP) that auto-tickets the clean, low-risk claims with no human involved. A separate fraud score that acts as a hard gate, so a suspicious claim never auto-pays no matter how clean it otherwise looks. And a saga for money movement, because a disbursement crosses your platform, a treasury system, and a bank — three systems no single transaction should ever try to wrap. The saga makes each step its own observable, reversible stage instead.
 
-Here's where most designs get the governance backwards. The temptation is to let the model decide. The discipline is to let it **reason** and keep people **deciding**.
+## Add AI without handing over the keys
 
-In this architecture, the AI is a **third decision layer** on top of the existing two (deterministic guardrails, then rules-and-ML scoring). A supervisor orchestrator fans out to specialist LLM agents — intake & triage, document intelligence, policy & coverage, decisioning, a fraud copilot, correspondence — each scoped to a bounded context it already serves. They read documents, reconcile facts across them, and draft a **decision packet**: a recommendation with cited evidence, per-factor reasoning, and a confidence score.
+This is where I think most designs get the governance backwards. The instinct is to let the model decide. The discipline is to let it reason, and keep humans deciding.
 
-Crucially, the agents are **advisory by design**:
+So the AI is a third decision layer, sitting above the two that were already there: the deterministic guardrails, and the rules-and-ML scoring. A supervisor orchestrator runs once per claim and fans out to specialist agents — intake and triage, document intelligence, policy and coverage, decisioning, a fraud copilot, correspondence. Each one is scoped to a context it already serves. They read the documents, reconcile the facts across them, and hand a human a decision packet: a recommendation, the evidence it's based on, the reasoning per factor, and a confidence score.
 
-- Every claim still runs the **full deterministic check pipeline**. AI skips nothing.
-- AI produces **proposed findings, not authority**. A person reviews and approves on the assisted path; the clean auto-ticket lane stays rule-decided.
-- **No denial is ever model-only** — it cites a coded reason mapped to a policy provision and is signed by a human.
-- Every AI output is itself an event on a derived `claims.ai.*` stream, carrying the model version, the inputs it saw, and its confidence — so "what did the AI suggest, and did a human decide?" is answerable for any claim, forever.
+The important part is what they *can't* do.
 
-And because the agents reason off the *committed* log without mutating it, a slow or failed model degrades adjudicator assist — it can never corrupt or block a claim's authoritative history.
+Every claim still runs the full deterministic pipeline. The AI doesn't get to skip a check. It produces proposed findings, not authority — a human reviews and approves on the assisted path, and the clean auto-ticket lane stays rule-decided. A denial is never the model's alone; it has to cite a coded reason mapped to a policy provision, signed by a human. And every AI output is itself an event, stamped with the model version, the inputs it saw, and its confidence. So for any claim you can answer the only question that matters in an audit: what did the AI suggest, and who actually decided?
 
-**Does it get smarter? Yes — through a flywheel, not a leap.** Every human decision is also a label. Confirmations and corrections land next to the agent's recommendation, becoming the training set for the next model and the evaluation set for the next agent version — gated by an offline "golden set" and rolled out shadow → canary → full. But more labels make the *recommendations* sharper; they do not quietly grant the model *authority*. Moving a claim class from "recommend" to "decide" is a deliberate, governed, one-directional step — earned against human reviewers, never an automatic consequence of a good score.
+There's a quieter benefit too. Because the agents reason off the committed log without writing back to it, a slow or broken model just degrades the assist. It can't corrupt or block a claim's real history.
 
-## The three problems that separate a real design from a slide
+Does it get better over time? Yes — but through a flywheel, not a leap. Every human decision is also a label. The confirmations and corrections land next to the agent's recommendation, and that becomes the training data for the next model and the test set for the next agent version, gated by an offline evaluation before anything ships and rolled out shadow-then-canary. More labels make the recommendations sharper. They do not quietly hand the model more authority. Moving a class of claims from "recommend" to "decide" is a deliberate, governed step you take on purpose, once the evidence is there — never something that happens because a metric looked good.
 
-Anyone can draw boxes and arrows. The credibility is in the parts most reference architectures quietly skip.
+## The parts most diagrams skip
 
-**1. Don't compact your system of record.** Kafka's log compaction keeps only the latest value per key — perfect for a *latest-state* topic like a policy snapshot, and quietly fatal for an *event log*, because it discards exactly the history event sourcing depends on. The fix is a discipline: the event-sourced log and the fact/audit streams use long retention on tiered storage and are **never compacted**; compaction is reserved for latest-state topics. (Easy to get wrong — I caught this exact contradiction in my own first draft.)
+Anyone can draw boxes and arrows. The credibility is in the three problems that usually get left off the slide.
 
-**2. The right to be forgotten, on an immutable log.** Privacy law says a person can ask to be erased. Event sourcing says the log is append-only and never deleted. These look irreconcilable — until you stop trying to erase the *log*. With **crypto-shredding**, each subject's personal data is encrypted under a per-subject key; to honor an erasure request you **destroy the key**. The events stay exactly where they are — same offsets, same hash chain, same audit guarantees — but the personal data inside them becomes unrecoverable ciphertext. You satisfy erasure *and* keep a tamper-evident record, because erasure acts on the key, never on the log.
+**Don't compact your system of record.** Kafka has log compaction, which keeps only the latest value per key. That's exactly right for a latest-state topic like a policy snapshot. It's quietly fatal for an event log, because it throws away the history that event sourcing exists to keep. So the rule is firm: the event log and the audit streams use long retention on tiered storage and are never compacted; compaction is reserved for latest-state topics. (I'll admit I had this wrong in my own first draft and caught it on review. It's an easy mistake to make.)
 
-**3. Recovering an in-flight payment.** A region fails over while a disbursement is half-done. Because the saga's state is itself a stream of events, recovery is deterministic: the orchestrator rehydrates each in-flight payment by replaying its events and resumes exactly where it stopped. Idempotency keys make a retried step a no-op at the bank rail — so a payment can never go out twice. The same three properties that make the platform auditable (state in the log, recovery by replay, idempotent effects) are what make it recoverable. That's not luck; it's the architecture paying a second dividend.
+**The right to be forgotten, on a log you never delete from.** Privacy law says a human can ask to be erased. Event sourcing says the log is append-only. Those look impossible to reconcile until you stop trying to erase the log. The trick is crypto-shredding: encrypt each person's data under a key that's unique to them, and when they ask to be erased, destroy the key. The events stay exactly where they are, with the same ordering and the same hash chain, but the personal data inside them is now unreadable. You've honored the erasure and kept a tamper-evident record, because you acted on the key, not the log.
+
+**Getting a half-finished payment back.** Picture a region failing over mid-disbursement. Because the saga keeps its state as events, recovery is just replay: the orchestrator rehydrates each in-flight payment and picks up exactly where it stopped. Idempotency keys mean a retried step is a no-op at the bank, so nobody gets paid twice. The same properties that make this platform auditable — state in the log, recovery by replay, effects that are safe to retry — are what make it recoverable. You get that second benefit for free once you've committed to the first.
 
 ## Why it pays for itself
 
-The business case is not exotic. It compounds:
+The business case isn't exotic, and it compounds.
 
-- **Auto-ticket deflection** — clean claims handled with little or no manual adjudication; the biggest lever, and it widens as the low-touch path matures.
-- **Faster cycle time** — visible immediately, even before any automation, and it directly reduces statutory prompt-pay interest.
-- **Less leakage** — more fraud caught via scoring and investigations routing; offsets and return-to-work applied on DI before you overpay.
-- **Defensibility** — every decision, human or automated, is explainable and auditable. That is worth more than it looks the first time a regulator asks.
+The biggest lever is auto-ticketing the clean claims, and it grows as the low-touch path widens. Faster cycle time shows up immediately, even before any real automation, and it directly cuts the statutory interest you owe on late payments. You lose less to fraud, because scoring and routing catch more of it, and on DI you apply offsets and catch return-to-work before you overpay. And everything stays defensible, because every decision — human or automated — is explainable. That last one is worth more than it looks, right up until the first time a regulator asks.
 
-The honest headline from the cost model: at realistic volumes, **infrastructure isn't the expensive part — the build is.** The Kafka run-rate is modest next to the engineering effort, which means cost control is mostly scope discipline: ship a thin, end-to-end slice (one claim type, front door to payment), prove cycle time on real claims, and let the case for going further make itself.
+One honest note from the cost model: at realistic volumes, the infrastructure isn't the expensive part. The build is. The Kafka run-rate is modest next to the engineering effort, which means cost control is mostly about scope discipline. Ship one claim type end to end, prove the cycle-time win on real claims, and the case for going further makes itself.
 
-## What this is
+## What this actually is
 
-It's a **vendor-neutral reference architecture** — open patterns only (event sourcing, CQRS, saga, outbox, change-data-capture, Avro with a schema registry), no product logos, with Life & Disability as the worked example because the domain's specifics (contestability, beneficiary identity, recertification, regulated money movement) are what make the design concrete rather than abstract.
+It's a vendor-neutral reference architecture. Open patterns only — event sourcing, CQRS, saga, outbox, change-data-capture, Avro with a schema registry — and no product logos. I used Life & Disability as the worked example on purpose, because the specifics (contestability, beneficiary identity, recertification, regulated money movement) are what keep a design honest instead of abstract.
 
-It's fully written up and live: L1/L2 diagrams, the event-streaming backbone, the domain model, decisioning & fraud, the AI-assisted layer, security & regulatory compliance, correspondence & money movement, observability, resilience & disaster recovery, the FinOps cost model, the architecture decision records, and a glossary.
+It's all written up and live: the L1/L2 diagrams, the event-streaming backbone, the domain model, decisioning and fraud, the AI-assisted layer, security and regulatory compliance, correspondence and money movement, observability, resilience and disaster recovery, the cost model, the decision records, and a glossary.
 
-**Read the whole thing:** https://harshshah85.github.io/insurance-claims-platform/
+**The whole thing is here:** https://harshshah85.github.io/insurance-claims-platform/
 
 ---
 
-*I'm Harsh Shah. I design event-driven and AI-assisted platforms for regulated domains. This reference architecture is a personal, self-directed build — I'd genuinely welcome critique from people who've shipped claims, payments, or event-sourced systems at scale. What would you challenge?*
+*I'm [Harsh Shah](https://harshshah85.github.io/about-me/). I design event-driven and AI-assisted platforms for regulated domains. This one is a humanal build, done on my own time, and I'd genuinely like to hear where people who've shipped claims, payments, or event-sourced systems at scale would push back. What would you change?*
