@@ -53,7 +53,7 @@
     <tr><td>Stream processor crash</td><td>One processor lags briefly</td><td>Seconds</td><td>0</td><td>Restart restores state from its compacted changelog and resumes from its committed offset. Exactly-once means no double effects.</td></tr>
     <tr><td>Read-model store loss</td><td>That query view is stale/unavailable</td><td>Rebuild time</td><td>0</td><td>Read models are projections — drop and rebuild by replaying the log. No data is lost because none was the source of truth.</td></tr>
     <tr><td>Poison event / bad deploy</td><td>One consumer group stalls</td><td>Minutes</td><td>0</td><td>Tiered retry → dead-letter queue isolates the bad message; roll back the deploy and replay. The log is untouched.</td></tr>
-    <tr><td>Whole-region loss</td><td>Platform failover</td><td>Minutes–hours</td><td>Near-0</td><td>Standby region fed by asynchronous cluster replication; failover promotes it. RPO equals the replication lag at the moment of loss.</td></tr>
+    <tr><td>Whole-region loss</td><td>Platform failover</td><td>Minutes–hours</td><td>= replication lag (bounded, &gt; 0)</td><td>Standby region fed by asynchronous cluster replication; failover promotes it. Because replication is async, the RPO is <em>not</em> zero — it is exactly the replication lag at the moment of loss: the most recent, not-yet-shipped events can be lost. §3 deals with what that means for a payment caught in that window.</td></tr>
   </table>
 
   <div class="note">Targets are tiered on purpose: the money-movement and audit paths get the tightest numbers; a stale dashboard can wait. Spending the same RTO budget everywhere would be over-engineering.</div>
@@ -64,9 +64,11 @@
     <tr><td>Replication factor</td><td>3, across 3 availability zones</td><td>Survive a broker or a full zone with no data loss.</td></tr>
     <tr><td>In-sync replicas</td><td><code>min.insync.replicas=2</code> + <code>acks=all</code></td><td>A write is acknowledged only once durably on two zones — no silent loss on a failover.</td></tr>
     <tr><td>The event log</td><td>Long retention on tiered storage; never compacted</td><td>The full history stays replayable for rebuild and audit (see Event Streaming Architecture).</td></tr>
-    <tr><td>Cross-region</td><td>Asynchronous cluster replication to a standby region</td><td>A regional disaster fails over to a warm copy; async keeps the hot path fast, accepting a small RPO.</td></tr>
-    <tr><td>Backups</td><td>Tiered-storage segments in durable object storage</td><td>The log's older segments already live in cheap, durable storage — that <em>is</em> the backup, and it's replayable.</td></tr>
+    <tr><td>Regional-disaster protection</td><td>Asynchronous cluster replication to a <em>standby region</em></td><td>This is the only control that survives losing the whole primary region. Async keeps the hot path fast but means a non-zero RPO — the replication lag at the moment of loss (see §1).</td></tr>
+    <tr><td>Broker / zone durability + cost</td><td>Tiered-storage segments in the same region's object storage</td><td>The log's older segments live in cheap, durable storage with RPO&nbsp;0 — but <em>only within the surviving region</em>. This is a broker/zone-durability and fast-replay lever, <strong>not</strong> a regional-disaster backup; against a region loss it is gone with everything else unless that bucket is itself cross-region replicated.</td></tr>
   </table>
+
+  <div class="note"><strong>Two mechanisms, two jobs — don't conflate them.</strong> The <em>cross-region replica</em> is your protection against losing a region, and it carries a real (&gt; 0) RPO. <em>Tiered storage</em> is cost optimization plus broker/zone durability plus fast replay, with RPO&nbsp;0 but only inside the region that survives. A region-loss event is covered by the first, not the second.</div>
 
   <div class="page-break"></div>
   <h1><span class="n">3</span> Recovering In-Flight Work — Including a Payment</h1>
@@ -86,6 +88,10 @@ recover: orchestrator replays <span class="g">payment.disbursement.v1</span> for
 </div>
 
   <div class="note accent"><strong>Why this is clean and not luck:</strong> the saga state lives in the log, not in a process; recovery is replay, not reconstruction; and idempotency keys make "did that step already happen?" a safe question to get wrong. The same three properties that make the platform auditable make it recoverable.</div>
+
+  <h3>The edge case the async RPO forces: a lost <code>PaymentSettled</code></h3>
+  <p>Walk the one scenario where "the log is the truth" and "async RPO&nbsp;&gt;&nbsp;0" collide over real money. The primary region writes <span class="y">PaymentSettled</span> — the bank rail <em>did</em> execute — but that event hasn't replicated when the region dies. The standby promotes, the saga rehydrates from the <em>replicated</em> log, sees the payment still at <span class="y">PaymentHeld</span>, and re-issues <span class="b">cmd.disburse</span>. The idempotency key protects the bank rail from a double-debit — <em>but only if the key's dedupe state also survived the failover.</em></p>
+  <p>It does, because the dedupe state is <strong>derived from the same replicated <code>payment.disbursement.v1</code> stream</strong>, not held in a side store with its own DR posture: on failover the orchestrator rebuilds the dedupe ledger by replaying that stream, so a <code>cmd.disburse</code> whose <span class="y">PaymentSettled</span> <em>did</em> replicate is correctly suppressed. The genuinely exposed case is narrow — a settlement that executed at the bank but whose event sat in the unreplicated async window. There, replay can't see it, and the backstop is the one already run every day: <strong>daily treasury settlement-file reconciliation</strong> catches the re-disbursement (the bank shows two debits, or the second is rejected as a duplicate), and a compensating event corrects the log. The async window doesn't make double-payment impossible by replay alone — reconciliation is the named control that closes it.</p>
 
   <h1><span class="n">4</span> Backups, Replay &amp; Rebuild</h1>
   <ul>

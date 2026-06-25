@@ -37,6 +37,14 @@
   </div>
 </div>
 
+<!-- READING PATH -->
+<div class="wrap section" style="padding-bottom:0;">
+  <div class="panel">
+    <h2>New here? A suggested path.</h2>
+    <p style="color:var(--muted);line-height:1.65;margin:0;">Start with the <a href="Architecture-Diagrams-L1-L2.html"><strong>L1 &amp; L2 Diagrams</strong></a> for the shape of it, then the <a href="Event-Driven-Decision-Records.html"><strong>Decision Records</strong></a> for the <em>why</em> behind the big choices. From there, <a href="Event-Streaming-Architecture.html"><strong>Event Streaming Architecture</strong></a> is the spine — read it next if you only read one deep doc. <a href="Claims-Decisioning-and-Fraud.html"><strong>Claims Decisioning &amp; Fraud</strong></a> and <a href="AI-Agentic-Decisioning.html"><strong>AI-Assisted &amp; Agentic Decisioning</strong></a> are the heart of how claims actually get decided. The rest — Security, Correspondence &amp; Money Movement, Observability, Resilience, FinOps, Onboarding — each go deep on one concern; read them when that concern is what you care about. The <a href="Glossary.html"><strong>Glossary</strong></a> is there whenever a term isn't pulling its weight.</p>
+  </div>
+</div>
+
 <!-- DOCUMENT CARDS -->
 <div class="wrap section">
   <div class="section-label">Reference Documents</div>
@@ -356,7 +364,7 @@
     <div class="decision-item">
       <div class="decision-num">Decision 05</div>
       <h3>STP &amp; Fraud Scoring Formulas</h3>
-      <p>STP = (policy_in_force × 0.25) + (coverage_clear × 0.20) + (doc_completeness × 0.20) + (identity_verified × 0.15) + (fraud_inverse × 0.10) + (amount_in_band × 0.10). Fraud risk is a separate weighted score; ≥ 60 forces fraud unit referral and blocks the low-touch path.</p>
+      <p>STP = (policy_in_force × 0.25) + (coverage_clear × 0.20) + (doc_completeness × 0.20) + (identity_verified × 0.15) + (fraud_inverse × 0.10) + (amount_in_band × 0.10). Fraud risk is a separate weighted score; ≥ 60 forces fraud unit referral and blocks the low-touch path. These weights are informed heuristics, not a fitted model — recalibrated by the feedback flywheel once labeled outcomes exist.</p>
     </div>
     <div class="decision-item">
       <div class="decision-num">Decision 06</div>

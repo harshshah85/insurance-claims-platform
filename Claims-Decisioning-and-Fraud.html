@@ -65,6 +65,8 @@ STP = (policy_in_force × 0.25)<br>
   <tr><td><strong>amount_in_band</strong></td><td>0.10</td><td>100 if face/benefit ≤ the auto-approval limit; decays above it (large amounts always get a human)</td></tr>
 </table>
 
+<div class="note"><strong>These weights are a starting point, not a fitted result.</strong> The two-decimal weights here (and the fraud weights below) and the 85/65/40 tier cut-offs are <em>informed heuristics</em> set with adjudicators — there is no labeled outcome history to fit them to at launch, and presenting them as anything more would overclaim. They are chosen to be robust: the decision is insensitive to small weight changes near the 85 boundary, because the hard guardrails — not the soft weights — do the decisive gating. As labeled outcomes accumulate, the feedback flywheel recalibrates both the weights and the thresholds against the false-auto rate and the fraud-unit hit rate tracked in §6.</div>
+
 <h3>Decision tiers</h3>
 <table>
   <tr><th>STP Score</th><th>Tier</th><th>Path</th></tr>
@@ -106,6 +108,8 @@ Fraud = (velocity × 0.25)<br>
   <tr><td>60 – 84</td><td><span class="tier t-cx">HIGH</span></td><td><strong>fraud unit referral</strong> (<code>SiuReferred</code>); claim blocked from any automated path; payment hold applied</td></tr>
   <tr><td>≥ 85</td><td><span class="tier t-cx">CRITICAL</span></td><td>Immediate fraud unit + compliance notification; payment hard-held pending <code>SiuCleared</code></td></tr>
 </table>
+
+<div class="note"><strong>Why some signals are counted more than once — on purpose.</strong> Contestability appears in three places: it lowers <code>coverage_clear</code> in the STP score, it is the <code>contestability_proximity</code> factor in the fraud score, and it is a hard guardrail that forces the claim out of the low-touch path. Fraud appears twice: the soft <code>fraud_inverse</code> factor and the hard gate at 60. The layering is intentional, and the two layers do different jobs — the <strong>soft factors shape queue routing among the non-gated claims</strong>, while the <strong>hard guardrails decide eligibility for automation at all</strong>. The gates do the decisive work (a claim at fraud 60 is forced out regardless of STP, so the soft <code>fraud_inverse</code> haircut is nearly inert by comparison); the soft couplings add resolution to <em>where</em> a borderline claim routes, not a second veto. We keep them because routing quality and automation-eligibility are genuinely separate concerns.</div>
 
 <h1><span class="n">3</span> Rules First, ML Later</h1>
 <table>

@@ -39,6 +39,10 @@
   <div class="byline">Prepared by Harsh Shah &nbsp;|&nbsp; June 2026</div>
 </div>
 
+<div class="note">
+  <strong>You can't run what you can't see — and an event-sourced platform sees more than most.</strong> This doc sets what we watch and why it matters: the usual metrics, logs, and traces, plus a fourth pillar that only event sourcing gives you — full event lineage, the <code>correlationid</code>/<code>causationid</code> chain that replays exactly how any decision or payment came to be. You'll get the SLOs, the alert routing, the money-movement watch metrics, and the blameless incident process. The throughline: the same log that is the system of record is also the best observability tool on the platform.
+</div>
+
 <h1><span class="n">1</span> The Three Pillars + the Fourth</h1>
 
 <div class="pillar"><h3>Metrics — what is happening right now?</h3><p>Throughput per topic, consumer lag, processor latency, API latency/error rate, STP rate, payment success rate. Collected every 60s. Used for SLO burn-rate alerting and capacity planning.</p></div>

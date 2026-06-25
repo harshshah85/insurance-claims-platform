@@ -65,7 +65,7 @@
 <div class="note">The progression is deliberate and one-directional: we only let the model decide a class of claims once its recommendations have been right, at volume, against human reviewers — and the hard guardrails (contestability, fraud, OFAC, amount limits) and the human-authored-denial rule stay in force at every stage. Moving a claim class from "recommend" to "decide" is an explicit, governed step, not a default.</div>
 
 <h1><span class="n">2</span> Agent Topology</h1>
-<h2>A supervisor orchestrator per claim, fanning out to single-responsibility specialist agents that mirror the bounded contexts. Every agent subscribes to events and emits events — so every AI action lands in the log and is auditable forever.</h2>
+<h2>A supervisor orchestrator per claim, fanning out to single-responsibility specialist agents that map onto the contexts they serve. Every agent subscribes to events and emits events — so every AI action lands in the log and is auditable forever.</h2>
 
 <div class="flow">
 <span class="b">FNOL + uploaded documents</span>  ─►  <span class="ai">Orchestrator</span> <span class="m">(one run per claim)</span>
@@ -119,7 +119,7 @@
 
 <table>
   <tr><th>Tier</th><th>What the AI does</th><th>The human gate</th></tr>
-  <tr><td><span class="tier t-auto">AUTO &nbsp;≥ 85</span></td><td>Prepares the full packet; rules + scores make the auto-ticket call inside the guardrails</td><td><strong>No per-claim human.</strong> But: a confidence floor is required, the AI can never deny, and a <strong>sampled share is pulled for human QA</strong> to catch drift</td></tr>
+  <tr><td><span class="tier t-auto">AUTO &nbsp;≥ 85</span></td><td>Prepares the packet for the audit trail; the <strong>deterministic</strong> STP rules + guardrails make the auto-ticket call — the model's own judgment does not approve or gate this lane</td><td><strong>No per-claim human.</strong> The floor here is the <em>deterministic</em> STP threshold and the hard guardrails, not a model confidence; the AI can never deny; and a <strong>sampled share is pulled for human QA</strong> to catch drift. (Agent-extracted facts can feed the deterministic gate that <em>demotes</em> a claim out of AUTO, but the model never approves one into it.)</td></tr>
   <tr><td><span class="tier t-assist">ASSISTED &nbsp;65–84</span></td><td>Delivers a complete decision packet — recommendation, evidence, citations, confidence</td><td><strong>One-click confirm or correct.</strong> This is the core "review the AI's findings, then approve" loop</td></tr>
   <tr><td><span class="tier t-std">STANDARD &nbsp;40–64</span></td><td>Copilot — extracts, summarizes, surfaces the facts and the score breakdown</td><td>Human adjudicates fully; the AI is assist-only</td></tr>
   <tr><td><span class="tier t-cx">COMPLEX / fraud unit &nbsp;&lt; 40</span></td><td>Assembles the narrative and the evidence pack</td><td>Senior adjudicator / investigator decide; the AI never automates any part</td></tr>

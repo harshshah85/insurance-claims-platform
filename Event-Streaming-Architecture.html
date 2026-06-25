@@ -104,7 +104,7 @@
     <tr><td><code>policy.snapshot.v1</code></td><td>Event (CDC)</td><td>policy_id</td><td>24</td><td>compact</td><td>Policy Admin CDC: in-force, coverage, contestability, beneficiaries</td></tr>
     <tr><td><code>party.identity.v1</code></td><td>Event</td><td>party_id</td><td>12</td><td>compact</td><td>Claimant / beneficiary identity verification results</td></tr>
     <tr><td><code>di.benefit.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>7y retain · tiered</td><td>DI recurring benefit periods, recertification, return-to-work, offsets</td></tr>
-    <tr><td><code>correspondence.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>90d delete</td><td>Inbound &amp; outbound correspondence facts across all channels</td></tr>
+    <tr><td><code>correspondence.v1</code></td><td>Event</td><td>claim_id</td><td>12</td><td>7y retain · tiered</td><td>Inbound &amp; outbound correspondence facts across all channels — including the <code>CorrespondenceDelivered</code> proof that a regulated notice (e.g. a denial letter with appeal rights) reached the claimant within statute</td></tr>
     <tr><td><code>payment.disbursement.v1</code></td><td>Event</td><td>payment_id</td><td>12</td><td>7y retain · tiered</td><td>Money-movement saga events: scheduled → held → settled / failed</td></tr>
     <tr><td><code>cmd.adjudicate.v1</code></td><td>Command</td><td>claim_id</td><td>12</td><td>3d delete</td><td>Requests to (re)run adjudication for a claim</td></tr>
     <tr><td><code>cmd.disburse.v1</code></td><td>Command</td><td>payment_id</td><td>6</td><td>3d delete</td><td>Idempotent disbursement commands into the payment saga</td></tr>
@@ -114,14 +114,18 @@
 
   <div class="note"><strong>Why <code>claim_id</code> keying matters:</strong> partitioning on <code>claim_id</code> guarantees per-claim ordering — every event for one claim lands on one partition and is processed in sequence. This is what makes the event-sourced aggregate deterministic. Cross-claim ordering is never assumed.</div>
 
+  <div class="note"><strong>Two retention notes worth calling out.</strong> <code>correspondence.v1</code> is decision-grade, not churn: it carries the delivery-confirmation facts that <em>prove</em> a regulated notice reached the claimant on time, the exact thing a market-conduct exam asks for years later — so it sits on the 7-year tiered horizon, not a 90-day window (the bulky letter bodies stay in the ECM/object store; Kafka keeps only the thin facts, so long retention is cheap). And <code>claims.fnol.v1</code> is a short-retention <em>intake buffer</em>: a correlation id chased back to it after a week finds nothing, by design — the durable origin of every claim's chain is the re-emitted <code>FnolCaptured</code> on the ∞-retained <code>claims.lifecycle.v1</code>.</div>
+
   <div class="note accent"><strong>Cleanup policy follows the topic's role.</strong> The event-sourced log and the fact / audit streams (<code>claims.lifecycle</code>, <code>claims.decision</code>, <code>di.benefit</code>, <code>payment.disbursement</code>) use <em>time/size retention on tiered storage</em> — the full history has to stay replayable, so they are <strong>never compacted</strong>. Compaction is reserved for <em>latest-state</em> topics — <code>policy.snapshot.v1</code> (current policy state per <code>policy_id</code>) and <code>party.identity.v1</code> (current verified identity per <code>party_id</code>) — where only the newest value per key matters. Compacting an append-only log would silently discard the very history event sourcing depends on.</div>
 
   <h3>Agentic decisioning topic — a derived advisory stream</h3>
   <p>The agent workers publish their analysis and recommendations to a dedicated topic. By design it is a <strong>derived stream</strong> — separate from the system-of-record topics the same way CQRS read models are derived from the log — so the canonical decision still lands on <code>claims.decision.v1</code>, signed by a human (or by the rules on the auto-ticket lane). It sits alongside the 14 core topics rather than inside them, by intent.</p>
   <table>
     <tr><th>Topic</th><th>Class</th><th>Key</th><th>Partitions</th><th>Retention / Cleanup</th><th>Purpose</th></tr>
-    <tr><td><code>claims.ai.v1</code></td><td>Event (advisory)</td><td>claim_id</td><td>12</td><td>90d delete</td><td>LLM analysis, proposed decision packets (rationale + citations + confidence), and escalation/abstention events. Consumed by adjudicator worklists; never auto-decides or moves money.</td></tr>
+    <tr><td><code>claims.ai.v1</code></td><td>Event (advisory)</td><td>claim_id</td><td>12</td><td>∞ retain · tiered</td><td>LLM analysis, proposed decision packets (rationale + citations + confidence), and escalation/abstention events. Consumed by adjudicator worklists; never auto-decides or moves money.</td></tr>
   </table>
+
+  <div class="note"><strong>The advisory stream gets the same governance as the facts.</strong> The agent event types (<code>DecisionProposed</code>, <code>EscalatedToManualReview</code>, and the rest) are Avro under the Schema Registry with <code>BACKWARD_TRANSITIVE</code> enforced in CI, exactly like the 36-event catalog — because these are precisely what an AI-governance audit replays to answer "what did the model suggest, and who decided?" For the same reason the topic is <strong>long-retained on tiered storage, never pruned at 90 days</strong>: it keeps the AI reasoning preserved for the life of the claim, matching the "every recommendation is itself an event, answerable forever" promise on the AI-Assisted and Security pages.</div>
 
   <!-- 3. EVENT CONTRACTS & SCHEMA EVOLUTION -->
   <div class="page-break"></div>

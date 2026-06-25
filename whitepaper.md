@@ -16,7 +16,7 @@ A lot of "AI in claims" projects bolt a model onto a system that overwrites its 
 
 So I built the opposite. It's a vendor-neutral reference architecture for a Life & Disability claims platform where the event log is the system of record, and the AI is an advisory layer sitting on top. The agents do the reading and reasoning. Humans make the call.
 
-It's fully written up and live — 12 docs covering the event backbone, the agentic decisioning layer, security and regulation, money movement, resilience, and the cost model. The white paper below is the short version.
+It's fully written up and live — 13 docs covering the event backbone, the agentic decisioning layer, security and regulation, money movement, resilience, and the cost model. The white paper below is the short version.
 
 🔗 https://harshshah85.github.io/insurance-claims-platform/
 
@@ -90,10 +90,10 @@ One honest note from the cost model: at realistic volumes, the infrastructure is
 
 It's a vendor-neutral reference architecture. Open patterns only — event sourcing, CQRS, saga, outbox, change-data-capture, Avro with a schema registry — and no product logos. I used Life & Disability as the worked example on purpose, because the specifics (contestability, beneficiary identity, recertification, regulated money movement) are what keep a design honest instead of abstract.
 
-It's all written up and live: the L1/L2 diagrams, the event-streaming backbone, the domain model, decisioning and fraud, the AI-assisted layer, security and regulatory compliance, correspondence and money movement, observability, resilience and disaster recovery, the cost model, the decision records, and a glossary.
+It's all written up and live: the L1/L2 diagrams, the event-streaming backbone, the domain model, decisioning and fraud, the AI-assisted layer, security and regulatory compliance, correspondence and money movement, observability, resilience and disaster recovery, the onboarding workflow, the cost model, the decision records, and a glossary.
 
 **The whole thing is here:** https://harshshah85.github.io/insurance-claims-platform/
 
 ---
 
-*I'm [Harsh Shah](https://harshshah85.github.io/about-me/). I design event-driven and AI-assisted platforms for regulated domains. This one is a humanal build, done on my own time, and I'd genuinely like to hear where people who've shipped claims, payments, or event-sourced systems at scale would push back. What would you change?*
+*I'm [Harsh Shah](https://harshshah85.github.io/about-me/). I design event-driven and AI-assisted platforms for regulated domains. This one is a personal build, done on my own time, and I'd genuinely like to hear where people who've shipped claims, payments, or event-sourced systems at scale would push back. What would you change?*

@@ -127,6 +127,22 @@
   <div class="decision"><span class="winner">Decision:</span> The LLM produces analysis + a recommended decision with cited detail; a <strong>human is the decision-maker</strong> on every AI-touched claim, and the deterministic auto-ticket lane stays rule-decided. A claim class moves from "recommend" to "AI decides" only once the model has proven out against human reviewers — a deliberate, governed, one-directional step. Hard guardrails and the human-authored-denial rule hold at every stage. (Extends ADR-06; see AI-Assisted &amp; Agentic Decisioning.)</div>
 </div>
 
+<div class="adr">
+  <h3>ADR-08 — Kafka as the system of record vs. a database of record <span class="status">ACCEPTED</span></h3>
+  <p class="ctx"><strong>Context:</strong> ADR-01 chose event sourcing and ADR-04 chose Kafka as the log technology — but one prior question is load-bearing and easy to leave implicit: <em>is the durable system of record the Kafka log itself, or a database, with Kafka only the streaming backbone in front of it?</em> The whole platform leans on the first answer ("the log <em>is</em> the truth"), so the trade-off deserves to be written down, not backed into.</p>
+  <table>
+    <tr><th>Dimension</th><th class="winner">Kafka as system of record</th><th>Database of record + Kafka backbone</th></tr>
+    <tr><td>Ordering &amp; history</td><td>Native — partition order <em>is</em> claim order; replay is first-class</td><td>Modeled with sequence/version columns; replay means querying then re-publishing</td></tr>
+    <tr><td>Audit story</td><td>The log is the audit record directly</td><td>Audit is a query over an events table — fine, but one more layer</td></tr>
+    <tr><td>Durability vs. total cluster loss</td><td>Needs an explicit off-cluster path (async replica + object storage)</td><td>Mature DB backup / point-in-time-restore tooling</td></tr>
+    <tr><td>Operational dependency</td><td>Writes block if Kafka is unhealthy</td><td>DB write succeeds independently; Kafka can lag or restart</td></tr>
+    <tr><td>Two-systems-in-sync burden</td><td>None — one source of truth</td><td>Real — the outbox now sits on the <em>critical write path</em>, not just the edges</td></tr>
+    <tr><td>Real-time reaction (fraud, STP, agents)</td><td>Native — everything is already a stream</td><td>A CDC hop before processors can react</td></tr>
+    <tr><td>Regulator / auditor familiarity</td><td>Lower (a streaming log)</td><td>Higher (SQL)</td></tr>
+  </table>
+  <div class="decision"><span class="winner">Decision:</span> <strong>Kafka is the system of record.</strong> For a platform whose dominant workload is many independent processors reacting to claim events in real time — fraud scoring, STP, projectors, agents — the streaming-native shape fits far better than a database-first design, and it removes the two-systems-in-sync burden from the hot path. But the choice <em>buys an obligation</em>: the off-cluster durability story is no longer optional. The cross-region replica and object-storage backup in <strong>Resilience &amp; Disaster Recovery</strong> are not a nice-to-have — they are the other half of this decision.</div>
+</div>
+
 <h1>Decision Status Legend</h1>
 <table>
   <tr><th>Status</th><th>Meaning</th></tr>
@@ -135,7 +151,7 @@
   <tr><td>SUPERSEDED</td><td>Replaced by a later ADR (linked)</td></tr>
 </table>
 
-<div class="note"><strong>How these connect:</strong> ADR-01 (event sourcing) makes ADR-04 (Kafka as log of record) almost forced. ADR-02/03 (choreography + saga) follow from having an event log. ADR-05 keeps it safe over time. ADR-06 keeps it defensible to regulators, and ADR-07 extends that same discipline to the LLM/agent layer — AI advises, humans decide, autonomy is earned. The decisions reinforce each other — which is the point of recording them together.</div>
+<div class="note"><strong>How these connect:</strong> ADR-01 (event sourcing) makes ADR-04 (Kafka as log of record) almost forced. ADR-02/03 (choreography + saga) follow from having an event log. ADR-05 keeps it safe over time. ADR-06 keeps it defensible to regulators, and ADR-07 extends that same discipline to the LLM/agent layer — AI advises, humans decide, autonomy is earned. ADR-08 names the choice that ADR-01 and ADR-04 quietly assume — Kafka <em>is</em> the record — and makes the off-cluster durability posture in Resilience &amp; Disaster Recovery the explicit other half of it. The decisions reinforce each other — which is the point of recording them together.</div>
 
 </div>
 
