@@ -9,6 +9,7 @@
   // Reading order (matches the index card order). [file, label]
   var ORDER = [
     ["Architecture-Diagrams-L1-L2.html",        "L1 & L2 Architecture Diagrams"],
+    ["Event-Driven-Decision-Records.html",      "Event-Driven Decision Records"],
     ["Event-Streaming-Architecture.html",       "Event Streaming Architecture"],
     ["Claims-Domain-Model.html",                "Claims Domain Model"],
     ["Claims-Decisioning-and-Fraud.html",       "Claims Decisioning & Fraud"],
@@ -18,8 +19,7 @@
     ["Observability-Monitoring.html",           "Observability & Monitoring"],
     ["Resilience-and-Disaster-Recovery.html",   "Resilience & Disaster Recovery"],
     ["FinOps-Cost-Model.html",                  "FinOps & Cost Architecture"],
-    ["Claims-Onboarding-Workflow.html",         "Claims Onboarding Workflow"],
-    ["Event-Driven-Decision-Records.html",      "Event-Driven Decision Records"]
+    ["Claims-Onboarding-Workflow.html",         "Claims Onboarding Workflow"]
   ];
 
   function themeToggle() {
