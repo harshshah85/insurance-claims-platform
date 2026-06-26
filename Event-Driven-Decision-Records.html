@@ -143,6 +143,17 @@
   <div class="decision"><span class="winner">Decision:</span> <strong>Kafka is the system of record.</strong> For a platform whose dominant workload is many independent processors reacting to claim events in real time — fraud scoring, STP, projectors, agents — the streaming-native shape fits far better than a database-first design, and it removes the two-systems-in-sync burden from the hot path. But the choice <em>buys an obligation</em>: the off-cluster durability story is no longer optional. The cross-region replica and object-storage backup in <strong>Resilience &amp; Disaster Recovery</strong> are not a nice-to-have — they are the other half of this decision.</div>
 </div>
 
+<div class="adr">
+  <h3>ADR-09 — Claim identity: minted at intake (command-side) vs. assigned downstream <span class="status">ACCEPTED</span></h3>
+  <p class="ctx"><strong>Context:</strong> at First Notice of Loss there is no claim yet — so the very first event has nothing to key on, which is a real problem when events are keyed by their aggregate's id. Worse, the <em>same</em> loss can arrive twice: a network retry, or a client and their advisor both reporting it. Event sourcing needs the creating event to carry the claim's identity, and the log must never sprout duplicate claims for one loss.</p>
+  <table>
+    <tr><th>Option</th><th>Pros</th><th>Cons</th></tr>
+    <tr><td class="winner">Mint command-side, at intake</td><td>The creating event is self-identifying; the claimant gets a reference number synchronously; no downstream round-trip before the log can be written</td><td>Intake gains a small stateful dependency — a claim-number allocator — so it isn't purely stateless</td></tr>
+    <tr><td>Let a downstream consumer / DB assign the id</td><td>Keeps intake trivially stateless</td><td>The first event <em>can't</em> be keyed by <code>claim_id</code>; you'd key on a throwaway token and re-key later — re-partitioning the log and breaking the "events are immutable, keyed by their aggregate" rule</td></tr>
+  </table>
+  <div class="decision"><span class="winner">Decision:</span> The <strong>Intake API mints the <code>claim_id</code></strong> (<code>CLM-YYYY-NNNNNN</code>, from a claim-number allocator) at the instant the claim is created, emits <code>ClaimNotified</code> keyed by it, and returns it to the claimant as their reference — identity is assigned <strong>command-side, before the first event is published</strong>, never by a downstream consumer. FNOL idempotency is handled <em>before</em> the claim exists: every intake carries an <strong>idempotency key</strong> — a client request token, plus a natural key of <code>policy + claimant + loss-type + loss-date</code>. A true <strong>retry</strong> of the same request token is deduplicated deterministically and returns the <em>existing</em> <code>claim_id</code>; a <strong>same-loss-from-two-channels</strong> match on the natural key is only <em>flagged as a suspected duplicate for human review</em>, never silently merged — because auto-merging two independently-reported claims is the kind of guess that burns a claimant. The dedup state is itself a <strong>compacted Kafka topic keyed by the intake key</strong> (<code>claims.intake.dedup</code>), so it survives failover by replay — the same derive-don't-side-store argument used for payment idempotency in <strong>Resilience &amp; Disaster Recovery</strong>.</div>
+</div>
+
 <h1>Decision Status Legend</h1>
 <table>
   <tr><th>Status</th><th>Meaning</th></tr>
@@ -151,7 +162,7 @@
   <tr><td>SUPERSEDED</td><td>Replaced by a later ADR (linked)</td></tr>
 </table>
 
-<div class="note"><strong>How these connect:</strong> ADR-01 (event sourcing) makes ADR-04 (Kafka as log of record) almost forced. ADR-02/03 (choreography + saga) follow from having an event log. ADR-05 keeps it safe over time. ADR-06 keeps it defensible to regulators, and ADR-07 extends that same discipline to the LLM/agent layer — AI advises, humans decide, autonomy is earned. ADR-08 names the choice that ADR-01 and ADR-04 quietly assume — Kafka <em>is</em> the record — and makes the off-cluster durability posture in Resilience &amp; Disaster Recovery the explicit other half of it. The decisions reinforce each other — which is the point of recording them together.</div>
+<div class="note"><strong>How these connect:</strong> ADR-01 (event sourcing) makes ADR-04 (Kafka as log of record) almost forced. ADR-02/03 (choreography + saga) follow from having an event log. ADR-05 keeps it safe over time. ADR-06 keeps it defensible to regulators, and ADR-07 extends that same discipline to the LLM/agent layer — AI advises, humans decide, autonomy is earned. ADR-08 names the choice that ADR-01 and ADR-04 quietly assume — Kafka <em>is</em> the record — and makes the off-cluster durability posture in Resilience &amp; Disaster Recovery the explicit other half of it. ADR-09 settles where a claim's identity comes from, so the very first event (<code>ClaimNotified</code>) can be keyed by it at all — the unglamorous prerequisite the other decisions assume. The decisions reinforce each other — which is the point of recording them together.</div>
 
 </div>
 

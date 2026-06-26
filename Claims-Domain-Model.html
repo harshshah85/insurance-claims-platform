@@ -160,7 +160,7 @@
 <h3>Property / data-type registry (selected)</h3>
 <table>
   <tr><th>Type</th><th>Format</th><th>Notes</th></tr>
-  <tr><td><code>claim_id</code></td><td>CLM-YYYY-NNNNNN</td><td>Platform-assigned; the canonical aggregate &amp; partition key</td></tr>
+  <tr><td><code>claim_id</code></td><td>CLM-YYYY-NNNNNN</td><td>Minted <strong>command-side</strong> by the Intake API at claim creation (the <code>ClaimNotified</code> event) and returned to the claimant as their reference; the canonical aggregate &amp; partition key — never assigned by a downstream consumer. See ADR-09.</td></tr>
   <tr><td><code>policy_id</code></td><td>External (Policy Admin)</td><td>Foreign key into the golden record; never minted here</td></tr>
   <tr><td><code>money</code></td><td>minor units + ISO-4217</td><td>Integer cents + currency; never a float</td></tr>
   <tr><td><code>ssn</code> / medical</td><td>vault token</td><td>Tokenized at the edge; raw value only in the access-controlled vault</td></tr>

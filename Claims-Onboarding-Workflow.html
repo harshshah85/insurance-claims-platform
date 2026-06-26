@@ -63,7 +63,7 @@
 
 <div class="flow">
 <span class="b">Channel</span> (client / advisor / rep / IVR / mail) ─► <span class="g">Intake API</span>
-   │  <span class="m">[auto] capture FNOL, attach channel, emit FnolCaptured (via outbox)</span>
+   │  <span class="m">[auto] check intake idempotency key → mint claim_id (allocator) → emit ClaimNotified, then FnolCaptured (channel attached, via outbox)</span>
    ▼
 <span class="g">Policy Resolution</span>
    ├─ resolved ──► <span class="y">PolicyResolved</span> + CoverageConfirmed + ContestabilityFlagged?  <span class="m">[auto]</span>
@@ -78,6 +78,8 @@
    ├─ STP ≥ 85 &amp; fraud &lt; 60 &amp; non-contestable ─► <span class="g">AUTO / low-touch ticket</span>
    └─ else ─► <span class="r">human queue</span> (assisted / standard / SIU)
 </div>
+
+<div class="note"><strong>There's no claim_id until intake makes one.</strong> At First Notice of Loss the claim doesn't exist yet, so the Intake API <strong>mints the <code>claim_id</code> command-side</strong> the moment it creates the claim — emitting <code>ClaimNotified</code> keyed by that id (so the first event is self-identifying) and handing the number back to the claimant as their reference. Duplicate-FNOL protection happens <em>before</em> the id is minted, on an intake idempotency key: a genuine <strong>retry</strong> (same request token) returns the existing claim, while the <strong>same loss reported through two channels</strong> (matched on policy + claimant + loss-type + loss-date) is <em>flagged as a suspected duplicate for a human</em>, not auto-merged. (See ADR-09.)</div>
 
 <h3>Automated vs. manual at intake</h3>
 <table>
