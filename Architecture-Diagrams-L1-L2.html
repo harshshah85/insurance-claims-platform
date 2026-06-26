@@ -132,6 +132,11 @@
     <p>Add <strong>ML</strong> for fraud and STP soft-factors <em>once there is enough labeled claims history to train on</em> — typically a stretch of real operations, not a date on a plan. The same stage introduces the <strong>LLM / agent assist layer</strong>: models read documents, reconcile facts, and draft a recommended decision with cited detail for a human to approve — and only graduate to deciding clean claims once proven against human reviewers. Hard guardrails (contestability, OFAC, limits) stay as rules, and a human stays the decision-maker until the model has earned more. This stage is optional and gated on data and proof, never on a calendar. (See <a href="AI-Agentic-Decisioning.html">AI-Assisted &amp; Agentic Decisioning</a>.)</p>
   </div>
 
+  <div class="roadmap-phase" style="border-left-color:#64748b;">
+    <h3>Stage E — Migration &amp; legacy coexistence <span style="font-weight:400;color:#64748b;">(// TODO — unsolved)</span></h3>
+    <p>Everything above assumes greenfield. The honest enterprise version starts from a <strong>strangler</strong>: route every <em>new</em> claim here, leave the old system running its existing book, and deliberately <strong>don't bulk-migrate the back catalog</strong> — closed and historical claims age out and die in legacy. The open questions this reference architecture doesn't yet answer: the <strong>work-in-progress claims at cutover</strong> (drain-in-place vs. synthetic-replay into the log — and a DI claim can stay open for <em>years</em>, so draining can keep legacy alive far longer than you'd like); <strong>how the two stay consistent</strong> during the dual-run (system-of-record per claim, reconciliation, and statutory prompt-pay clocks that must not pause because a claim straddles two systems); and a <strong>read-bridge</strong> back to legacy, since a new claim can still reference an old one. See the home page's <em>Open Questions</em> for the full enterprise list.</p>
+  </div>
+
   <h3>Why this order</h3>
   <table>
     <tr><th>Principle</th><th>Rationale</th></tr>

@@ -94,6 +94,31 @@ It's all written up and live: the L1/L2 diagrams, the event-streaming backbone, 
 
 **The whole thing is here:** https://harshshah85.github.io/insurance-claims-platform/
 
+## The part I haven't solved — migration
+
+Greenfield is the easy version. The honest, hard version is the one every enterprise actually faces: you already have a claims system, with real claims in it, and you can't just turn it off.
+
+The shape I'd start from is a strangler — send every *new* claim to the new platform and leave the old system running its existing book, so the new design earns trust on real work without a big-bang cutover. I'd also make a deliberate, slightly uncomfortable choice: **don't bulk-migrate the back catalog.** Closed and historical claims can stay where they are and quietly age out. Lifting years of legacy data into a pristine event log is mostly risk for very little reward — let them die in place.
+
+But that's where the easy answers stop, and the //TODO begins.
+
+- **The claims caught mid-flight.** At cutover, some claims are open. Do you let the old system finish what it started (drain-in-place), or replay synthetic events to rebuild their history in the new log and carry them over? Neither is clean — and a disability-income claim can stay open for *years*, which means "let legacy finish its in-flight work" can quietly commit you to keeping the old system alive long after you wanted it gone.
+- **"Let it die in legacy" still needs a door back in.** A brand-new claim can reach for an old one — a beneficiary contesting a prior decision, a new DI claim that leans on prior history. So even claims you never migrate have to stay *readable* from the new platform. Dying in place isn't the same as disappearing.
+- **Staying consistent while both are alive.** For the whole dual-run, which system is the source of truth for a given claim? How do the two reconcile so a payment or a status never disagrees across them? And the one that would keep me up at night: the statutory prompt-pay clock can't pause or reset just because a claim straddles two systems — the regulator doesn't care that you're mid-migration.
+
+## And the rest of what an enterprise would still need
+
+Migration is the biggest gap, but it isn't the only one. If this were heading for production instead of a portfolio, the honest next list looks like:
+
+- **Sign-off on the AI, not just the architecture** — a formal model-risk review, bias and fairness testing, and compliance approval before any class of claims is ever allowed to graduate from "recommend" to "decide."
+- **Erasure that reaches both systems** — during coexistence, a right-to-be-forgotten request has to crypto-shred a person across the new platform *and* the legacy one. A half-honored erasure is worse than none.
+- **Paying for two systems at once** — a dual-run means funding both platforms through the overlap, an unglamorous line item that sinks more migrations than any technical problem.
+- **Identity, access, and the agents' own credentials** — enterprise SSO, real entitlements for adjusters, SIU, and treasury, and scoped service identities for the agent workers themselves.
+- **Who owns the schemas** — event contracts become a shared asset the moment more than one team depends on them, and someone has to govern how they evolve.
+- **Reporting that spans the seam** — regulatory and financial reporting, right down to tax forms, has to read as one book across both systems for as long as the migration lasts.
+
+None of these are reasons not to build it. They're the difference between a reference architecture and a production system — and I'd rather name them out loud than pretend the diagram is the whole job.
+
 ---
 
 *I'm [Harsh Shah](https://harshshah85.github.io/about-me/). I design event-driven and AI-assisted platforms for regulated domains. This one is a personal build, done on my own time, and I'd genuinely like to hear where people who've shipped claims, payments, or event-sourced systems at scale would push back. What would you change?*

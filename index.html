@@ -379,6 +379,44 @@
   </div>
 </div>
 
+<!-- OPEN QUESTIONS / TODO -->
+<div class="wrap section" style="padding-top:0;">
+  <h2 style="font-size:17px;font-weight:700;color:var(--ink);margin-bottom:8px;">// TODO — Open Questions an Enterprise Still Has to Answer</h2>
+  <p style="color:var(--muted);line-height:1.65;margin:0 0 20px;max-width:760px;">Greenfield is the easy version. The honest one is that an enterprise already has a claims system, full of real claims, that it can't just switch off. These are the parts this reference architecture deliberately leaves open — named on purpose, because the gap between a diagram and a production system is exactly this list.</p>
+  <div class="decision-grid">
+    <div class="decision-item">
+      <div class="decision-num">// TODO 01 · Migration</div>
+      <h3>Find the pattern to migrate the existing book</h3>
+      <p>The shape to start from is a strangler — send every <em>new</em> claim to the new platform and leave the old system running its existing book. And a deliberate, slightly uncomfortable choice: <strong>don't bulk-migrate the back catalog.</strong> Closed and historical claims can stay put and quietly age out — let them die in legacy. The unsolved part is the <strong>work-in-progress claims caught mid-flight at cutover</strong>: do you let the old system finish what it started (drain-in-place), or replay synthetic events to rebuild their history in the new log? Neither is clean — and a disability-income claim can stay open for <em>years</em>, so "let legacy finish" can quietly commit you to keeping the old system alive long after you wanted it gone.</p>
+    </div>
+    <div class="decision-item">
+      <div class="decision-num">// TODO 02 · Consistency</div>
+      <h3>How modern and legacy stay consistent across the seam</h3>
+      <p>While both systems are live, which one is the source of truth for a given claim? How do they reconcile so a status or a payment never disagrees between them? And the sharp one: the statutory <strong>prompt-pay clock can't pause or reset</strong> just because a claim straddles two systems — the regulator doesn't care that you're mid-migration.</p>
+    </div>
+    <div class="decision-item">
+      <div class="decision-num">// TODO 03 · Read-bridge</div>
+      <h3>"Die in legacy" still needs a door back in</h3>
+      <p>A brand-new claim can reach for an old one — a beneficiary contesting a prior decision, a new DI claim that leans on prior history. So even claims we never migrate have to stay <em>readable</em> from the new platform. Dying in place isn't the same as disappearing.</p>
+    </div>
+    <div class="decision-item">
+      <div class="decision-num">// TODO 04 · AI sign-off</div>
+      <h3>Govern the AI, not just the architecture</h3>
+      <p>A formal model-risk review, bias and fairness testing, and compliance approval before any class of claims is ever allowed to graduate from "recommend" to "decide." The autonomy step has to be earned in front of a governance body, not a dashboard.</p>
+    </div>
+    <div class="decision-item">
+      <div class="decision-num">// TODO 05 · Erasure</div>
+      <h3>Right-to-be-forgotten across both systems</h3>
+      <p>During coexistence, an erasure request has to crypto-shred a person in the new platform <em>and</em> the legacy one. A half-honored erasure is worse than none — so the deletion path has to span the seam too.</p>
+    </div>
+    <div class="decision-item">
+      <div class="decision-num">// TODO 06 · The enterprise tail</div>
+      <h3>The unglamorous rest of it</h3>
+      <p>Funding a <strong>dual-run</strong> (paying for two systems through the overlap — what sinks more migrations than any technical problem), enterprise <strong>SSO &amp; entitlements</strong> for adjusters, SIU, and treasury plus scoped service identities for the agent workers, <strong>schema/contract governance</strong> once more than one team depends on the events, and regulatory &amp; tax <strong>reporting that reads as one book</strong> across both systems for as long as the migration lasts.</p>
+    </div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer>
   <p>Event-Driven, AI-Assisted Claims Platform — Reference Architecture <span class="sep">|</span> <a href="https://harshshah85.github.io/about-me/" style="color:inherit">Harsh Shah</a> <span class="sep">|</span> June 2026</p>
